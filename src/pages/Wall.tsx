@@ -1,5 +1,5 @@
 import SocialCard from 'components/SocialCard'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 const socials = [
   {
@@ -22,9 +22,10 @@ const socials = [
 
 const PageWall = () => {
   const navigate = useNavigate()
+  const { id } = useParams()
 
   const createNewPost = () => {
-    navigate('/new/1')
+    navigate(`/new/${id}`)
   }
 
   return (
