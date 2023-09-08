@@ -19,13 +19,15 @@ import { Route, Routes } from 'react-router-dom'
 
 import PageIndex from 'pages'
 import PageEditor from 'pages/editor'
-import PageNft from 'pages/nft'
 import PageInventory from 'pages/inventory'
 import { ApiProvider } from 'hooks/use-api'
-import SignInModal from 'components/Modal/SignInModal'
 import PublicLayout from 'layouts/PublicLayout'
 import PageShareEditor from 'pages/share'
 import { Web3AuthProvider } from 'hooks/use-web3auth'
+import PageLogin from 'pages/Login'
+import PageDashboard from 'pages/Dashboard'
+import PageWall from 'pages/Wall'
+import PageNewPost from 'pages/NewPost'
 
 const App = () => {
   return (
@@ -34,11 +36,14 @@ const App = () => {
         <Routes>
           <Route element={<MainLayout children={undefined} />}>
             <Route path="/" element={<PageIndex />} />
-            <Route path="/nft" element={<PageNft />} />
             <Route path="/editor/:chainId/:tokenAddress/:tokenId/:version" element={<PageEditor />} />
             <Route path="/inventory" element={<PageInventory />} />
+            <Route path="/dashboard" element={<PageDashboard />} />
+            <Route path="/wall/:id" element={<PageWall />} />
           </Route>
           <Route element={<PublicLayout children={undefined} />}>
+            <Route path="/login" element={<PageLogin />} />
+            <Route path="/new/:id" element={<PageNewPost />} />
             <Route path="/shared/:chainId/:tokenAddress/:tokenId/:version" element={<PageShareEditor />} />
           </Route>
         </Routes>
@@ -88,7 +93,6 @@ export function Web3Wrapper({ children }: { children: React.ReactNode }) {
       <IpfsProvider>
         <AlertMessageProvider>{children}</AlertMessageProvider>
       </IpfsProvider>
-      <SignInModal />
     </WagmiConfig>
   )
 }
