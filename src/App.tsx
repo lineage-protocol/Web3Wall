@@ -31,24 +31,26 @@ import PageNewPost from 'pages/NewPost'
 
 const App = () => {
   return (
-    <Web3AuthProvider>
-      <ApiProvider>
-        <Routes>
-          <Route element={<MainLayout children={undefined} />}>
-            <Route path="/" element={<PageIndex />} />
-            <Route path="/editor/:chainId/:tokenAddress/:tokenId/:version" element={<PageEditor />} />
-            <Route path="/inventory" element={<PageInventory />} />
-            <Route path="/dashboard" element={<PageDashboard />} />
-            <Route path="/wall/:id" element={<PageWall />} />
-          </Route>
-          <Route element={<PublicLayout children={undefined} />}>
-            <Route path="/login" element={<PageLogin />} />
-            <Route path="/new/:id" element={<PageNewPost />} />
-            <Route path="/shared/:chainId/:tokenAddress/:tokenId/:version" element={<PageShareEditor />} />
-          </Route>
-        </Routes>
-      </ApiProvider>
-    </Web3AuthProvider>
+    <IpfsProvider>
+      <Web3AuthProvider>
+        <ApiProvider>
+          <Routes>
+            <Route element={<MainLayout children={undefined} />}>
+              <Route path="/" element={<PageIndex />} />
+              <Route path="/editor/:chainId/:tokenAddress/:tokenId/:version" element={<PageEditor />} />
+              <Route path="/inventory" element={<PageInventory />} />
+              <Route path="/dashboard" element={<PageDashboard />} />
+              <Route path="/wall/:id" element={<PageWall />} />
+            </Route>
+            <Route element={<PublicLayout children={undefined} />}>
+              <Route path="/login" element={<PageLogin />} />
+              <Route path="/new/:id" element={<PageNewPost />} />
+              <Route path="/shared/:chainId/:tokenAddress/:tokenId/:version" element={<PageShareEditor />} />
+            </Route>
+          </Routes>
+        </ApiProvider>
+      </Web3AuthProvider>
+    </IpfsProvider>
   )
 }
 

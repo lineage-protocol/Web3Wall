@@ -1,4 +1,5 @@
 import EventCard from 'components/EventCard'
+import { useGetSheets } from 'repositories/subgraph.repository'
 
 const items = [
   {
@@ -24,6 +25,9 @@ const items = [
 ]
 
 const PageDashboard = () => {
+  const { data: sheets } = useGetSheets({})
+  console.log(sheets)
+
   return (
     <div className="bg-yellow-100 h-screen">
       <div className="grid gap-3 p-3">

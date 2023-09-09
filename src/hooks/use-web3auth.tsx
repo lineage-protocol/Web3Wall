@@ -1,6 +1,6 @@
 import { SafeEventEmitterProvider } from '@web3auth/base'
 import { Web3Auth } from '@web3auth/modal'
-import { OpenloginAdapter } from '@web3auth/openlogin-adapter'
+import { OpenloginAdapter, OpenloginUserInfo } from '@web3auth/openlogin-adapter'
 import { TorusWalletAdapter } from '@web3auth/torus-evm-adapter'
 import { TorusWalletConnectorPlugin } from '@web3auth/torus-wallet-connector-plugin'
 import { createContext, useContext, useEffect, useState } from 'react'
@@ -12,8 +12,10 @@ interface Web3AuthContextInterface {
   torusAddress: string
   web3Auth: Web3Auth | null
   web3: Web3 | undefined
+  userInfo: Partial<OpenloginUserInfo> | undefined
   initWeb3AuthModal: () => Promise<void>
-  connectWeb3Auth: () => Promise<void>
+  connect: () => Promise<void>
+  disconnect: () => Promise<void>
   isConnected: () => boolean
   signMessage: (message: string) => Promise<{ signature: string; torusAddress: string } | undefined>
 }
@@ -40,6 +42,8 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
   const [torusAddress, setTorusAddress] = useState<string>('')
   const [web3, setWeb3] = useState<Web3>(new Web3())
   const [isInitiated, setIsInitiated] = useState<boolean>(false)
+
+  const [userInfo, setUserInfo] = useState<Partial<OpenloginUserInfo>>()
 
   async function initWeb3AuthModal(): Promise<void> {
     const MUMBAI_HEXADECIMAL_CHAIN_ID = parseInt(import.meta.env.VITE_DEFAULT_CHAIN_ID).toString(16)
@@ -104,15 +108,28 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
     await web3auth.initModal()
     setWeb3Auth(web3auth)
     setProvider(web3auth.provider)
+
+    const user = await web3auth?.getUserInfo()
+    if (user) setUserInfo(user)
+
     if (web3auth) setIsInitiated(true)
   }
 
-  async function connectWeb3Auth() {
+  async function connect() {
     if (web3Auth) {
       const provider = await web3Auth.connect()
       setProvider(provider)
+
+      const user = await web3Auth?.getUserInfo()
+      if (user) setUserInfo(user)
     }
   }
+
+  async function disconnect() {
+    if (web3Auth) await web3Auth.logout()
+    setUserInfo(undefined)
+  }
+
   async function signMessage(message: string) {
     if (!provider) {
       console.log('Provider not initialized yet')
@@ -148,13 +165,15 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
     <Web3AuthContext.Provider
       value={{
         initWeb3AuthModal,
-        connectWeb3Auth,
+        connect,
+        disconnect,
         signMessage,
         isConnected,
         web3Auth,
         torusAddress,
         web3,
         isInitiated,
+        userInfo,
       }}
     >
       {children}
