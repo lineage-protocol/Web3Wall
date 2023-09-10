@@ -70,7 +70,7 @@ const PageDashboard = () => {
 
   return (
     <div className="bg-yellow-100 h-screen">
-      <GenericButton className="ml-4 mt-4" name="Mint" onClick={() => openModal()} />
+      <GenericButton className="ml-4 mt-4" name="New Event" onClick={() => openModal()} />
       <div className="grid gap-3 p-3">
         {txs && txs.length > 0
           ? txs.map((item, index) => {

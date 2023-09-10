@@ -15,13 +15,14 @@ interface Props {
 const MintModal = (prop: Props) => {
   const navigate = useNavigate()
   const [file, setFile] = useState<File>()
+  const [imagePreview, setImagePreview] = useState('')
   const inputFileRef = useRef<HTMLInputElement>(null)
 
   const [mint, setMint] = useState({ name: '', image: '' })
   const { data: url, mutateAsync: storeBlob } = useStoreBlob()
 
   const onSelectMedia = () => {
-    return new Promise<void>(async (resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const filePicker = document.getElementById('image') as HTMLInputElement
 
       if (!filePicker || !filePicker.files || filePicker.files.length <= 0) {
@@ -31,6 +32,7 @@ const MintModal = (prop: Props) => {
 
       const pickedFile = filePicker.files[0]
       setFile(pickedFile)
+      setImagePreview(URL.createObjectURL(pickedFile))
       resolve()
     })
   }
@@ -53,11 +55,13 @@ const MintModal = (prop: Props) => {
       setIsLoading(false)
     }
 
-    if (file) upload()
-  }, [file])
+    if (file) {
+      upload()
+    }
+  }, [file, storeBlob])
 
   useEffect(() => {
-    async function setURL() {
+    function setURL() {
       setMint(prev => ({ ...prev, ['image']: `${url}` }))
     }
 
@@ -88,7 +92,7 @@ const MintModal = (prop: Props) => {
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
+            <div className="flex min-h-full items-center justify-center text-center">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -98,27 +102,62 @@ const MintModal = (prop: Props) => {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full text-center max-w-sm transform overflow-hidden rounded-2xl bg-white p-6 align-middle shadow-xl transition-all">
-                  <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
-                    Mint Event
-                  </Dialog.Title>
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500">Enter event name & upload desired logo</p>
-                  </div>
+                <Dialog.Panel className="w-full h-screen text-center transform overflow-hidden bg-white align-middle shadow-xl transition-all">
+                  <header className="bg-gray-50">
+                    <div className="px-4 py-2">
+                      <div className="">
+                        <div className="flex justify-between">
+                          <div className="relative flex items-center">
+                            <button onClick={() => closeDialog()} className="p-2.5 text-gray-600">
+                              Cancel
+                            </button>
+                          </div>
 
-                  <div className="flex flex-col justify-center items-center mt-2">
-                    <input type="text" name="name" value={mint.name} onChange={e => onInputChange(e)} />
-
-                    <div className="flex gap-5 justify-left p-3">
+                          {isLoading ? (
+                            <p className="block shrink-0 p-2.5">Processing...</p>
+                          ) : (
+                            <MintButton url={mint.image} name={mint.name} disabled={isLoading} />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </header>
+                  <div className="relative h-1/3 w-full">
+                    <img
+                      className="h-full w-full object-cover"
+                      src={
+                        imagePreview ||
+                        'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8YXZhdGFyfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60'
+                      }
+                    />
+                    <div className="absolute">
                       <GenericButton
                         onClick={() => {
                           inputFileRef?.current?.click()
                         }}
                         name="Media"
                         icon={<CameraIcon />}
-                        className=""
+                        className="absolute bottom-14 left-1"
                       />
+                    </div>
+                  </div>
 
+                  <div className="text-left mt-5 p-3">
+                    <label htmlFor="name" className="block text-2xl font-semi text-gray-500">
+                      Start creating your event!
+                    </label>
+
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Give your event a title"
+                      value={mint.name}
+                      onChange={e => onInputChange(e)}
+                      className="w-full p-0 text-xl border-none mt-5 text-gray-400"
+                    />
+                    <hr />
+
+                    <div className="flex gap-5 justify-left p-3">
                       <input
                         id="image"
                         ref={inputFileRef}
@@ -129,21 +168,6 @@ const MintModal = (prop: Props) => {
                         className="bg-gray-400 p-3 hidden"
                       />
                     </div>
-
-                    {file && (
-                      <>
-                        <label>Image name:</label>
-                        <p className="text-ellipsis overflow-hidden w-[260px]">{file.name}</p>
-                      </>
-                    )}
-                  </div>
-
-                  <div className="mt-4">
-                    {isLoading ? (
-                      <p>Uploading image...</p>
-                    ) : (
-                      <MintButton url={mint.image} name={mint.name} disabled={isLoading} />
-                    )}
                   </div>
                 </Dialog.Panel>
               </Transition.Child>

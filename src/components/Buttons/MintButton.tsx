@@ -69,7 +69,9 @@ const MintButton = (prop: Prop) => {
 
   return (
     <>
-      <GenericButton disabled={prop.disabled} name="Mint" onClick={() => onMint()} className="" />
+      <button onClick={() => onMint()} className="block shrink-0 p-2.5 font-semibold text-blue-600">
+        Create
+      </button>
     </>
   )
 }
