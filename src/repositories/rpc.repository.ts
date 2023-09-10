@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import rpc, { JSONRPCFilter, NftMetadata, Transaction } from '../services/rpc'
 import { useIpfs } from 'hooks/use-ipfs'
 import { RQ_KEY } from 'repositories'
+import { networkToChainId } from 'utils'
 
 const useGetCompleteTransactions = () => {
   return useQuery({
@@ -44,15 +45,15 @@ export async function parseString(input: string): Promise<DataTypeMetadata | Dat
   return { type: 'none', data: input }
 }
 
-const useGetTransactions = (data: JSONRPCFilter<Transaction> & { address: `0x${string}` | undefined }) => {
+const useGetTransactions = (data: JSONRPCFilter<Transaction> & { address?: `0x${string}` | undefined }) => {
   const { address, ...filter } = data
 
   return useQuery({
     queryKey: [RQ_KEY.GET_TXS],
     queryFn: async () => {
-      return await rpc.getTransactions(filter)
+      let result = await rpc.getTransactions(filter)
+      return result.map(el => ({ ...el, chain_id: networkToChainId(el.chain_id) }))
     },
-    //enabled: Boolean(data.address),
   })
 }
 

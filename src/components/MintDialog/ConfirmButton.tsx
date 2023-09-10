@@ -1,5 +1,5 @@
 import { usePrepareContractWrite, useContractWrite, useWaitForTransaction } from 'wagmi'
-import { ethers } from 'ethers'
+import { BigNumber } from '@ethersproject/bignumber'
 import { LoadingSpinner } from 'components/Icons/icons'
 import { useContext, useState } from 'react'
 import { AlertMessageContext } from 'hooks/use-alert-message'

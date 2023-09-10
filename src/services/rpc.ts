@@ -1,7 +1,7 @@
 import rpc from 'adapter/jsonrpc'
 import { formatDataKey } from 'utils'
 
-type RPCResponse<T> = {
+export type RPCResponse<T> = {
   id: string
   jsonrpc: '2.0'
   result: {
