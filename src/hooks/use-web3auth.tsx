@@ -18,6 +18,7 @@ interface Web3AuthContextInterface {
   disconnect: () => Promise<void>
   isConnected: () => boolean
   signMessage: (message: string) => Promise<{ signature: string; torusAddress: string } | undefined>
+  writeContract: (data: { abi: any; contractAddress: string; data: string[] }) => Promise<string>
 }
 
 interface Web3AuthProviderProps {
@@ -83,7 +84,7 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
     web3auth.configureAdapter(openloginAdapter)
 
     const torusplugin = new TorusWalletConnectorPlugin({
-      torusWalletOpts: { buttonSize: 0 },
+      torusWalletOpts: { buttonSize: 50, buttonPosition: 'bottom-left', modalZIndex: 99 },
       walletInitOptions: {
         whiteLabel: {
           theme: { isDark: true, colors: { primary: '#00a8ff' } },
@@ -153,6 +154,24 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
     return web3Auth?.status === 'connected'
   }
 
+  async function writeContract({ abi, contractAddress, data }: { abi: any; contractAddress: string; data: string[] }) {
+    const web3 = new Web3(web3Auth?.provider as any)
+    web3.setProvider(torusPlugin?.proxyProvider as any)
+
+    const fromAddress = (await web3.eth.getAccounts())[0]
+    const contract = new web3.eth.Contract(abi, contractAddress)
+
+    //@ts-ignore
+    const receipt = await contract.methods.mint(...data).send({
+      from: fromAddress,
+      gas: `${2_500_000_000}`,
+    })
+
+    return receipt?.transactionHash
+
+    console.log(receipt)
+  }
+
   useEffect(() => {
     async function init() {
       await initWeb3AuthModal()
@@ -168,6 +187,7 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
         connect,
         disconnect,
         signMessage,
+        writeContract,
         isConnected,
         web3Auth,
         torusAddress,

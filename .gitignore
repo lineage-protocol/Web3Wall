@@ -26,5 +26,4 @@ dist-ssr
 # environment variables
 .env
 
-# Build
 tsconfig.tsbuildinfo
