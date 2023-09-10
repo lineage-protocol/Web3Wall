@@ -61,15 +61,14 @@ const MintButton = (prop: Prop) => {
         },
       ]
 
-      let signedTx = await writeContract({
+      let hash = await writeContract({
         abi,
         contractAddress: `${import.meta.env.VITE_WEB3WALL_UTILITY}`,
         data: [prop.name, prop.url],
       })
 
-      if (signedTx) {
+      if (hash) {
         setModalState({ mint: { isOpen: false } })
-        navigate('/dashboard')
       }
     } catch (e: unknown) {
       console.log('e', e)

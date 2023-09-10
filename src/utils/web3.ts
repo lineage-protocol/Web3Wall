@@ -133,7 +133,8 @@ export default class EthereumRPC {
 
       try {
         const signedTx = await this.web3.eth.accounts.signTransaction(tx, privateKey)
-        return signedTx
+        const receipt = await this.web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+        return receipt.transactionHash
       } catch (e) {
         return null
       }

@@ -5,7 +5,7 @@ import { TorusWalletAdapter } from '@web3auth/torus-evm-adapter'
 import { TorusWalletConnectorPlugin } from '@web3auth/torus-wallet-connector-plugin'
 import { createContext, useContext, useEffect, useState } from 'react'
 import RPC from 'utils/web3'
-import Web3, { eth } from 'web3'
+import Web3, { Bytes, eth } from 'web3'
 
 interface Web3AuthContextInterface {
   isInitiated: boolean
@@ -18,11 +18,7 @@ interface Web3AuthContextInterface {
   disconnect: () => Promise<void>
   isConnected: () => boolean
   signMessage: (message: string) => Promise<{ signature: string; torusAddress: string } | undefined>
-  writeContract: (data: {
-    abi: any
-    contractAddress: string
-    data: string[]
-  }) => Promise<string | eth.accounts.SignTransactionResult | null>
+  writeContract: (data: { abi: any; contractAddress: string; data: string[] }) => Promise<Bytes | null>
 }
 
 interface Web3AuthProviderProps {
@@ -171,7 +167,12 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
 
     const rpc = new RPC(torusPlugin?.proxyProvider as any, web3 as any)
 
-    return await rpc.mint({ abi, contractAddress, data, privateKey })
+    return await rpc.mint({
+      abi,
+      contractAddress,
+      data,
+      privateKey,
+    })
   }
 
   useEffect(() => {
