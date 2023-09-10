@@ -11,7 +11,7 @@ const ResponsiveText: React.FC<ResponsiveTextProps> = ({ children }) => {
     const adjustFontSize = () => {
       if (textRef.current && typeof children === 'string') {
         const maxLength = 280 // maximum length of the text
-        const minFontSize = 16 // minimum font size in pixels
+        const minFontSize = 14 // minimum font size in pixels
         const maxFontSize = 32 // maximum font size in pixels
         const fontSize = Math.max(
           minFontSize,
@@ -25,7 +25,7 @@ const ResponsiveText: React.FC<ResponsiveTextProps> = ({ children }) => {
   }, [children])
 
   return (
-    <div ref={textRef} className="px-5">
+    <div ref={textRef} className="px-3">
       {children}
     </div>
   )

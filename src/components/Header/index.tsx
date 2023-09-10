@@ -3,10 +3,22 @@ import React from 'react'
 export default function Header() {
   return (
     <>
-      <header className="bg-gray-50">
-        <div className="mx-auto max-w-screen-xl px-4 py-2">
+      <header className="bg-gray-100">
+        <div className="mx-auto max-w-screen-xl px-4 py-3">
           <div className="">
             <div className="flex justify-between">
+
+              <div>
+                <a
+                  href="#"
+                  className="block shrink-0 rounded-full bg-white p-2.5 text-gray-600 shadow-sm hover:text-gray-700"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+                  </svg>
+                </a>
+              </div>
+
               <div className="relative">
                 <label className="sr-only" htmlFor="search">
                   {' '}

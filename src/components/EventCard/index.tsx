@@ -29,10 +29,10 @@ const EventCard = (prop: VersionCardProp) => {
   return (
     <>
       <article
-        className="overflow-hidden rounded-lg shadow transition hover:shadow-lg"
+        className="overflow-hidden rounded-lg shadow border-[1px] border-black transition hover:shadow-lg"
         onClick={() => goToWall(nftKey)}
       >
-        <div className="bg-white p-4 sm:p-3">
+        <div className="bg-[#F5F5F5] p-4 sm:p-3">
           <div className="flex items-center gap-2 text-xs text-gray-500">
             <span role="img" aria-label="Polygon Logo" className="icon-32">
               <svg aria-hidden="true" focusable="false" viewBox="0 0 16 16">
@@ -45,7 +45,7 @@ const EventCard = (prop: VersionCardProp) => {
             {prop.tokenAddress} &middot; {prop.tokenId}
           </div>
 
-          <h3 className="my-2 text-xl font-semibold text-gray-900">{prop.title}</h3>
+          <h3 className="my-2 text-xl font-semibold text-indigo-500">{prop.title}</h3>
 
           <div className="mt-3 flex items-center justify-between gap-2">
             <div className="flex items-center gap-1 text-gray-500">

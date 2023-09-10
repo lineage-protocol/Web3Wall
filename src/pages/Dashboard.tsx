@@ -25,8 +25,28 @@ const items = [
 
 const PageDashboard = () => {
   return (
-    <div className="bg-yellow-100 h-screen">
+   /*  <div className="bg-yellow-100 h-screen">
       <div className="grid gap-3 p-3">
+        {items.map((item, index) => {
+          return (
+            <EventCard
+              key={index}
+              tokenAddress={item.token.token_address}
+              chainId={item.token.chain_id}
+              tokenId={item.token.token_id}
+              title={item.title}
+              onHandleShareClicked={() => {}}
+              totalUser={item.users}
+              totalPost={item.posts}
+            />
+          )
+        })}
+      </div>
+    </div> */
+
+    <div className="bg-white h-screen">
+      <div className="grid gap-3 p-3">
+        <div className='text-xl font-bold pt-4'>Happening now</div>
         {items.map((item, index) => {
           return (
             <EventCard
