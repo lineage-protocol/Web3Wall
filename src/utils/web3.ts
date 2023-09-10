@@ -4,17 +4,17 @@ import Web3 from 'web3'
 
 export default class EthereumRPC {
   private provider: SafeEventEmitterProvider
-  private web3: Web3
 
-  constructor(provider: SafeEventEmitterProvider, web3: Web3) {
+  constructor(provider: SafeEventEmitterProvider) {
     this.provider = provider
-    this.web3 = web3
   }
 
   async getChainId(): Promise<string> {
     try {
+      const web3 = new Web3(this.provider as any)
+
       // Get the connected Chain's ID
-      const chainId = await this.web3.eth.getChainId()
+      const chainId = await web3.eth.getChainId()
 
       return chainId.toString()
     } catch (error) {
@@ -24,8 +24,9 @@ export default class EthereumRPC {
 
   async getAccounts(): Promise<any> {
     try {
-      // Get user's Ethereum public address
-      const address = await this.web3.eth.getAccounts()
+      const web3 = new Web3(this.provider as any)
+
+      const address = await web3.eth.getAccounts()
 
       return address[0]
     } catch (error) {
@@ -35,12 +36,12 @@ export default class EthereumRPC {
 
   async getBalance(): Promise<string> {
     try {
-      // Get user's Ethereum public address
-      const address = (await this.web3.eth.getAccounts())[0]
+      const web3 = new Web3(this.provider as any)
+      const address = (await web3.eth.getAccounts())[0]
 
       // Get user's balance in ether
-      const balance = this.web3.utils.fromWei(
-        await this.web3.eth.getBalance(address), // Balance is in wei
+      const balance = web3.utils.fromWei(
+        await web3.eth.getBalance(address), // Balance is in wei
         'wei'
       )
 
@@ -52,15 +53,17 @@ export default class EthereumRPC {
 
   async sendTransaction(): Promise<any> {
     try {
+      const web3 = new Web3(this.provider as any)
+
       // Get user's Ethereum public address
-      const fromAddress = (await this.web3.eth.getAccounts())[0]
+      const fromAddress = (await web3.eth.getAccounts())[0]
 
       const destination = fromAddress
 
-      const amount = this.web3.utils.toWei('0.001', 'ether') // Convert 1 ether to wei
+      const amount = web3.utils.toWei('0.001', 'ether') // Convert 1 ether to wei
 
       // Submit transaction to the blockchain and wait for it to be mined
-      const receipt = await this.web3.eth.sendTransaction({
+      const receipt = await web3.eth.sendTransaction({
         from: fromAddress,
         to: destination,
         value: amount,
@@ -76,13 +79,15 @@ export default class EthereumRPC {
 
   async signMessage(message: string) {
     try {
+      const web3 = new Web3(this.provider as any)
+
       // Get user's Ethereum public address
-      const fromAddress = (await this.web3.eth.getAccounts())[0]
+      const fromAddress = (await web3.eth.getAccounts())[0]
 
       console.log(fromAddress)
 
       // Sign the message
-      const signedMessage = await this.web3.eth.personal.sign(
+      const signedMessage = await web3.eth.personal.sign(
         message,
         fromAddress,
         '' // configure your own password here.
@@ -118,10 +123,12 @@ export default class EthereumRPC {
     privateKey: string
   }) {
     try {
-      const fromAddress = (await this.web3.eth.getAccounts())[0]
-      const contract = new this.web3.eth.Contract(abi, contractAddress)
+      const web3 = new Web3(this.provider as any)
 
-      let tx = {
+      const fromAddress = (await web3.eth.getAccounts())[0]
+      const contract = new web3.eth.Contract(abi, contractAddress)
+
+      const tx = {
         from: fromAddress,
         to: contractAddress,
         gas: 500_000,
@@ -132,8 +139,8 @@ export default class EthereumRPC {
       }
 
       try {
-        const signedTx = await this.web3.eth.accounts.signTransaction(tx, privateKey)
-        const receipt = await this.web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+        const signedTx = await web3.eth.accounts.signTransaction(tx, privateKey)
+        const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction)
         return receipt.transactionHash
       } catch (e) {
         return null

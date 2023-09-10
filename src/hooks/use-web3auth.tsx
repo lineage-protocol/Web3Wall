@@ -1,10 +1,10 @@
-import { SafeEventEmitterProvider } from '@web3auth/base'
+import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from '@web3auth/base'
 import { Web3Auth } from '@web3auth/modal'
 import { OpenloginAdapter, OpenloginUserInfo } from '@web3auth/openlogin-adapter'
 import { TorusWalletAdapter } from '@web3auth/torus-evm-adapter'
 import { TorusWalletConnectorPlugin } from '@web3auth/torus-wallet-connector-plugin'
 import { createContext, useContext, useEffect, useState } from 'react'
-import RPC from 'utils/web3'
+import RPC from 'utils/ethers'
 import Web3, { Bytes, eth } from 'web3'
 
 interface Web3AuthContextInterface {
@@ -17,8 +17,10 @@ interface Web3AuthContextInterface {
   connect: () => Promise<void>
   disconnect: () => Promise<void>
   isConnected: () => boolean
-  signMessage: (message: string) => Promise<{ signature: string; torusAddress: string } | undefined>
+  signMessage: (message: string) => Promise<{ signature: string } | undefined>
   writeContract: (data: { abi: any; contractAddress: string; data: string[] }) => Promise<Bytes | null>
+  getAccounts: () => Promise<any>
+  getUserInfo: () => Promise<any>
 }
 
 interface Web3AuthProviderProps {
@@ -47,20 +49,15 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
   const [userInfo, setUserInfo] = useState<Partial<OpenloginUserInfo>>()
 
   async function initWeb3AuthModal(): Promise<void> {
-    const MUMBAI_HEXADECIMAL_CHAIN_ID = parseInt(import.meta.env.VITE_DEFAULT_CHAIN_ID).toString(16)
+    // const MUMBAI_HEXADECIMAL_CHAIN_ID = parseInt(import.meta.env.VITE_DEFAULT_CHAIN_ID).toString(16)
 
     const web3auth = new Web3Auth({
       clientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID,
+      web3AuthNetwork: import.meta.env.VITE_WEB3AUTH_NETWORK,
       chainConfig: {
-        chainNamespace: 'eip155',
-        chainId: `0x${MUMBAI_HEXADECIMAL_CHAIN_ID}`,
-        rpcTarget: 'https://rpc.ankr.com/polygon_mumbai',
-        // Avoid using public rpcTarget in production.
-        // Use services like Infura, Quicknode etc
-        displayName: 'Polygon Mumbai Testnet',
-        blockExplorer: 'https://mumbai.polygonscan.com/',
-        ticker: 'MATIC',
-        tickerName: 'Matic',
+        chainNamespace: CHAIN_NAMESPACES.EIP155,
+        chainId: `${import.meta.env.VITE_DEFAULT_CHAIN_ID_HEX}`,
+        rpcTarget: import.meta.env.VITE_INFURA_URL,
       },
     })
 
@@ -140,17 +137,10 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
       return
     }
 
-    const web3 = new Web3(web3Auth?.provider as any)
-    web3.setProvider(torusPlugin?.proxyProvider as any)
-    const address = await web3.eth.getAccounts()
-
-    const rpc = new RPC(torusPlugin?.proxyProvider as any, web3 as any)
+    const rpc = new RPC(provider)
     const signedMessage = await rpc.signMessage(message)
 
-    setTorusAddress(address[0])
-    setWeb3(web3)
-
-    return { signature: signedMessage, torusAddress: address[0] }
+    return { signature: signedMessage }
   }
 
   function isConnected() {
@@ -158,25 +148,32 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
   }
 
   async function writeContract({ abi, contractAddress, data }: { abi: any; contractAddress: string; data: string[] }) {
-    const web3 = new Web3(web3Auth?.provider as any)
-    web3.setProvider(torusPlugin?.proxyProvider as any)
+    if (!provider) {
+      return
+    }
 
-    const privateKey = (await web3Auth?.provider?.request({
-      method: 'eth_private_key',
-    })) as string
+    const rpc = new RPC(provider)
+    return await rpc.mint(abi as string, contractAddress, data)
+  }
 
-    const rpc = new RPC(torusPlugin?.proxyProvider as any, web3 as any)
+  async function getAccounts() {
+    if (!provider) {
+      return
+    }
+    const rpc = new RPC(provider)
+    const addresses = await rpc.getAccounts()
+    return addresses
+  }
 
-    return await rpc.mint({
-      abi,
-      contractAddress,
-      data,
-      privateKey,
-    })
+  async function getUserInfo() {
+    if (!web3Auth) return
+
+    const user = await web3Auth.getUserInfo()
+    return user
   }
 
   useEffect(() => {
-    let web3 = new Web3(provider as any)
+    const web3 = new Web3(provider as any)
     setWeb3(web3)
   }, [web3Auth?.connected])
 
@@ -202,6 +199,8 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
         web3,
         isInitiated,
         userInfo,
+        getAccounts,
+        getUserInfo,
       }}
     >
       {children}

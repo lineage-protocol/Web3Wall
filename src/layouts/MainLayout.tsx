@@ -7,7 +7,9 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
     <Web3Wrapper>
       <div className="container mx-auto text-black bg-white h-screen pb-[100px]">
         <Header />
-        <Outlet />
+        <div className="pt-[55px]">
+          <Outlet />
+        </div>
       </div>
     </Web3Wrapper>
   )

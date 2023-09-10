@@ -1,10 +1,21 @@
-import React from 'react'
+import { useWeb3Auth } from 'hooks/use-web3auth'
+import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 export default function Header() {
+  // const { getUserInfo, getAccounts } = useWeb3Auth()
+  // useEffect(() => {
+  //   const test = async () => {
+  //     const a = await getAccounts()
+  //     console.log(a)
+  //   }
+
+  //   test()
+  // }, [])
+
   return (
     <>
-      <header className="bg-gray-50">
+      <header className="bg-gray-50 fixed w-full top-0 z-5">
         <div className="mx-auto max-w-screen-xl px-4 py-2">
           <div className="">
             <div className="flex justify-between">

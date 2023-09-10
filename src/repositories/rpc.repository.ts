@@ -36,8 +36,8 @@ export async function parseString(input: string): Promise<DataTypeMetadata | Dat
   } catch (e) {}
 
   try {
-    let response = await fetch(input)
-    let contentType = response.headers.get('content-type')
+    const response = await fetch(input)
+    const contentType = response.headers.get('content-type')
     if (contentType?.startsWith('image/')) return { type: 'image', data: input }
     if (contentType?.startsWith('audio/')) return { type: 'audio', data: input }
   } catch (e) {}
@@ -78,7 +78,7 @@ const useStoreBlob = () => {
   return useMutation({
     mutationFn: async (blob: Blob) => {
       const resp = await ipfs?.storeBlob(blob)
-      const url = `${import.meta.env.VITE_IPFS_BEAT_STORAGE_URL}/${resp}`
+      const url = `${import.meta.env.VITE_IPFS_NFT_STORAGE_URL}/${resp}`
       return url
     },
   })
@@ -88,7 +88,7 @@ const useGetPosts = () => {
   return useQuery({
     queryKey: [RQ_KEY.GET_POSTS],
     queryFn: async () => {
-      let result = await rpc.getTransactions({
+      const result = await rpc.getTransactions({
         query: [
           {
             column: 'method',

@@ -35,9 +35,13 @@ const NewPostModal = (prop: Props) => {
   const { mutateAsync: storeBlob } = useStoreBlob()
   const { mutateAsync: publishTx } = usePublishTransaction()
 
-  const { signMessage } = useWeb3Auth()
+  const { signMessage, getAccounts } = useWeb3Auth()
 
   const onPost = async (): Promise<void> => {
+    const account = await getAccounts()
+    if (!account) {
+      return
+    }
     setIsLoading(true)
     let url = ''
     if (file) url = await storeBlob(new Blob([file]))
@@ -48,8 +52,9 @@ const NewPostModal = (prop: Props) => {
     }
 
     try {
+      console.log(JSON.stringify(content))
       const signed = await signMessage(JSON.stringify(content))
-
+      console.log(signed)
       await publishTx({
         alias: '',
         chain_id: prop.chainId as string,
@@ -58,7 +63,7 @@ const NewPostModal = (prop: Props) => {
         mcdata: JSON.stringify({ loose: 0 }),
         meta_contract_id: `${import.meta.env.VITE_WEB3WALL_META_CONTRACT_ID}`,
         method: 'metadata',
-        public_key: signed?.torusAddress as string,
+        public_key: account as string,
         token_address: prop.tokenAddress as string,
         token_id: prop.tokenId as string,
         version: '1',
@@ -201,7 +206,7 @@ const NewPostModal = (prop: Props) => {
                     {file && (
                       <div className="flex justify-left w-full">
                         {getFileType() === 'image' && (
-                          <img src={URL.createObjectURL(file)} className="object-contain -bg-indigo-600" />
+                          <img src={URL.createObjectURL(file)} className="object-contain w-full" />
                         )}
                         {getFileType() === 'video' && (
                           <video controls className="object-fit bg-indigo-600">
@@ -211,7 +216,7 @@ const NewPostModal = (prop: Props) => {
                       </div>
                     )}
 
-                    <div className="flex gap-5 justify-center p-3">
+                    <div className="flex gap-5 p-3">
                       <GenericButton
                         onClick={() => {
                           inputFileRef?.current?.click()
