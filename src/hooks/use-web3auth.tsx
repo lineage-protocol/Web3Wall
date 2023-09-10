@@ -5,7 +5,7 @@ import { TorusWalletAdapter } from '@web3auth/torus-evm-adapter'
 import { TorusWalletConnectorPlugin } from '@web3auth/torus-wallet-connector-plugin'
 import { createContext, useContext, useEffect, useState } from 'react'
 import RPC from 'utils/web3'
-import Web3 from 'web3'
+import Web3, { eth } from 'web3'
 
 interface Web3AuthContextInterface {
   isInitiated: boolean
@@ -18,7 +18,11 @@ interface Web3AuthContextInterface {
   disconnect: () => Promise<void>
   isConnected: () => boolean
   signMessage: (message: string) => Promise<{ signature: string; torusAddress: string } | undefined>
-  writeContract: (data: { abi: any; contractAddress: string; data: string[] }) => Promise<string>
+  writeContract: (data: {
+    abi: any
+    contractAddress: string
+    data: string[]
+  }) => Promise<string | eth.accounts.SignTransactionResult | null>
 }
 
 interface Web3AuthProviderProps {
@@ -41,7 +45,7 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null)
   const [torusPlugin, setTorusPlugin] = useState<TorusWalletConnectorPlugin>()
   const [torusAddress, setTorusAddress] = useState<string>('')
-  const [web3, setWeb3] = useState<Web3>(new Web3())
+  const [web3, setWeb3] = useState<Web3>()
   const [isInitiated, setIsInitiated] = useState<boolean>(false)
 
   const [userInfo, setUserInfo] = useState<Partial<OpenloginUserInfo>>()
@@ -105,15 +109,18 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
 
     // it will add/update  the torus-evm adapter in to web3auth class
     web3auth.configureAdapter(torusWalletAdapter)
+    setWeb3Auth(web3auth)
 
     await web3auth.initModal()
-    setWeb3Auth(web3auth)
+
+    setWeb3(new Web3(web3auth.provider as any))
     setProvider(web3auth.provider)
 
-    const user = await web3auth?.getUserInfo()
-    if (user) setUserInfo(user)
-
-    if (web3auth) setIsInitiated(true)
+    if (web3auth.connected) {
+      const user = await web3auth?.getUserInfo()
+      if (user) setUserInfo(user)
+      if (web3auth) setIsInitiated(true)
+    }
   }
 
   async function connect() {
@@ -158,19 +165,19 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
     const web3 = new Web3(web3Auth?.provider as any)
     web3.setProvider(torusPlugin?.proxyProvider as any)
 
-    const fromAddress = (await web3.eth.getAccounts())[0]
-    const contract = new web3.eth.Contract(abi, contractAddress)
+    const privateKey = (await web3Auth?.provider?.request({
+      method: 'eth_private_key',
+    })) as string
 
-    //@ts-ignore
-    const receipt = await contract.methods.mint(...data).send({
-      from: fromAddress,
-      gas: `${2_500_000_000}`,
-    })
+    const rpc = new RPC(torusPlugin?.proxyProvider as any, web3 as any)
 
-    return receipt?.transactionHash
-
-    console.log(receipt)
+    return await rpc.mint({ abi, contractAddress, data, privateKey })
   }
+
+  useEffect(() => {
+    let web3 = new Web3(provider as any)
+    setWeb3(web3)
+  }, [web3Auth?.connected])
 
   useEffect(() => {
     async function init() {

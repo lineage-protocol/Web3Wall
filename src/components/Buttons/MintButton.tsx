@@ -1,5 +1,7 @@
+import { useBoundStore } from 'store'
 import GenericButton from './GenericButton'
 import { useWeb3Auth } from 'hooks/use-web3auth'
+import { useNavigate } from 'react-router-dom'
 
 interface Prop {
   name: string
@@ -8,7 +10,9 @@ interface Prop {
 }
 
 const MintButton = (prop: Prop) => {
+  const navigate = useNavigate()
   const { writeContract } = useWeb3Auth()
+  const { setModalState } = useBoundStore()
 
   // TODO: try wagmi web3auth if current method doesn't work
   /*   const { config } = usePrepareContractWrite({
@@ -57,11 +61,16 @@ const MintButton = (prop: Prop) => {
         },
       ]
 
-      await writeContract({
+      let signedTx = await writeContract({
         abi,
         contractAddress: `${import.meta.env.VITE_WEB3WALL_UTILITY}`,
         data: [prop.name, prop.url],
       })
+
+      if (signedTx) {
+        setModalState({ mint: { isOpen: false } })
+        navigate('/dashboard')
+      }
     } catch (e: unknown) {
       console.log('e', e)
     }
