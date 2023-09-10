@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import rpc, { JSONRPCFilter, NftMetadata, Transaction } from '../services/rpc'
 import { useIpfs } from 'hooks/use-ipfs'
 import { RQ_KEY } from 'repositories'
-import { networkToChainId } from 'utils'
+import { formatDataKey } from 'utils'
 
 const useGetCompleteTransactions = () => {
   return useQuery({
@@ -51,8 +51,7 @@ const useGetTransactions = (data: JSONRPCFilter<Transaction> & { address?: `0x${
   return useQuery({
     queryKey: [RQ_KEY.GET_TXS],
     queryFn: async () => {
-      let result = await rpc.getTransactions(filter)
-      return result.map(el => ({ ...el, chain_id: networkToChainId(el.chain_id) }))
+      return await rpc.getTransactions(filter)
     },
   })
 }
@@ -66,7 +65,7 @@ const usePublishTransaction = () => {
     onSuccess: async () => {
       let timeout: NodeJS.Timeout
       timeout = setTimeout(async () => {
-        await queryClient.invalidateQueries([RQ_KEY.GET_TXS])
+        await queryClient.invalidateQueries([RQ_KEY.GET_POSTS])
         if (timeout) clearTimeout(timeout)
       }, 5000)
     },
@@ -85,4 +84,62 @@ const useStoreBlob = () => {
   })
 }
 
-export { useGetCompleteTransactions, useGetTransactions, usePublishTransaction, useStoreBlob }
+const useGetPosts = () => {
+  return useQuery({
+    queryKey: [RQ_KEY.GET_POSTS],
+    queryFn: async () => {
+      let result = await rpc.getTransactions({
+        query: [
+          {
+            column: 'method',
+            op: '=',
+            query: 'metadata',
+          },
+          {
+            column: 'status',
+            op: '=',
+            query: '1',
+          },
+          {
+            column: 'meta_contract_id',
+            op: '=',
+            query: `${import.meta.env.VITE_WEB3WALL_META_CONTRACT_ID}`,
+          },
+        ],
+        ordering: [
+          {
+            column: 'timestamp',
+            sort: 'desc',
+          },
+        ],
+        from: 0,
+        to: 0,
+      })
+
+      return result?.reduce(
+        (prev, curr) => {
+          const data_key = formatDataKey(curr.chain_id, curr.token_address, curr.token_id)
+
+          if (!prev[data_key]) prev[data_key] = []
+
+          try {
+            const data = JSON.parse(curr.data) as { text: string; image: string }
+
+            prev[data_key]?.push({
+              ...data,
+              public_key: curr.public_key,
+              timestamp: curr.timestamp as number,
+            })
+
+            return prev
+          } catch (e) {
+            return prev
+          }
+        },
+        {} as Record<string, { public_key: string; text: string; image: string; timestamp: number }[]>
+      )
+    },
+  })
+}
+
+export { useGetCompleteTransactions, useGetTransactions, usePublishTransaction, useStoreBlob, useGetPosts }
