@@ -150,6 +150,31 @@ export function networkToChainId(chain: string) {
   return chainId
 }
 
+export function chainIdToNetwork(chain: string) {
+  switch (chain) {
+    case 'eth':
+    case '1':
+      return 'homestead'
+    case '137':
+      return 'matic'
+    case '56':
+      return 'bsc'
+    case '42161':
+      return 'arbitrum'
+    case 'celo':
+    case '42220':
+      return 'celo'
+    case 'sol':
+    case 'solana':
+      return 'solana'
+    case 'near':
+      return 'near'
+    case '80001':
+      return 'mumbai'
+    default:
+      return ''
+  }
+}
 export function formatDataKey(chain_id: String, address: String, token_id: String) {
   const input = `${chain_id}${address}${token_id}`
   const sha256Hash = SHA256(input).toString()
@@ -169,4 +194,11 @@ function hexToUint8Array(hexString: String): Uint8Array {
   }
 
   return arrayBuffer
+}
+
+export function formatTokenKey(chain_id: String, address: String) {
+  const input = `${chain_id}${address}`
+  const sha256Hash = SHA256(input).toString()
+  const uint8Array = hexToUint8Array(sha256Hash)
+  return encode(uint8Array)
 }

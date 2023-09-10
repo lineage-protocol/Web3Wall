@@ -45,7 +45,7 @@ const PageNewPost = () => {
       chain_id: state.chain_id,
       signature: signed?.signature as string,
       data: JSON.stringify(content),
-      mcdata: '',
+      mcdata: JSON.stringify({ loose: 0 }),
       meta_contract_id: `${import.meta.env.VITE_WEB3WALL_META_CONTRACT_ID}`,
       method: 'metadata',
       public_key: signed?.torusAddress as string,
