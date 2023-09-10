@@ -34,12 +34,12 @@ const App = () => {
         <ApiProvider>
           <Routes>
             <Route element={<MainLayout children={undefined} />}>
-              <Route path="/" element={<PageIndex />} />
               <Route path="/inventory" element={<PageInventory />} />
               <Route path="/dashboard" element={<PageDashboard />} />
               <Route path="/wall/:id" element={<PageWall />} />
             </Route>
             <Route element={<PublicLayout children={undefined} />}>
+              <Route path="/" element={<PageIndex />} />
               <Route path="/login" element={<PageLogin />} />
               <Route path="/new/:id" element={<PageNewPost />} />
             </Route>
