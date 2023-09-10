@@ -13,9 +13,9 @@ export type ApolloClientFilter = {
   where?: { to?: string; from: string }
 }
 
-export const apolloQuery = async (
+export const apolloQuery = async <R>(
   options: Omit<QueryOptions<OperationVariables, any>, 'query'> & { query: string }
 ) => {
   const { query, variables } = options
-  return await apolloClientInstance.query({ query: gql(query), variables })
+  return (await apolloClientInstance.query({ query: gql(query), variables })) as R
 }

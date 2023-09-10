@@ -140,6 +140,9 @@ export function networkToChainId(chain: string) {
     case 'near':
       chainId = 'near'
       break
+    case 'mumbai':
+      chainId = '80001'
+      break
     default:
       break
   }

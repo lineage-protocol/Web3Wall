@@ -3,6 +3,7 @@ import { RQ_KEY } from './'
 import { ApolloClientFilter, apolloQuery } from 'services/apollo'
 import { Sheet } from 'lib'
 import { MintedNft, categorize, format } from 'utils/subgraph.util'
+import { formatDataKey } from 'utils'
 
 const useGetSheets = (variables: ApolloClientFilter) => {
   const query = `
@@ -18,7 +19,7 @@ const useGetSheets = (variables: ApolloClientFilter) => {
   return useQuery({
     queryKey: [RQ_KEY.GET_SHEETS],
     queryFn: async () => {
-      const response = await apolloQuery({ query, variables })
+      const response = await apolloQuery<any>({ query, variables })
       return response.data
     },
   })
@@ -38,7 +39,7 @@ const useGetBookmarkedSheets = (variables: ApolloClientFilter) => {
   return useQuery({
     queryKey: [RQ_KEY.GET_BOOKMARKED_SHEETS],
     queryFn: async () => {
-      const { data } = await apolloQuery({ query, variables })
+      const { data } = await apolloQuery<any>({ query, variables })
 
       const formatted = data.collaBeatNftMinteds
         .map((nft: MintedNft) => {
@@ -68,7 +69,7 @@ const useCheckBookmarkedSheets = (address: string, token_id: string) => {
   return useQuery({
     queryKey: [RQ_KEY.CHECK_BOOKMARKED_SHEETS],
     queryFn: async () => {
-      const { data } = await apolloQuery({ query, variables })
+      const { data } = await apolloQuery<any>({ query, variables })
       const categorized = categorize(data.collaBeatNftMinteds as MintedNft[])
 
       const isOwned = categorized.length > 0
@@ -80,4 +81,46 @@ const useCheckBookmarkedSheets = (address: string, token_id: string) => {
   })
 }
 
-export { useGetSheets, useGetBookmarkedSheets, useCheckBookmarkedSheets }
+type MintedEvent = {
+  tokenId: number
+  id: string
+  data: any
+  transactionHash: string
+  blockTimestamp: number
+}
+
+const useGetEvents = (variables: ApolloClientFilter) => {
+  let query = `
+  query Minteds($first: Int, $skip: Int, $where: Minted_filter) {
+    minteds(first: $first, skip: $skip, where: $where) {
+      tokenId
+      id
+      data
+      transactionHash
+      blockTimestamp
+    }
+  }
+  `
+
+  return useQuery({
+    queryKey: [RQ_KEY.CHECK_BOOKMARKED_SHEETS],
+    queryFn: async () => {
+      const { minteds } = await apolloQuery<{ minteds: MintedEvent[] }>({ query, variables })
+
+      return minteds.reduce(
+        (prev, curr) => {
+          const data_key = formatDataKey(
+            `${import.meta.env.VITE_DEFAULT_CHAIN_ID}`,
+            `${import.meta.env.VITE_WEB3WALL_NFT}`,
+            `${curr.tokenId}`
+          )
+          prev[data_key] = curr
+          return prev
+        },
+        {} as Record<string, MintedEvent>
+      )
+    },
+  })
+}
+
+export { useGetSheets, useGetBookmarkedSheets, useCheckBookmarkedSheets, useGetEvents }
