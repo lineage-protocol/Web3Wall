@@ -1,3 +1,4 @@
+import { AbiCoder } from 'ethers'
 import { formatDataKey } from 'utils'
 
 export type MintedNft = {
@@ -6,6 +7,12 @@ export type MintedNft = {
   to: string
   tokenId: string
   transactionHash: string
+}
+
+export function decodeMinted(data: string) {
+  const abiCoder = new AbiCoder()
+  const [_, bytes] = abiCoder.decode(['string', 'bytes'], data)
+  return abiCoder.decode(['string', 'string'], bytes)
 }
 
 export const format = (minted: MintedNft) => {

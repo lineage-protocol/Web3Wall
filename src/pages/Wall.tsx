@@ -1,5 +1,6 @@
 import SocialCard from 'components/SocialCard'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useGetPosts } from 'repositories/rpc.repository'
 
 const socials = [
   {
@@ -24,6 +25,8 @@ const PageWall = () => {
   const navigate = useNavigate()
   const { id } = useParams()
   const { state } = useLocation()
+  const { data: posts } = useGetPosts()
+  const socials = posts?.[`${id}`]
 
   const createNewPost = () => {
     navigate(`/new/${id}`, {
@@ -34,9 +37,10 @@ const PageWall = () => {
   return (
     <>
       <div className="grid gap-3 overflow-auto bg-blue-800/30">
-        {socials.map((social, index) => {
-          return <SocialCard key={index} {...social} />
-        })}
+        {socials &&
+          socials?.map((social, index) => {
+            return <SocialCard key={index} {...social} />
+          })}
       </div>
       <button
         onClick={() => createNewPost()}

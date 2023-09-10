@@ -4,11 +4,25 @@ interface SocialCardProp {
   text: String
   image: String
   public_key: String
+  timestamp: number
 }
 
 const SortCardDisplay = (prop: SocialCardProp) => {
-  if (prop.image) {
-    return <img src={prop.image as string} alt="" />
+  if (prop.text && prop.image) {
+    return (
+      <>
+        <ResponsiveText>{prop.text}</ResponsiveText>
+        <div className="max-w-[300px] mx-auto">
+          <img src={prop.image as string} className="object-contain" alt="" />
+        </div>
+      </>
+    )
+  } else if (prop.image) {
+    return (
+      <div className="max-w-[300px] flex justify-around">
+        <img src={prop.image as string} className="object-contain" alt="" />
+      </div>
+    )
   } else if (prop.text) {
     return <ResponsiveText>{prop.text}</ResponsiveText>
   } else {

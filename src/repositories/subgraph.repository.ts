@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { RQ_KEY } from './'
 import { ApolloClientFilter, apolloQuery } from 'services/apollo'
 import { Sheet } from 'lib'
-import { MintedNft, categorize, format } from 'utils/subgraph.util'
+import { MintedNft, categorize, decodeMinted, format } from 'utils/subgraph.util'
 import { formatDataKey } from 'utils'
 
 const useGetSheets = (variables: ApolloClientFilter) => {
@@ -82,11 +82,11 @@ const useCheckBookmarkedSheets = (address: string, token_id: string) => {
 }
 
 type MintedEvent = {
-  tokenId: number
+  tokenId: string
   id: string
   data: any
   transactionHash: string
-  blockTimestamp: number
+  blockTimestamp: string
 }
 
 const useGetEvents = (variables: ApolloClientFilter) => {
@@ -101,24 +101,24 @@ const useGetEvents = (variables: ApolloClientFilter) => {
     }
   }
   `
-
   return useQuery({
-    queryKey: [RQ_KEY.CHECK_BOOKMARKED_SHEETS],
+    queryKey: [RQ_KEY.GET_SHEETS],
     queryFn: async () => {
-      const { minteds } = await apolloQuery<{ minteds: MintedEvent[] }>({ query, variables })
+      const { data } = await apolloQuery<{ minteds: MintedEvent[] }>({ query, variables })
 
-      return minteds.reduce(
-        (prev, curr) => {
-          const data_key = formatDataKey(
+      return data?.minteds?.map(el => {
+        let [name, title] = decodeMinted(el.data)
+
+        return {
+          ...el,
+          data: { name, title },
+          data_key: formatDataKey(
             `${import.meta.env.VITE_DEFAULT_CHAIN_ID}`,
             `${import.meta.env.VITE_WEB3WALL_NFT}`,
-            `${curr.tokenId}`
-          )
-          prev[data_key] = curr
-          return prev
-        },
-        {} as Record<string, MintedEvent>
-      )
+            `${el.tokenId}`
+          ),
+        }
+      })
     },
   })
 }
