@@ -1,25 +1,25 @@
 const manifestForPlugIn = {
-  name: 'React-vite-app',
-  short_name: 'react-vite-app',
-  description: 'I am a simple vite app',
+  name: 'Web3Wall',
+  short_name: 'web-3-wall',
+  description: 'Content Created by users from Token2049 events. Developed by Lineage Protocol',
   icons: [
     {
       src: '/android-chrome-192x192.png',
       sizes: '192x192',
       type: 'image/png',
-      purpose: 'favicon',
+      purpose: 'any favicon',
     },
     {
       src: '/android-chrome-512x512.png',
       sizes: '512x512',
       type: 'image/png',
-      purpose: 'favicon',
+      purpose: 'any favicon',
     },
     {
       src: '/apple-touch-icon.png',
       sizes: '180x180',
       type: 'image/png',
-      purpose: 'apple touch icon',
+      purpose: 'any apple touch icon',
     },
   ],
   theme_color: '#171717',
