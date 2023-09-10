@@ -25,7 +25,7 @@ const ResponsiveText: React.FC<ResponsiveTextProps> = ({ children }) => {
   }, [children])
 
   return (
-    <div ref={textRef} className="px-5">
+    <div ref={textRef} className="px-3">
       {children}
     </div>
   )

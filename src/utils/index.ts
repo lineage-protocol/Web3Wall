@@ -202,3 +202,23 @@ export function formatTokenKey(chain_id: String, address: String) {
   const uint8Array = hexToUint8Array(sha256Hash)
   return encode(uint8Array)
 }
+
+export function timeAgo(timestamp: number): string {
+  const secondsPast = (Date.now() - timestamp) / 1000
+
+  if (secondsPast < 60) {
+    return `${Math.floor(secondsPast)} seconds ago`
+  }
+  if (secondsPast < 3600) {
+    return `${Math.floor(secondsPast / 60)} minutes ago`
+  }
+  if (secondsPast <= 86400) {
+    return `${Math.floor(secondsPast / 3600)} hours ago`
+  }
+  if (secondsPast > 86400) {
+    const days = Math.floor(secondsPast / 86400)
+    return `${days} day${days !== 1 ? 's' : ''} ago`
+  }
+
+  return ''
+}

@@ -23,13 +23,7 @@ const EventCard = (prop: VersionCardProp) => {
   }, [prop.chainId, prop.tokenAddress, prop.tokenId])
 
   const goToWall = (id: String) => {
-    navigate(`/wall/${id}`, {
-      state: {
-        token_address: prop.tokenAddress,
-        chain_id: prop.chainId,
-        token_id: prop.tokenId,
-      },
-    })
+    navigate(`/wall/${prop.tokenAddress}/${prop.tokenId}/${prop.chainId}/${id}`)
   }
 
   return (

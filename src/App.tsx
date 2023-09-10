@@ -36,7 +36,7 @@ const App = () => {
             <Route element={<MainLayout children={undefined} />}>
               <Route path="/inventory" element={<PageInventory />} />
               <Route path="/dashboard" element={<PageDashboard />} />
-              <Route path="/wall/:id" element={<PageWall />} />
+              <Route path="/wall/:token_address/:token_id/:chain_id/:key/" element={<PageWall />} />
             </Route>
             <Route element={<PublicLayout children={undefined} />}>
               <Route path="/" element={<PageIndex />} />
