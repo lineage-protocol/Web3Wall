@@ -31,7 +31,7 @@ const PageNewPost = () => {
   const onPost = async (): Promise<void> => {
     setIsLoading(true)
     let url = ''
-    if (file) url = await storeBlob(new Blob([file as File]))
+    if (file) url = await storeBlob(new Blob([file]))
 
     const content = {
       text,
@@ -63,7 +63,7 @@ const PageNewPost = () => {
   }
 
   const onSelectMedia = () => {
-    return new Promise<void>(async (resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       const filePicker = document.querySelector('input')
 
       if (!filePicker || !filePicker.files || filePicker.files.length <= 0) {

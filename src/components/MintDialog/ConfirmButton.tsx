@@ -1,10 +1,9 @@
 import { usePrepareContractWrite, useContractWrite, useWaitForTransaction } from 'wagmi'
-import {  BigNumber } from 'ethers'
+import { ethers } from 'ethers'
 import { LoadingSpinner } from 'components/Icons/icons'
 import { useContext, useState } from 'react'
 import { AlertMessageContext } from 'hooks/use-alert-message'
 import { parseEther } from 'viem'
-
 
 interface ConfirmButton {
   tokenId: String
@@ -31,7 +30,7 @@ const ConfirmButton = ({ tokenId, onBookmarkSuccess }: ConfirmButton) => {
     ],
     functionName: 'mint',
     //@ts-ignore
-    args: [BigNumber.from(tokenId)._hex, 1],
+    args: [ethers.BigNumber.from(tokenId)._hex, 1],
     value: parseEther('0.015'),
     onError(error) {
       console.log('Error', error)
