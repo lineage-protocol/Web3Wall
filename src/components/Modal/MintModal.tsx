@@ -13,7 +13,6 @@ interface Props {
 }
 
 const MintModal = (prop: Props) => {
-  const navigate = useNavigate()
   const [file, setFile] = useState<File>()
   const [imagePreview, setImagePreview] = useState('')
   const inputFileRef = useRef<HTMLInputElement>(null)
