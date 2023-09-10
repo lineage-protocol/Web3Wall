@@ -3423,7 +3423,7 @@
     query-string "7.1.3"
     uint8arrays "^3.1.0"
 
-"@walletconnect/utils@^2.9.1":
+"@walletconnect/utils@^2.10.0", "@walletconnect/utils@^2.9.1":
   version "2.10.0"
   resolved "https://registry.yarnpkg.com/@walletconnect/utils/-/utils-2.10.0.tgz#6918d12180d797b8bd4a19fb2ff128e394e181d6"
   integrity sha512-9GRyEz/7CJW+G04RvrjPET5k7hOEsB9b3fF9cWDk/iDCxSWpbkU/hv/urRB36C+gvQMAZgIZYX3dHfzJWkY/2g==
@@ -3544,7 +3544,7 @@
     "@web3auth/base" "^6.1.7"
     bs58 "^5.0.0"
 
-"@web3auth/base@^6.1.3", "@web3auth/base@^6.1.7":
+"@web3auth/base@^6.1.7":
   version "6.1.7"
   resolved "https://registry.yarnpkg.com/@web3auth/base/-/base-6.1.7.tgz#9bd7cd47b3b6fb71682254be806b28f37c612bd0"
   integrity sha512-0RrIgC1HFB4U/85QWf31oAUm+5+7ZOlSPMQuLIZ0nYEKgNY/jCAQuZVumOjBaH4lVz0ScuHltrBDE8odlmViCQ==
@@ -3579,6 +3579,28 @@
     eth-rpc-errors "^4.0.3"
     jsonschema "^1.4.1"
 
+"@web3auth/ethereum-provider@^6.1.8":
+  version "6.1.8"
+  resolved "https://registry.yarnpkg.com/@web3auth/ethereum-provider/-/ethereum-provider-6.1.8.tgz#e40660faea30fc3422d3127c0c0618e3717f49d1"
+  integrity sha512-3T2Qxo6xcCe9t4K6I+RVDPlq//fPdRwZXVM0N3av6ntseSDSXK9nx5by3tDqjQfu5Y7BxdPhjS79djQNZd+fAw==
+  dependencies:
+    "@ethereumjs/common" "^3.2.0"
+    "@ethereumjs/tx" "^4.2.0"
+    "@ethereumjs/util" "^8.1.0"
+    "@metamask/eth-sig-util" "^6.0.0"
+    "@toruslabs/base-controllers" "^3.1.0"
+    "@toruslabs/http-helpers" "^4.0.0"
+    "@toruslabs/openlogin-jrpc" "^4.7.2"
+    "@walletconnect/legacy-types" "2.0.0"
+    "@walletconnect/utils" "^2.10.0"
+    "@web3auth/base" "^6.1.7"
+    "@web3auth/base-provider" "^6.1.7"
+    assert "^2.0.0"
+    bignumber.js "^9.1.1"
+    bn.js "^5.2.1"
+    eth-rpc-errors "^4.0.3"
+    jsonschema "^1.4.1"
+
 "@web3auth/metamask-adapter@^6.1.7":
   version "6.1.7"
   resolved "https://registry.yarnpkg.com/@web3auth/metamask-adapter/-/metamask-adapter-6.1.7.tgz#f061147d82cc435990061a906a50713b49240bb0"
@@ -3588,23 +3610,23 @@
     "@web3auth/base" "^6.1.7"
     "@web3auth/base-evm-adapter" "^6.1.7"
 
-"@web3auth/modal@^6.1.3":
-  version "6.1.7"
-  resolved "https://registry.yarnpkg.com/@web3auth/modal/-/modal-6.1.7.tgz#31d04d5200a629f2eb11a84b69120ac63c8418ce"
-  integrity sha512-ekUvj9o+uCODhNE5RGH1G4pg/8fA3UoZewO8hd8HViUQ3IQCreWwwmFzPHBILGingh0IbIm0oOo6CiOmaZ6BBQ==
+"@web3auth/modal@^6.1.8":
+  version "6.1.8"
+  resolved "https://registry.yarnpkg.com/@web3auth/modal/-/modal-6.1.8.tgz#ee25d0c0ebc98f72478888f88e5d8e2d1ea2537f"
+  integrity sha512-FRzRouyYpbhP80i4SNNbPIQHp3GwvFw68w1jceAwIKKHBpTbbewTBRcHyDekZA4mHjihjYBhSgB+LYgYWg8t4w==
   dependencies:
     "@web3auth/base" "^6.1.7"
     "@web3auth/base-provider" "^6.1.7"
-    "@web3auth/ethereum-provider" "^6.1.7"
+    "@web3auth/ethereum-provider" "^6.1.8"
     "@web3auth/metamask-adapter" "^6.1.7"
     "@web3auth/no-modal" "^6.1.7"
     "@web3auth/openlogin-adapter" "^6.1.7"
-    "@web3auth/phantom-adapter" "^6.1.7"
-    "@web3auth/solana-provider" "^6.1.7"
+    "@web3auth/phantom-adapter" "^6.1.8"
+    "@web3auth/solana-provider" "^6.1.8"
     "@web3auth/torus-evm-adapter" "^6.1.7"
-    "@web3auth/torus-solana-adapter" "^6.1.7"
-    "@web3auth/ui" "^6.1.7"
-    "@web3auth/wallet-connect-v2-adapter" "^6.1.7"
+    "@web3auth/torus-solana-adapter" "^6.1.8"
+    "@web3auth/ui" "^6.1.8"
+    "@web3auth/wallet-connect-v2-adapter" "^6.1.8"
 
 "@web3auth/no-modal@^6.1.7":
   version "6.1.7"
@@ -3618,7 +3640,7 @@
     "@web3auth/base-plugin" "^6.1.7"
     "@web3auth/base-provider" "^6.1.7"
 
-"@web3auth/openlogin-adapter@^6.1.3", "@web3auth/openlogin-adapter@^6.1.7":
+"@web3auth/openlogin-adapter@^6.1.7":
   version "6.1.7"
   resolved "https://registry.yarnpkg.com/@web3auth/openlogin-adapter/-/openlogin-adapter-6.1.7.tgz#0234c8061cb8eb2c834650bd32f320091ef814c4"
   integrity sha512-tmSpvDMPF4gjYgvGM+ROaJofYpGnPvPQueQ2SYBqPQ2qhAY0BlmkI1kRoZAUaPpXKW7Fsyt1DkUuXwzGlLzJNA==
@@ -3629,21 +3651,21 @@
     "@web3auth/base-provider" "^6.1.7"
     lodash.merge "^4.6.2"
 
-"@web3auth/phantom-adapter@^6.1.7":
-  version "6.1.7"
-  resolved "https://registry.yarnpkg.com/@web3auth/phantom-adapter/-/phantom-adapter-6.1.7.tgz#2804197131c85fa51851f7e7b58ad0c4e78e6de3"
-  integrity sha512-hNZSUMX/ZAa1PssAO63WenpUGzj7ALci4T+fJePSC/EtqaAO9HXlMbpXMG/Z8BTZfA9GHCDec4METKylQ9oYcg==
+"@web3auth/phantom-adapter@^6.1.8":
+  version "6.1.8"
+  resolved "https://registry.yarnpkg.com/@web3auth/phantom-adapter/-/phantom-adapter-6.1.8.tgz#a1a827b5eb8a5738e51743419ff6160545adda44"
+  integrity sha512-hkS+byXS4S9ULB/X0BK/k4eQpTVq5Y+dKK/ESHV73ufgImuADA/Pm/+NJxlFmFW2GobsImf+3btP4ACLoT1mCQ==
   dependencies:
     "@web3auth/base" "^6.1.7"
     "@web3auth/base-provider" "^6.1.7"
     "@web3auth/base-solana-adapter" "^6.1.7"
-    "@web3auth/solana-provider" "^6.1.7"
+    "@web3auth/solana-provider" "^6.1.8"
     bn.js "^5.2.1"
 
-"@web3auth/solana-provider@^6.1.7":
-  version "6.1.7"
-  resolved "https://registry.yarnpkg.com/@web3auth/solana-provider/-/solana-provider-6.1.7.tgz#74cfd79c9f8f56092dd6f2d894399ed5d6e8deff"
-  integrity sha512-AeWmLrjTicjmalinhlv+C+QIcJG9reRLC0DVxmHjYVoAMvDc1HyELopzXwWhidGGRNKfoPTZDpuIm9j9MiMjVg==
+"@web3auth/solana-provider@^6.1.8":
+  version "6.1.8"
+  resolved "https://registry.yarnpkg.com/@web3auth/solana-provider/-/solana-provider-6.1.8.tgz#d1b070e1cb77c9328d9cba60d248b44a71b9a17a"
+  integrity sha512-nW/vZOBE+hUNR8XAOaPSmf0GHyKdDiskN0EsudbwhCJ86nZo3t7gH3AeJ/GnnUr+AK2+WRaZJxPn5lzmxN43+Q==
   dependencies:
     "@toruslabs/base-controllers" "^3.1.0"
     "@toruslabs/openlogin-ed25519" "^4.2.0"
@@ -3665,16 +3687,16 @@
     "@web3auth/base" "^6.1.7"
     "@web3auth/base-evm-adapter" "^6.1.7"
 
-"@web3auth/torus-solana-adapter@^6.1.7":
-  version "6.1.7"
-  resolved "https://registry.yarnpkg.com/@web3auth/torus-solana-adapter/-/torus-solana-adapter-6.1.7.tgz#38931dc066c7c4d8e10c7989f417b3805ba7287d"
-  integrity sha512-1yuKYlIOeYBOt7QBNLFA60nauxk6obxy3wWmec8sPBkjSoWK3d4OGHrhUWmCaE9RQFNO+1cEYASirToz6Iw8/A==
+"@web3auth/torus-solana-adapter@^6.1.8":
+  version "6.1.8"
+  resolved "https://registry.yarnpkg.com/@web3auth/torus-solana-adapter/-/torus-solana-adapter-6.1.8.tgz#532afb901c79ecb88c8fd00a7f1c9c41d8ea6bf0"
+  integrity sha512-4I4aUjoVbAsVSwzubf7tcyHNPtRaYXksX7eE/WHpwSj7fzzPlvk4tqGJFUXLKIQr+xrlBgAif/Hr7RadbMTOUg==
   dependencies:
     "@toruslabs/solana-embed" "^1.0.0"
     "@web3auth/base" "^6.1.7"
     "@web3auth/base-provider" "^6.1.7"
     "@web3auth/base-solana-adapter" "^6.1.7"
-    "@web3auth/solana-provider" "^6.1.7"
+    "@web3auth/solana-provider" "^6.1.8"
 
 "@web3auth/torus-wallet-connector-plugin@^6.1.3":
   version "6.1.7"
@@ -3687,10 +3709,10 @@
     "@web3auth/no-modal" "^6.1.7"
     loglevel "^1.8.1"
 
-"@web3auth/ui@^6.1.7":
-  version "6.1.7"
-  resolved "https://registry.yarnpkg.com/@web3auth/ui/-/ui-6.1.7.tgz#1080ff5de114e6e353416ce4ee0e29e9780021fc"
-  integrity sha512-l7wSmvSfMVAfssvZfkijPE0TDMOOsfXYwJYxSxcM4npR7j0qtgRlVoAexzrUrRfQs3coIN4E7DgeASgJ6H1nWg==
+"@web3auth/ui@^6.1.8":
+  version "6.1.8"
+  resolved "https://registry.yarnpkg.com/@web3auth/ui/-/ui-6.1.8.tgz#b8d29336c0fde0c764a2e2431cc632faa7e94308"
+  integrity sha512-Li06B6xQIm3knYnoXcu1ZA5xRK1hFZuNJ3wyP0JJvSPTHsiqNPMqsmmzDds4T2Zb3roLqHPTUxkiZznFl0zonQ==
   dependencies:
     "@toruslabs/http-helpers" "^4.0.0"
     "@toruslabs/openlogin" "^4.7.2"
@@ -3700,13 +3722,13 @@
     bowser "^2.11.0"
     classnames "^2.3.2"
     copy-to-clipboard "^3.3.3"
-    i18next "^23.3.0"
+    i18next "^23.4.2"
     lodash.clonedeep "^4.5.0"
     lodash.merge "^4.6.2"
-    react-i18next "^13.0.2"
+    react-i18next "^13.0.3"
     react-qrcode-logo "^2.9.0"
 
-"@web3auth/wallet-connect-v2-adapter@^6.1.3", "@web3auth/wallet-connect-v2-adapter@^6.1.7":
+"@web3auth/wallet-connect-v2-adapter@^6.1.3":
   version "6.1.7"
   resolved "https://registry.yarnpkg.com/@web3auth/wallet-connect-v2-adapter/-/wallet-connect-v2-adapter-6.1.7.tgz#351e0dfd3f700ee71413b35d9f04cf198984b36e"
   integrity sha512-5tv45Snp+MMwiWMNReWtQOX6xnwFnOO4EExRhm0qC45M03De5FU1mhsLiHroyUIFPNclFpkeIBSmqCWSjLHNOQ==
@@ -3714,6 +3736,16 @@
     "@web3auth/base" "^6.1.7"
     "@web3auth/base-evm-adapter" "^6.1.7"
     "@web3auth/ethereum-provider" "^6.1.7"
+    lodash.merge "^4.6.2"
+
+"@web3auth/wallet-connect-v2-adapter@^6.1.8":
+  version "6.1.8"
+  resolved "https://registry.yarnpkg.com/@web3auth/wallet-connect-v2-adapter/-/wallet-connect-v2-adapter-6.1.8.tgz#f37d92275ad1a3973488ba346aed59cc245c491a"
+  integrity sha512-12dTwAuPnAdm5nQ9DqbrYAECJHiTbbCQvc6uUJGel6Zmq7H+ptLX92ADlQWk6InvoUBfNEqhFbDPJLgegcWTtQ==
+  dependencies:
+    "@web3auth/base" "^6.1.7"
+    "@web3auth/base-evm-adapter" "^6.1.7"
+    "@web3auth/ethereum-provider" "^6.1.8"
     lodash.merge "^4.6.2"
 
 "@web3auth/web3auth-wagmi-connector@^4.0.1":
@@ -5567,10 +5599,10 @@ humanize-ms@^1.2.1:
   dependencies:
     ms "^2.0.0"
 
-i18next@^23.3.0:
-  version "23.4.5"
-  resolved "https://registry.yarnpkg.com/i18next/-/i18next-23.4.5.tgz#3405926b7cd4a4682d6521633e9f836b3d81c5e7"
-  integrity sha512-XXALnva7/5H+kg7TjDsmzY3jRypuSJvjR1eUWtt11yUgsOqjZFq/mnaujJ/XpVWhUJU75QhCUhrZqAarlYpOSQ==
+i18next@^23.4.2:
+  version "23.5.1"
+  resolved "https://registry.yarnpkg.com/i18next/-/i18next-23.5.1.tgz#7f7c35ffaa907618d9489f106d5006b09fbca3d3"
+  integrity sha512-JelYzcaCoFDaa+Ysbfz2JsGAKkrHiMG6S61+HLBUEIPaF40WMwW9hCPymlQGrP+wWawKxKPuSuD71WZscCsWHg==
   dependencies:
     "@babel/runtime" "^7.22.5"
 
@@ -7499,10 +7531,10 @@ react-dom@18.2.0, react-dom@^18.2.0:
     loose-envify "^1.1.0"
     scheduler "^0.23.0"
 
-react-i18next@^13.0.2:
-  version "13.2.0"
-  resolved "https://registry.yarnpkg.com/react-i18next/-/react-i18next-13.2.0.tgz#9d7a574144738e46dd4c66573907f56942435ced"
-  integrity sha512-YD8xMc+I0jkHHLotd8ERMzZ53hMaCBVLCndbcbBveJn3FbppRP4jyYOAkmR8XItN01sTD9ilAjoEjpH1i42IgA==
+react-i18next@^13.0.3:
+  version "13.2.2"
+  resolved "https://registry.yarnpkg.com/react-i18next/-/react-i18next-13.2.2.tgz#b1e78ed66a54f4bc819616f68b98221e1b1a1936"
+  integrity sha512-+nFUkbRByFwnrfDcYqvzBuaeZb+nACHx+fAWN/pZMddWOCJH5hoc21+Sa/N/Lqi6ne6/9wC/qRGOoQhJa6IkEQ==
   dependencies:
     "@babel/runtime" "^7.22.5"
     html-parse-stringify "^3.0.1"

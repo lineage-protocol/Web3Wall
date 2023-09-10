@@ -1,8 +1,8 @@
 import GenericButton from 'components/Buttons/GenericButton'
 import EventCard from 'components/EventCard'
 import MintModal from 'components/Modal/MintModal'
-import { useState } from 'react'
 import { useGetEvents } from 'repositories/subgraph.repository'
+import { useBoundStore } from 'store'
 
 const items = [
   {
@@ -28,17 +28,16 @@ const items = [
 ]
 
 const PageDashboard = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const { modal, setModalState } = useBoundStore()
+  const { data: events } = useGetEvents({})
 
   const openModal = () => {
-    setIsModalOpen(true)
+    setModalState({ mint: { isOpen: true } })
   }
 
   const closeModal = () => {
-    setIsModalOpen(false)
+    setModalState({ mint: { isOpen: false } })
   }
-
-  const { data: events } = useGetEvents({})
 
   return (
     <div className="bg-yellow-100 h-screen">
@@ -74,7 +73,7 @@ const PageDashboard = () => {
               )
             })}
       </div>
-      <MintModal isOpen={isModalOpen} onClose={closeModal} />
+      <MintModal isOpen={modal.mint.isOpen} onClose={closeModal} />
     </div>
   )
 }
