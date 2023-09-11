@@ -53,7 +53,6 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
 
     const web3auth = new Web3Auth({
       clientId: import.meta.env.VITE_WEB3AUTH_CLIENT_ID,
-      web3AuthNetwork: import.meta.env.VITE_WEB3AUTH_NETWORK,
       chainConfig: {
         chainNamespace: CHAIN_NAMESPACES.EIP155,
         chainId: `${import.meta.env.VITE_DEFAULT_CHAIN_ID_HEX}`,
