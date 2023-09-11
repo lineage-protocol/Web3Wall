@@ -23,7 +23,7 @@ const PageWall = () => {
     <div className="h-ful">
       <div className="grid gap-3 overflow-auto pb-10 h-full pt-5">
         {socials &&
-          socials?.map((social, index) => {
+          socials?.map((social: any, index: number) => {
             return <SocialCard key={index} {...social} />
           })}
       </div>
