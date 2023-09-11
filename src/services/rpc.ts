@@ -78,11 +78,16 @@ const getMetadataUseKeyByBlock = (nftKey: String, meta_contract_id: String, vers
   })
 }
 
+<<<<<<< HEAD
 const searchMetadatas = async ({ query = [], ordering = [], from = 0, to = 0 }: Partial<JSONRPCFilter<Metadata>>) => {
+=======
+const getAllMetadataByDataKeyAndBlock = async (nftKey: String, meta_contract_id: String) => {
+>>>>>>> e773e82 (using search_metadatas instead of get_transactions && generate new uuid everytime publish)
   const response = await rpc({
     method: 'POST',
     data: JSON.stringify({
       jsonrpc: '2.0',
+<<<<<<< HEAD
       method: 'search_metadatas',
       params: {
         query: [
@@ -96,6 +101,25 @@ const searchMetadatas = async ({ query = [], ordering = [], from = 0, to = 0 }: 
         ordering,
         from,
         to,
+=======
+      method: 'get_metadatas_by_block',
+      params: {
+        query: [
+          {
+            column: 'data_key',
+            op: '=',
+            query: nftKey,
+          },
+          {
+            column: 'meta_contract_id',
+            op: '=',
+            query: meta_contract_id,
+          },
+        ],
+        ordering: [],
+        from: 0,
+        to: 0,
+>>>>>>> e773e82 (using search_metadatas instead of get_transactions && generate new uuid everytime publish)
       },
       id: '1',
     }),
@@ -200,5 +224,9 @@ export default {
   getMetaContractById,
   getCompleteTransactions,
   getTransactions,
+<<<<<<< HEAD
   searchMetadatas,
+=======
+  getAllMetadataByDataKeyAndBlock,
+>>>>>>> e773e82 (using search_metadatas instead of get_transactions && generate new uuid everytime publish)
 }
