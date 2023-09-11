@@ -40,6 +40,7 @@
     "audiobuffer-to-wav": "^1.0.0",
     "axios": "^1.4.0",
     "bn.js": "^5.2.1",
+    "browser-image-compression": "^2.0.2",
     "bs58": "^5.0.0",
     "classnames": "^2.3.2",
     "crypto-js": "^4.1.1",

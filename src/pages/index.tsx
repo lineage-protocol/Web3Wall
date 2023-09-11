@@ -1,6 +1,7 @@
 import AddToHomeScreenModal from 'components/Modal/AddToHomeScreenModal'
 import AndroidNotMatchModal from 'components/Modal/AndroidNotMatch'
 import IosNotMatchModal from 'components/Modal/IosNotMatch'
+import { useWeb3Auth } from 'hooks/use-web3auth'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -52,8 +53,7 @@ const PageIndex = () => {
     }
 
     checkPWA()
-    checkVersion()
-  }, [navigate])
+  }, [])
 
   useEffect(() => {
     if (isPWA && (isPWAiOS || isPWAAndroid)) {
@@ -64,9 +64,7 @@ const PageIndex = () => {
   return (
     <>
       <div className="flex flex-col h-screen justify-center items-center p-2 w-full mx-auto">
-        {/* <IosNotMatchModal /> */}
-        {/* <AndroidNotMatchModal /> */}
-        <AddToHomeScreenModal />
+        {!isPWA && <AddToHomeScreenModal />}
       </div>
     </>
   )

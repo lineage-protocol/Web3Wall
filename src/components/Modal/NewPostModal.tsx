@@ -3,8 +3,8 @@ import GenericButton from 'components/Buttons/GenericButton'
 import { CameraIcon, LoadingSpinner } from 'components/Icons/icons'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { usePublishTransaction, useStoreBlob } from 'repositories/rpc.repository'
+import imageCompression from 'browser-image-compression'
 
 const LoadingOverlay = () => {
   return (
@@ -27,7 +27,7 @@ interface Props {
 const NewPostModal = (prop: Props) => {
   const [isLoading, setIsLoading] = useState(false)
   const [text, setText] = useState('')
-  const [file, setFile] = useState<File>()
+  const [file, setFile] = useState<File | Blob>()
   const [disablePostBtn, setDisablePostBtn] = useState(true)
   const [textRows, setTextRows] = useState(8)
   const inputFileRef = useRef<HTMLInputElement>(null)
@@ -52,9 +52,8 @@ const NewPostModal = (prop: Props) => {
     }
 
     try {
-      console.log(JSON.stringify(content))
       const signed = await signMessage(JSON.stringify(content))
-      console.log(signed)
+
       await publishTx({
         alias: '',
         chain_id: prop.chainId as string,
@@ -71,7 +70,6 @@ const NewPostModal = (prop: Props) => {
 
       onCloseDialog()
     } catch (e) {
-      console.log(e)
       onCloseDialog()
     }
   }
@@ -95,8 +93,26 @@ const NewPostModal = (prop: Props) => {
       }
 
       const pickedFile = filePicker.files[0]
-      setFile(pickedFile)
-      setTextRows(2)
+
+      if (getFileType() == 'image') {
+        console.log(`originalFile size ${pickedFile.size / 1024 / 1024} MB`)
+
+        const options = {
+          maxSizeMB: 300,
+          maxWidthOrHeight: 400,
+        }
+
+        imageCompression(pickedFile, options)
+          .then(compressedFile => {
+            setFile(compressedFile)
+          })
+          .catch(e => {
+            console.log(e)
+          })
+      } else {
+        setFile(pickedFile)
+      }
+
       resolve()
     })
   }

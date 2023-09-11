@@ -3,9 +3,8 @@ import GenericButton from 'components/Buttons/GenericButton'
 import MintButton from 'components/Buttons/MintButton'
 import { CameraIcon } from 'components/Icons/icons'
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useStoreBlob } from 'repositories/rpc.repository'
-
+import imageCompression from 'browser-image-compression'
 interface Props {
   isOpen: boolean
   onClose: () => void
@@ -13,7 +12,7 @@ interface Props {
 }
 
 const MintModal = (prop: Props) => {
-  const [file, setFile] = useState<File>()
+  const [file, setFile] = useState<File | Blob>()
   const [imagePreview, setImagePreview] = useState('')
   const inputFileRef = useRef<HTMLInputElement>(null)
 
@@ -30,8 +29,21 @@ const MintModal = (prop: Props) => {
       }
 
       const pickedFile = filePicker.files[0]
-      setFile(pickedFile)
-      setImagePreview(URL.createObjectURL(pickedFile))
+
+      const options = {
+        maxSizeMB: 300,
+        maxWidthOrHeight: 400,
+      }
+
+      imageCompression(pickedFile, options)
+        .then(compressedFile => {
+          setFile(compressedFile)
+          setImagePreview(URL.createObjectURL(compressedFile))
+        })
+        .catch(e => {
+          console.log(e)
+        })
+
       resolve()
     })
   }
@@ -122,13 +134,27 @@ const MintModal = (prop: Props) => {
                     </div>
                   </header>
                   <div className="relative h-1/3 w-full">
-                    <img
-                      className="h-full w-full object-cover"
-                      src={
-                        imagePreview ||
-                        'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8YXZhdGFyfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=800&q=60'
-                      }
-                    />
+                    {!imagePreview && (
+                      <div className="h-full w-full flex justify-center items-center bg-gray-100">
+                        <span>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="#e0e0e0"
+                            className="w-12 h-12"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                            />
+                          </svg>
+                        </span>
+                      </div>
+                    )}
+                    {imagePreview && <img className="h-full w-full object-cover" src={imagePreview} />}
                     <div className="absolute">
                       <GenericButton
                         onClick={() => {

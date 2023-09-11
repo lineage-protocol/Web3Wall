@@ -20,8 +20,8 @@ const PageWall = () => {
   }
 
   return (
-    <>
-      <div className="grid gap-3 overflow-auto pb-10 h-full bg-purple-800/30">
+    <div className="h-ful">
+      <div className="grid gap-3 overflow-auto pb-10 h-full pt-5">
         {socials &&
           socials?.map((social, index) => {
             return <SocialCard key={index} {...social} />
@@ -29,7 +29,7 @@ const PageWall = () => {
       </div>
       <button
         onClick={() => openModal()}
-        className="absolute bottom-5 right-5 bg-blue-500 text-white h-12 w-12 rounded-full flex items-center justify-center text-2xl"
+        className="fixed bottom-5 right-5 bg-blue-500 text-white h-12 w-12 rounded-full flex items-center justify-center text-2xl"
       >
         +
       </button>
@@ -41,7 +41,7 @@ const PageWall = () => {
         isOpen={isModalOpen}
         onClose={closeModal}
       />
-    </>
+    </div>
   )
 }
 
