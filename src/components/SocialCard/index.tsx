@@ -55,7 +55,7 @@ const SocialCard = (prop: SocialCardProp) => {
                 url: `${window.location.href}?share=true`,
                 text: 'Check this out!',
               }}
-              onClick={() => console.log('shared successfully!')}
+              onClick={() => {}}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

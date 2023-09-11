@@ -14,7 +14,6 @@ export default function Header() {
   const setShareURL = () => {
     let url = new URL(window.location.href)
     let isShare = url.searchParams.get('share')
-    console.log(url.pathname)
     if (isShare) setWallState({ shareURL: url.pathname.split('?')[0] })
   }
 

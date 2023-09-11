@@ -8,15 +8,17 @@ const PageLogin = () => {
   const navigate = useNavigate()
   const { userInfo, connect } = useWeb3Auth()
 
-  const { wall } = useBoundStore()
+  const { wall, setWallState } = useBoundStore()
 
   const onClickLogin = async () => {
     await connect()
     wall?.shareURL ? navigate(wall.shareURL) : navigate('/dashboard')
+    setWallState({ shareURL: undefined })
   }
 
   const onClickDashboard = () => {
     wall?.shareURL ? navigate(wall.shareURL) : navigate('/dashboard')
+    setWallState({ shareURL: undefined })
   }
 
   return (
