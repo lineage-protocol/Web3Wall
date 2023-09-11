@@ -7,15 +7,20 @@ export default function Header() {
   const navigate = useNavigate()
 
   const [address, setAddress] = useState('')
+  const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
     const getAccount = async () => {
       const acc = await getAccounts()
+      if (!acc) {
+        navigate('/login')
+      }
       setAddress(acc)
+      setIsLoaded(true)
     }
 
     getAccount()
-  }, [getAccounts])
+  }, [getAccounts, navigate])
 
   const onLogOut = async () => {
     await disconnect()
@@ -24,7 +29,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-gray-50 fixed w-full top-0 z-5">
+      <header className="bg-gray-50 fixed w-full top-0 z-10">
         <div className="mx-auto max-w-screen-xl px-4 py-2">
           <div className="">
             <div className="flex justify-between items-center">
@@ -35,7 +40,7 @@ export default function Header() {
 
               <div className="text-right">
                 <Link to="/login" className="block shrink-0">
-                  {address.substring(0, 6) + '...' + address.substring(address.length - 4)}
+                  {isLoaded && address && address.substring(0, 6) + '...' + address.substring(address.length - 4)}
                 </Link>
                 <button
                   onClick={() => onLogOut()}

@@ -41,7 +41,7 @@ const PageDashboard = () => {
   const filteredEvents = events?.filter(event => event?.data.name.toLowerCase().includes(search.toLowerCase()))
 
   return (
-    <div className="bg-yellow-100 h-screen">
+    <div className="h-screen pt-5">
       <div className="flex items-center p-3">
         <div className="relative flex-1">
           <label className="sr-only" htmlFor="search">
