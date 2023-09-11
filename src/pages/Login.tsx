@@ -2,18 +2,21 @@ import GenericButton from 'components/Buttons/GenericButton'
 import { LoginIcon, LogoutIcon } from 'components/Icons/icons'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import { useNavigate } from 'react-router-dom'
+import { useBoundStore } from 'store'
 
 const PageLogin = () => {
   const navigate = useNavigate()
   const { userInfo, connect } = useWeb3Auth()
 
+  const { wall } = useBoundStore()
+
   const onClickLogin = async () => {
     await connect()
-    navigate('/dashboard')
+    wall?.shareURL ? navigate(wall.shareURL) : navigate('/dashboard')
   }
 
   const onClickDashboard = () => {
-    navigate('/dashboard')
+    wall?.shareURL ? navigate(wall.shareURL) : navigate('/dashboard')
   }
 
   return (
