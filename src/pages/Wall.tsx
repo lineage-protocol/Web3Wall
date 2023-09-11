@@ -6,7 +6,7 @@ import { useGetPosts } from 'repositories/rpc.repository'
 
 const PageWall = () => {
   const { token_address, token_id, chain_id, key } = useParams()
-  const { data: posts } = useGetPosts()
+  const { data: posts } = useGetPosts(key as string)
   const socials = posts?.[`${key}`]
 
   const [isModalOpen, setIsModalOpen] = useState(false)

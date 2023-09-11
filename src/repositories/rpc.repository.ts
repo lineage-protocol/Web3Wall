@@ -84,37 +84,14 @@ const useStoreBlob = () => {
   })
 }
 
-const useGetPosts = () => {
+const useGetPosts = (nft_key: string) => {
   return useQuery({
     queryKey: [RQ_KEY.GET_POSTS],
     queryFn: async () => {
-      const result = await rpc.getTransactions({
-        query: [
-          {
-            column: 'method',
-            op: '=',
-            query: 'metadata',
-          },
-          {
-            column: 'status',
-            op: '=',
-            query: '1',
-          },
-          {
-            column: 'meta_contract_id',
-            op: '=',
-            query: `${import.meta.env.VITE_WEB3WALL_META_CONTRACT_ID}`,
-          },
-        ],
-        ordering: [
-          {
-            column: 'timestamp',
-            sort: 'desc',
-          },
-        ],
-        from: 0,
-        to: 0,
-      })
+      const result = await rpc.getAllMetadataByDataKeyAndBlock(
+        nft_key,
+        `${import.meta.env.VITE_WEB3WALL_META_CONTRACT_ID}`
+      )
 
       return result?.reduce(
         (prev, curr) => {

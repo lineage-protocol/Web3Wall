@@ -77,6 +77,36 @@ const getMetadataUseKeyByBlock = (nftKey: String, meta_contract_id: String, vers
   })
 }
 
+const getAllMetadataByDataKeyAndBlock = async (nftKey: String, meta_contract_id: String) => {
+  const response = await rpc({
+    method: 'POST',
+    data: JSON.stringify({
+      jsonrpc: '2.0',
+      method: 'get_metadatas_by_block',
+      params: {
+        query: [
+          {
+            column: 'data_key',
+            op: '=',
+            query: nftKey,
+          },
+          {
+            column: 'meta_contract_id',
+            op: '=',
+            query: meta_contract_id,
+          },
+        ],
+        ordering: [],
+        from: 0,
+        to: 0,
+      },
+      id: '1',
+    }),
+  })
+
+  return response.data?.result?.metadatas
+}
+
 const getContentFromIpfs = (cid: String) => {
   return rpc({
     method: 'POST',
@@ -173,4 +203,5 @@ export default {
   getMetaContractById,
   getCompleteTransactions,
   getTransactions,
+  getAllMetadataByDataKeyAndBlock,
 }

@@ -5,6 +5,7 @@ import { useWeb3Auth } from 'hooks/use-web3auth'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { usePublishTransaction, useStoreBlob } from 'repositories/rpc.repository'
 import imageCompression from 'browser-image-compression'
+import { uuid } from 'uuidv4'
 
 const LoadingOverlay = () => {
   return (
@@ -65,7 +66,7 @@ const NewPostModal = (prop: Props) => {
         public_key: account as string,
         token_address: prop.tokenAddress as string,
         token_id: prop.tokenId as string,
-        version: '1',
+        version: uuid(),
       })
 
       onCloseDialog()
