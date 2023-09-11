@@ -3,9 +3,8 @@ import GenericButton from 'components/Buttons/GenericButton'
 import MintButton from 'components/Buttons/MintButton'
 import { CameraIcon } from 'components/Icons/icons'
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useStoreBlob } from 'repositories/rpc.repository'
-
+import imageCompression from 'browser-image-compression'
 interface Props {
   isOpen: boolean
   onClose: () => void
@@ -13,7 +12,7 @@ interface Props {
 }
 
 const MintModal = (prop: Props) => {
-  const [file, setFile] = useState<File>()
+  const [file, setFile] = useState<File | Blob>()
   const [imagePreview, setImagePreview] = useState('')
   const inputFileRef = useRef<HTMLInputElement>(null)
 
@@ -30,8 +29,24 @@ const MintModal = (prop: Props) => {
       }
 
       const pickedFile = filePicker.files[0]
-      setFile(pickedFile)
-      setImagePreview(URL.createObjectURL(pickedFile))
+
+      console.log(`originalFile size ${pickedFile.size / 1024 / 1024} MB`)
+
+      const options = {
+        maxSizeMB: 300,
+        maxWidthOrHeight: 400,
+      }
+
+      imageCompression(pickedFile, options)
+        .then(compressedFile => {
+          console.log(compressedFile.size / 1024 / 1024)
+          setFile(compressedFile)
+          setImagePreview(URL.createObjectURL(compressedFile))
+        })
+        .catch(e => {
+          console.log(e)
+        })
+
       resolve()
     })
   }

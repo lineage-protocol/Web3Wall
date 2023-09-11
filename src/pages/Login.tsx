@@ -1,20 +1,39 @@
 import GenericButton from 'components/Buttons/GenericButton'
 import { LoginIcon, LogoutIcon } from 'components/Icons/icons'
 import { useWeb3Auth } from 'hooks/use-web3auth'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const PageLogin = () => {
   const navigate = useNavigate()
-  const { userInfo, connect, disconnect } = useWeb3Auth()
+  const { getAccounts, userInfo, connect, disconnect } = useWeb3Auth()
+  const [isLoggedIn, SetIsLoggedIn] = useState(false)
 
   const onClickLogin = async () => {
     await connect()
-    navigate('/dashboard')
+    SetIsLoggedIn(true)
   }
 
   const onClickLogout = async () => {
     await disconnect()
   }
+
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      const account = await getAccounts()
+      if (account) {
+        SetIsLoggedIn(true)
+      } else {
+        SetIsLoggedIn(false)
+      }
+    }
+
+    checkLoggedIn()
+
+    if (isLoggedIn) {
+      navigate('/dashboard')
+    }
+  }, [navigate, getAccounts, isLoggedIn])
 
   return (
     <>
