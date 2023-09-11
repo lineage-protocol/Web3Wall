@@ -2,14 +2,33 @@ import GenericButton from 'components/Buttons/GenericButton'
 import EventCard from 'components/EventCard'
 import { AddIcon } from 'components/Icons/icons'
 import MintModal from 'components/Modal/MintModal'
-import { useState } from 'react'
+import { useWeb3Auth } from 'hooks/use-web3auth'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useGetEvents } from 'repositories/subgraph.repository'
 import { useBoundStore } from 'store'
 
 const PageDashboard = () => {
+  const { getAccounts } = useWeb3Auth()
+  const navigate = useNavigate()
+
   const { modal, setModalState } = useBoundStore()
   const { data: events } = useGetEvents({})
   const [search, setSearch] = useState('')
+  const [isLoggedIn, SetIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      const account = await getAccounts()
+      if (account) {
+        SetIsLoggedIn(true)
+      } else {
+        SetIsLoggedIn(false)
+      }
+    }
+
+    checkLoggedIn()
+  }, [navigate, getAccounts, isLoggedIn])
 
   const openModal = () => {
     setModalState({ mint: { isOpen: true } })

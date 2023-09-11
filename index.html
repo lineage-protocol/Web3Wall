@@ -33,15 +33,6 @@
       window.process = process
       window.EventEmitter = EventEmitter
     </script>
-    <script>
-      document.body.addEventListener(
-        'touchmove',
-        function (event) {
-          event.preventDefault()
-        },
-        { passive: false }
-      )
-    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

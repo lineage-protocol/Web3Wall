@@ -7,33 +7,32 @@ import { useNavigate } from 'react-router-dom'
 const PageLogin = () => {
   const navigate = useNavigate()
   const { getAccounts, userInfo, connect, disconnect } = useWeb3Auth()
-  const [isLoggedIn, SetIsLoggedIn] = useState(false)
 
   const onClickLogin = async () => {
     await connect()
-    SetIsLoggedIn(true)
+    navigate('/dashboard')
   }
 
-  const onClickLogout = async () => {
-    await disconnect()
+  const onClickDashboard = () => {
+    navigate('/dashboard')
   }
 
-  useEffect(() => {
-    const checkLoggedIn = async () => {
-      const account = await getAccounts()
-      if (account) {
-        SetIsLoggedIn(true)
-      } else {
-        SetIsLoggedIn(false)
-      }
-    }
+  // useEffect(() => {
+  //   const checkLoggedIn = async () => {
+  //     const account = await getAccounts()
+  //     if (account) {
+  //       SetIsLoggedIn(true)
+  //     } else {
+  //       SetIsLoggedIn(false)
+  //     }
+  //   }
 
-    checkLoggedIn()
+  //   checkLoggedIn()
 
-    if (isLoggedIn) {
-      navigate('/dashboard')
-    }
-  }, [navigate, getAccounts, isLoggedIn])
+  //   if (isLoggedIn) {
+  //     navigate('/dashboard')
+  //   }
+  // }, [navigate, getAccounts, isLoggedIn])
 
   return (
     <>
@@ -59,7 +58,7 @@ const PageLogin = () => {
                 {!userInfo ? (
                   <GenericButton className="" icon={<LoginIcon />} name="Login" onClick={() => onClickLogin()} />
                 ) : (
-                  <GenericButton className="" icon={<LogoutIcon />} name="Logout" onClick={() => onClickLogout()} />
+                  <GenericButton className="" name="Go To Dashboard" onClick={() => onClickDashboard()} />
                 )}
               </div>
             </div>
