@@ -1,13 +1,21 @@
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useBoundStore } from 'store'
 
 export default function Header() {
   const { getAccounts, disconnect } = useWeb3Auth()
   const navigate = useNavigate()
+  const { setWallState } = useBoundStore()
 
   const [address, setAddress] = useState('')
   const [isLoaded, setIsLoaded] = useState(false)
+
+  const setShareURL = () => {
+    let url = new URL(window.location.href)
+    let isShare = url.searchParams.get('share')
+    if (isShare) setWallState({ shareURL: url.pathname.split('?')[0] })
+  }
 
   useEffect(() => {
     const getAccount = async () => {
@@ -19,6 +27,7 @@ export default function Header() {
       setIsLoaded(true)
     }
 
+    setShareURL()
     getAccount()
   }, [getAccounts, navigate])
 
