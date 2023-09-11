@@ -77,29 +77,13 @@ const getMetadataUseKeyByBlock = (nftKey: String, meta_contract_id: String, vers
   })
 }
 
-const getAllMetadataByDataKeyAndBlock = async (nftKey: String, meta_contract_id: String) => {
+const getAllMetadataByDataKeyAndBlock = async (nftKey: String, meta_contract_id: String, version: string) => {
   const response = await rpc({
     method: 'POST',
     data: JSON.stringify({
       jsonrpc: '2.0',
       method: 'get_metadatas_by_block',
-      params: {
-        query: [
-          {
-            column: 'data_key',
-            op: '=',
-            query: nftKey,
-          },
-          {
-            column: 'meta_contract_id',
-            op: '=',
-            query: meta_contract_id,
-          },
-        ],
-        ordering: [],
-        from: 0,
-        to: 0,
-      },
+      params: [nftKey, meta_contract_id, version],
       id: '1',
     }),
   })
