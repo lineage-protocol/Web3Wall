@@ -51,9 +51,9 @@ const SocialCard = (prop: SocialCardProp) => {
           <div className="flex justify-end mx-3 mt-4  items-center gap-1 text-gray-500">
             <RWebShare
               data={{
-                title: 'Web3Wall',
-                url: `${window.location.href}?share=true`,
-                text: 'Check this out!',
+                title: 'W3wall',
+                url: `${window.location.href}`,
+                text: 'Check this out',
               }}
               onClick={() => {}}
             >

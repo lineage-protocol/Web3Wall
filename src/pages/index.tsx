@@ -1,7 +1,4 @@
 import AddToHomeScreenModal from 'components/Modal/AddToHomeScreenModal'
-import AndroidNotMatchModal from 'components/Modal/AndroidNotMatch'
-import IosNotMatchModal from 'components/Modal/IosNotMatch'
-import { useWeb3Auth } from 'hooks/use-web3auth'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
