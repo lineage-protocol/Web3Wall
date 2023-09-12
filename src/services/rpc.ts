@@ -115,6 +115,11 @@ const getAllMetadataByDataKeyAndBlock = async (nftKey: String, meta_contract_id:
             op: '=',
             query: meta_contract_id,
           },
+          {
+            column: 'loose',
+            op: '=',
+            query: '0',
+          },
         ],
         ordering: [],
         from: 0,

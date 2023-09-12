@@ -60,7 +60,7 @@ const NewPostModal = (prop: Props) => {
         chain_id: prop.chainId as string,
         signature: signed?.signature as string,
         data: JSON.stringify(content),
-        mcdata: JSON.stringify({ loose: 0 }),
+        mcdata: '',
         meta_contract_id: `${import.meta.env.VITE_WEB3WALL_META_CONTRACT_ID}`,
         method: 'metadata',
         public_key: account as string,
