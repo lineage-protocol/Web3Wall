@@ -1,7 +1,7 @@
 import { Dialog, Transition } from '@headlessui/react'
 import { Fragment, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { v4 as uuidv4 } from 'uuid'
+import { v4 } from 'uuid'
 interface VersionModalProp {
   isOpen: boolean
   onClose: () => void
@@ -17,7 +17,7 @@ const VersionModal = (prop: VersionModalProp) => {
 
   useEffect(() => {
     if (!uuid) {
-      const id = uuidv4()
+      const id = v4()
       setUuid(id as String)
     }
   }, [uuid])

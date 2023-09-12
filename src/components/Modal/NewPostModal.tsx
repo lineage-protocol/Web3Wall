@@ -5,7 +5,7 @@ import { useWeb3Auth } from 'hooks/use-web3auth'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { usePublishTransaction, useStoreBlob } from 'repositories/rpc.repository'
 import imageCompression from 'browser-image-compression'
-import { uuid } from 'uuidv4'
+import { v4 } from 'uuid'
 
 const LoadingOverlay = () => {
   return (
@@ -60,13 +60,13 @@ const NewPostModal = (prop: Props) => {
         chain_id: prop.chainId as string,
         signature: signed?.signature as string,
         data: JSON.stringify(content),
-        mcdata: JSON.stringify({ loose: 0 }),
+        mcdata: '',
         meta_contract_id: `${import.meta.env.VITE_WEB3WALL_META_CONTRACT_ID}`,
         method: 'metadata',
         public_key: account as string,
         token_address: prop.tokenAddress as string,
         token_id: prop.tokenId as string,
-        version: uuid(),
+        version: v4(),
       })
 
       onCloseDialog()

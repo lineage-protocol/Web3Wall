@@ -94,15 +94,13 @@ const useGetPosts = (nft_key: string) => {
       )
 
       return result?.reduce(
-        (prev: any, curr: any) => {
-          const data_key = formatDataKey(curr.chain_id, curr.token_address, curr.token_id)
-
-          if (!prev[data_key]) prev[data_key] = []
-
+        async (prev: any, curr: any) => {
+          if (!prev[curr.data_key]) prev[curr.data_key] = []
           try {
-            const data = JSON.parse(curr.data) as { text: string; image: string }
+            const res = await rpc.getContentFromIpfs(curr.cid)
+            const data = JSON.parse(res.data.result.content as string) as { text: string; image: string }
 
-            prev[data_key]?.push({
+            prev[curr.data_key]?.push({
               ...data,
               public_key: curr.public_key,
               timestamp: curr.timestamp as number,
