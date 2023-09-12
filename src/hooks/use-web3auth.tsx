@@ -66,7 +66,7 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
         mfaLevel: 'optional',
       },
       adapterSettings: {
-        uxMode: 'popup',
+        uxMode: 'redirect',
         whiteLabel: {
           name: 'Web3Auth',
           logoLight: 'https://web3auth.io/images/w3a-L-Favicon-1.svg',
