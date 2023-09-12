@@ -93,26 +93,21 @@ const useGetPosts = (nft_key: string) => {
         `${import.meta.env.VITE_WEB3WALL_META_CONTRACT_ID}`
       )
 
-      return result?.reduce(
-        async (prev: any, curr: any) => {
-          if (!prev[curr.data_key]) prev[curr.data_key] = []
-          try {
-            const res = await rpc.getContentFromIpfs(curr.cid)
-            const data = JSON.parse(res.data.result.content as string) as { text: string; image: string }
+      const promises = result?.map(async curr => {
+        const res = await rpc.getContentFromIpfs(curr.cid as string)
+        const content = JSON.parse(res.data.result.content as string)
+        const data = content.content as { text: string; image: string }
 
-            prev[curr.data_key]?.push({
-              ...data,
-              public_key: curr.public_key,
-              timestamp: curr.timestamp as number,
-            })
+        return {
+          ...data,
+          public_key: curr.public_key,
+          timestamp: content.timestamp as number,
+        }
+      })
 
-            return prev
-          } catch (e) {
-            return prev
-          }
-        },
-        {} as Record<string, { public_key: string; text: string; image: string; timestamp: number }[]>
-      )
+      const results = await Promise.all(promises)
+
+      return results
     },
   })
 }
