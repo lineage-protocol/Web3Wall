@@ -93,7 +93,7 @@ const useGetPosts = (nft_key: string) => {
         `${import.meta.env.VITE_WEB3WALL_META_CONTRACT_ID}`
       )
 
-      const promises = result?.map(async curr => {
+      const promises = result?.map(async (curr: any) => {
         const res = await rpc.getContentFromIpfs(curr.cid as string)
         const content = JSON.parse(res.data.result.content as string)
         const data = content.content as { text: string; image: string }
