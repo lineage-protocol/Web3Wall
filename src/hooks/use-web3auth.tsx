@@ -172,6 +172,15 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
     return await rpc.mintCopy(abi as string, contractAddress, data as number)
   }
 
+  async function mintCopy({ abi, contractAddress, data }: { abi: any; contractAddress: string; data: number }) {
+    if (!provider) {
+      return
+    }
+
+    const rpc = new RPC(provider)
+    return await rpc.mintCopy(abi as string, contractAddress, data)
+  }
+
   async function getAccounts() {
     if (!provider) {
       return

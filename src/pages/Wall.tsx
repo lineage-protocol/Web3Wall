@@ -16,6 +16,7 @@ const PageWall = () => {
   const { modal, setModalState } = useBoundStore()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isPOAPModalOpen, setIsPOAPModalOpen] = useState(false)
 
   const openModal = () => {
     setIsModalOpen(true)
