@@ -1,4 +1,5 @@
 import NewPostModal from 'components/Modal/NewPostModal'
+import PoapModal from 'components/Modal/PoapModal'
 import SocialCard from 'components/SocialCard'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -10,6 +11,7 @@ const PageWall = () => {
   const socials = posts
 
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isPOAPModalOpen, setIsPOAPModalOpen] = useState(false)
 
   const openModal = () => {
     setIsModalOpen(true)
@@ -17,6 +19,14 @@ const PageWall = () => {
 
   const closeModal = () => {
     setIsModalOpen(false)
+  }
+
+  const openPOAPModal = () => {
+    setIsPOAPModalOpen(true)
+  }
+
+  const closePOAPModal = () => {
+    setIsPOAPModalOpen(false)
   }
 
   return (
@@ -27,12 +37,20 @@ const PageWall = () => {
             return <SocialCard key={index} {...social} />
           })}
       </div>
-      <button
-        onClick={() => openModal()}
-        className="fixed bottom-5 right-5 bg-blue-500 text-white h-12 w-12 rounded-full flex items-center justify-center text-2xl"
-      >
-        +
-      </button>
+      <div className="fixed bottom-5 right-5 ">
+        <button
+          onClick={() => openModal()}
+          className="bg-blue-500 text-white h-12 w-12 rounded-full flex items-center justify-center text-2xl"
+        >
+          POAP
+        </button>
+        <button
+          onClick={() => openModal()}
+          className="bg-blue-500 text-white h-12 w-12 rounded-full flex items-center justify-center text-2xl"
+        >
+          +
+        </button>
+      </div>
       <NewPostModal
         id={key as String}
         tokenId={token_id as String}
@@ -41,6 +59,8 @@ const PageWall = () => {
         isOpen={isModalOpen}
         onClose={closeModal}
       />
+
+      <PoapModal tokenId={token_id} isOpen={isPOAPModalOpen} onClose={closePOAPModal} />
     </div>
   )
 }
