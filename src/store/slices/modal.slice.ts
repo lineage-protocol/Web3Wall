@@ -10,6 +10,7 @@ export type Modal = {
   signUpMain: ModalState
   signUpRainbow: ModalState
   mint: ModalState
+  poap: ModalState
 }
 
 export interface ModalSlice {
@@ -23,6 +24,7 @@ const initialModal = {
     signUpMain: { isOpen: false },
     signUpRainbow: { isOpen: false },
     mint: { isOpen: false },
+    poap: { isOpen: false },
   },
 }
 

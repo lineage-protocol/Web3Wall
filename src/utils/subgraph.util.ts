@@ -11,6 +11,10 @@ export type MintedNft = {
 
 export function decodeMinted(data: string) {
   const abiCoder = new AbiCoder()
+  if (data.length < 32 * 2) {
+    return ['', '']
+  }
+
   const [_, bytes] = abiCoder.decode(['string', 'bytes'], data)
   return abiCoder.decode(['string', 'string'], bytes)
 }
