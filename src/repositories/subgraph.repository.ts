@@ -90,7 +90,7 @@ type MintedEvent = {
 }
 
 const useGetEvents = (variables: ApolloClientFilter) => {
-  let query = `
+  const query = `
   query Minteds($first: Int, $skip: Int, $where: Minted_filter) {
     minteds(first: $first, skip: $skip, where: $where) {
       tokenId
@@ -107,8 +107,7 @@ const useGetEvents = (variables: ApolloClientFilter) => {
       const { data } = await apolloQuery<{ minteds: MintedEvent[] }>({ query, variables })
 
       return data?.minteds?.map(el => {
-        let [name, title] = decodeMinted(el.data)
-
+        const [name, title] = decodeMinted(el.data)
         return {
           ...el,
           data: { name, title },

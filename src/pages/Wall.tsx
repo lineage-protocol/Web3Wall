@@ -10,6 +10,7 @@ const PageWall = () => {
   const { token_address, token_id, chain_id, key } = useParams()
   const { data: posts } = useGetPosts(key as string)
   const socials = posts
+
   const { modal, setModalState } = useBoundStore()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
