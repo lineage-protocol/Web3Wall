@@ -20,6 +20,6 @@ select {
 
 @layer base {
   html {
-    @apply bg-yellow-100;
+    @apply bg-gray-200;
   }
 }

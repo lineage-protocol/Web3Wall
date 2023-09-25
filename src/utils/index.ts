@@ -207,17 +207,17 @@ export function timeAgo(timestamp: number): string {
   const secondsPast = (Date.now() - timestamp) / 1000
 
   if (secondsPast < 60) {
-    return `${Math.floor(secondsPast)} seconds ago`
+    return `${Math.floor(secondsPast)}s`
   }
   if (secondsPast < 3600) {
-    return `${Math.floor(secondsPast / 60)} minutes ago`
+    return `${Math.floor(secondsPast / 60)}m`
   }
   if (secondsPast <= 86400) {
-    return `${Math.floor(secondsPast / 3600)} hours ago`
+    return `${Math.floor(secondsPast / 3600)}h`
   }
   if (secondsPast > 86400) {
     const days = Math.floor(secondsPast / 86400)
-    return `${days} day${days !== 1 ? 's' : ''} ago`
+    return `${days}d`
   }
 
   return ''

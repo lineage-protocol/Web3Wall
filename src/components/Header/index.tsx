@@ -12,8 +12,8 @@ export default function Header() {
   const [isLoaded, setIsLoaded] = useState(false)
 
   const setShareURL = () => {
-    let url = new URL(window.location.href)
-    let isShare = url.searchParams.get('share')
+    const url = new URL(window.location.href)
+    const isShare = url.searchParams.get('share')
     if (isShare) setWallState({ shareURL: url.pathname.split('?')[0] })
   }
 
@@ -38,8 +38,8 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-gray-50 fixed w-full top-0 z-10">
-        <div className="mx-auto max-w-screen-xl px-4 py-2">
+      <header className="bg-gray-50 fixed w-full max-w-md top-0 z-10">
+        <div className="px-4 py-2">
           <div className="">
             <div className="flex justify-between items-center">
               <Link to="/dashboard" className="block shrink-0">

@@ -3,18 +3,22 @@ import { timeAgo } from 'utils'
 import { RWebShare } from 'react-web-share'
 
 interface SocialCardProp {
+  tokenId: String
+  tokenAddress: String
+  chainId: String
   text: String
   image: String
   public_key: String
   timestamp: number
+  onCommentClicked: (tokenId: String, tokenAddress: String, chainId: String) => void
 }
 
 const SortCardDisplay = (prop: SocialCardProp) => {
   if (prop.text && prop.image) {
     return (
       <>
-        <ResponsiveText>{prop.text}</ResponsiveText>
-        <div className="mx-auto">
+        <div className="px-3">{prop.text}</div>
+        <div className="mx-auto mt-2">
           <img src={prop.image as string} className="w-full object-contain" alt="" />
         </div>
       </>
@@ -26,7 +30,7 @@ const SortCardDisplay = (prop: SocialCardProp) => {
       </div>
     )
   } else if (prop.text) {
-    return <ResponsiveText>{prop.text}</ResponsiveText>
+    return <div className="px-3">{prop.text}</div>
   } else {
     return <></>
   }
@@ -36,19 +40,38 @@ const SocialCard = (prop: SocialCardProp) => {
   return (
     <>
       <article className="transition">
-        <div className="bg-white pb-5 border-[1px] border-black mx-2 mt-2 rounded-md">
-          <div className="px-3 pt-5 mb-2 text-xs">
+        <div className="bg-white border-b-[1px] mb-1 border-gray-200 mx-1">
+          <div className="flex px-3 pt-3 mb-1 text-xs">
             <div className="font-bold">
               {prop.public_key.substring(0, 6) + '...' + prop.public_key.substring(prop.public_key.length - 4)}
             </div>
-            <div className="text-gray-400">{timeAgo(prop.timestamp)}</div>
+            <div className="ml-2 text-gray-400">{timeAgo(prop.timestamp)}</div>
           </div>
 
           <div>
             <SortCardDisplay {...prop} />
           </div>
 
-          <div className="flex justify-end mx-3 mt-4  items-center gap-1 text-gray-500">
+          <div className="flex justify-between mx-3 items-center gap-1 py-3 text-gray-500">
+            <button
+              className="text-sm flex gap-2 items-center cursor-pointer"
+              onClick={() => prop.onCommentClicked(prop.tokenId, prop.tokenAddress, prop.chainId)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
+                />
+              </svg>
+            </button>
             <RWebShare
               data={{
                 title: 'W3wall',
@@ -57,20 +80,24 @@ const SocialCard = (prop: SocialCardProp) => {
               }}
               onClick={() => {}}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="w-4 h-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"
-                />
-              </svg>
+              <div className="text-sm flex gap-2 items-center cursor-pointer">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-4 h-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+                  />
+                </svg>
+
+                <div>Share</div>
+              </div>
             </RWebShare>
           </div>
         </div>
