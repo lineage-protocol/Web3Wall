@@ -84,60 +84,30 @@ const useStoreBlob = () => {
   })
 }
 
-const useGetPosts = () => {
+const useGetPosts = (nft_key: string) => {
   return useQuery({
     queryKey: [RQ_KEY.GET_POSTS],
     queryFn: async () => {
-      const result = await rpc.getTransactions({
-        query: [
-          {
-            column: 'method',
-            op: '=',
-            query: 'metadata',
-          },
-          {
-            column: 'status',
-            op: '=',
-            query: '1',
-          },
-          {
-            column: 'meta_contract_id',
-            op: '=',
-            query: `${import.meta.env.VITE_WEB3WALL_META_CONTRACT_ID}`,
-          },
-        ],
-        ordering: [
-          {
-            column: 'timestamp',
-            sort: 'desc',
-          },
-        ],
-        from: 0,
-        to: 0,
+      const result = await rpc.getAllMetadataByDataKeyAndBlock(
+        nft_key,
+        `${import.meta.env.VITE_WEB3WALL_META_CONTRACT_ID}`
+      )
+
+      const promises = result?.map(async (curr: any) => {
+        const res = await rpc.getContentFromIpfs(curr.cid as string)
+        const content = JSON.parse(res.data.result.content as string)
+        const data = content.content as { text: string; image: string }
+
+        return {
+          ...data,
+          public_key: curr.public_key,
+          timestamp: content.timestamp as number,
+        }
       })
 
-      return result?.reduce(
-        (prev, curr) => {
-          const data_key = formatDataKey(curr.chain_id, curr.token_address, curr.token_id)
+      const results = await Promise.all(promises)
 
-          if (!prev[data_key]) prev[data_key] = []
-
-          try {
-            const data = JSON.parse(curr.data) as { text: string; image: string }
-
-            prev[data_key]?.push({
-              ...data,
-              public_key: curr.public_key,
-              timestamp: curr.timestamp as number,
-            })
-
-            return prev
-          } catch (e) {
-            return prev
-          }
-        },
-        {} as Record<string, { public_key: string; text: string; image: string; timestamp: number }[]>
-      )
+      return results
     },
   })
 }

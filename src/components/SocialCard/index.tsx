@@ -15,7 +15,7 @@ const SortCardDisplay = (prop: SocialCardProp) => {
       <>
         <ResponsiveText>{prop.text}</ResponsiveText>
         <div className="mx-auto">
-          <img src={prop.image as string} className="object-contain" alt="" />
+          <img src={prop.image as string} className="w-full object-contain" alt="" />
         </div>
       </>
     )
