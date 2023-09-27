@@ -14,6 +14,7 @@ import { Web3AuthProvider } from 'hooks/use-web3auth'
 import PageLogin from 'pages/Login'
 import PageDashboard from 'pages/Dashboard'
 import PageWall from 'pages/Wall'
+import PageComment from 'pages/Comment'
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
             <Route element={<MainLayout children={undefined} />}>
               <Route path="/dashboard" element={<PageDashboard />} />
               <Route path="/wall/:token_address/:token_id/:chain_id/:key/" element={<PageWall />} />
+              <Route path="/comment/:token_address/:token_id/:chain_id/:cid/" element={<PageComment />} />
             </Route>
             <Route element={<PublicLayout children={undefined} />}>
               <Route path="/" element={<PageIndex />} />
