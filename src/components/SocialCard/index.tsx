@@ -10,7 +10,7 @@ interface SocialCardProp {
   public_key: String
   timestamp: number
   cid: string
-  onCommentClicked: (tokenId: String, tokenAddress: String, chainId: String, cid: string) => void
+  goToComments: (cid: string) => void
 }
 
 const SortCardDisplay = (prop: SocialCardProp) => {
@@ -55,7 +55,7 @@ const SocialCard = (prop: SocialCardProp) => {
           <div className="flex justify-between mx-3 items-center gap-1 py-3 text-gray-500">
             <button
               className="text-sm flex gap-2 items-center cursor-pointer"
-              onClick={() => prop.onCommentClicked(prop.tokenId, prop.tokenAddress, prop.chainId, prop.cid)}
+              onClick={() => prop.goToComments(prop.cid)}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

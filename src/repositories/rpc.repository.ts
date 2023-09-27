@@ -66,6 +66,7 @@ const usePublishTransaction = () => {
       let timeout: NodeJS.Timeout
       timeout = setTimeout(async () => {
         await queryClient.invalidateQueries([RQ_KEY.GET_POSTS])
+        await queryClient.invalidateQueries([RQ_KEY.GET_COMMENTS])
         if (timeout) clearTimeout(timeout)
       }, 5000)
     },
@@ -113,6 +114,9 @@ const useGetPosts = (nft_key: string) => {
           public_key: curr.public_key,
           timestamp: content.timestamp as number,
           cid: curr.cid,
+          token_address: curr.token_address,
+          token_id: curr.token_id,
+          chain_id: curr.chain_id,
         }
       })
 
@@ -121,6 +125,12 @@ const useGetPosts = (nft_key: string) => {
       return results
     },
   })
+}
+
+type Comment = {
+  from: string
+  message: string
+  timestamp: number
 }
 
 const useGetComments = (cid: string) => {
@@ -150,13 +160,14 @@ const useGetComments = (cid: string) => {
       const promises = result?.map(async (curr: any) => {
         const res = await rpc.getContentFromIpfs(curr.cid as string)
         const content = JSON.parse(res.data.result.content as string)
-        // const data = content.content as { text: string; image: string }
-        return content
+        const data = content.content as Comment[]
+        return data
       })
 
       const results = await Promise.all(promises)
+      const flattened = results.flat() as Comment[]
 
-      return results
+      return flattened.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1))
     },
   })
 }

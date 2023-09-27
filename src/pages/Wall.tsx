@@ -3,12 +3,13 @@ import NewPostModal from 'components/Modal/NewPostModal'
 import PoapModal from 'components/Modal/PoapModal'
 import SocialCard from 'components/SocialCard'
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useGetPosts } from 'repositories/rpc.repository'
 import { useBoundStore } from 'store'
 
 const PageWall = () => {
   const { token_address, token_id, chain_id, key } = useParams()
+  const navigate = useNavigate()
   const { data: posts } = useGetPosts(key as string)
   const socials = posts
 
@@ -28,8 +29,8 @@ const PageWall = () => {
     setModalState({ poap: { isOpen: true } })
   }
 
-  const onHandleCommentClicked = (tokenId: String, tokenAddress: String, chainId: String, cid: string) => {
-    setModalState({ comment: { isOpen: true, tokenId, tokenAddress, chainId, postCid: cid } })
+  const goToComments = (cid: string) => {
+    navigate(`/comment/${token_address}/${token_id}/${chain_id}/${cid}`)
   }
 
   const closePOAPModal = () => {
@@ -45,7 +46,7 @@ const PageWall = () => {
       <div className="grid gap-0 overflow-auto pb-[120px] h-full pt-3">
         {socials &&
           socials?.map((social: any, index: number) => {
-            return <SocialCard key={index} {...social} onCommentClicked={onHandleCommentClicked} />
+            return <SocialCard key={index} {...social} goToComments={goToComments} />
           })}
       </div>
       <div className="fixed bottom-5 right-5">
