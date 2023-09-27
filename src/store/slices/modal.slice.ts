@@ -17,7 +17,7 @@ export type Modal = {
   signUpRainbow: ModalState
   mint: ModalState
   poap: ModalState
-  comment: ModalState & TokenState
+  comment: ModalState & TokenState & { postCid: string }
 }
 
 export interface ModalSlice {
@@ -32,7 +32,7 @@ const initialModal = {
     signUpRainbow: { isOpen: false },
     mint: { isOpen: false },
     poap: { isOpen: false },
-    comment: { isOpen: false, tokenId: '', tokenAddress: '', chainId: '' },
+    comment: { isOpen: false, tokenId: '', tokenAddress: '', chainId: '', postCid: '' },
   },
 }
 

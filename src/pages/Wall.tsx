@@ -28,8 +28,8 @@ const PageWall = () => {
     setModalState({ poap: { isOpen: true } })
   }
 
-  const onHandleCommentClicked = (tokenId: String, tokenAddress: String, chainId: String) => {
-    setModalState({ comment: { isOpen: true, tokenId, tokenAddress, chainId } })
+  const onHandleCommentClicked = (tokenId: String, tokenAddress: String, chainId: String, cid: string) => {
+    setModalState({ comment: { isOpen: true, tokenId, tokenAddress, chainId, postCid: cid } })
   }
 
   const closePOAPModal = () => {
@@ -37,7 +37,7 @@ const PageWall = () => {
   }
 
   const closeCommentModal = () => {
-    setModalState({ comment: { isOpen: false, tokenId: '', tokenAddress: '', chainId: '' } })
+    setModalState({ comment: { isOpen: false, tokenId: '', tokenAddress: '', chainId: '', postCid: '' } })
   }
 
   return (
