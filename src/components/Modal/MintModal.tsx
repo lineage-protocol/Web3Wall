@@ -1,10 +1,11 @@
 import { Dialog, Transition } from '@headlessui/react'
 import GenericButton from 'components/Buttons/GenericButton'
 import MintButton from 'components/Buttons/MintButton'
-import { CameraIcon } from 'components/Icons/icons'
+import { CameraIcon, TelegramIcon } from 'components/Icons/icons'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { useStoreBlob } from 'repositories/rpc.repository'
 import imageCompression from 'browser-image-compression'
+
 interface Props {
   isOpen: boolean
   onClose: () => void
@@ -79,6 +80,10 @@ const MintModal = (prop: Props) => {
     if (url) setURL()
   }, [url])
 
+  const goToTelegram = () => {
+    window.open('https://t.me/+H7Spt2NaASY0ZTE1', '_blank')
+  }
+
   return (
     <>
       <Transition
@@ -134,6 +139,20 @@ const MintModal = (prop: Props) => {
                     </div>
                   </header>
                   <div className="relative h-1/3 w-full">
+                    <div
+                      role="alert"
+                      className="rounded border-s-4 border-yellow-500 bg-red-50 p-4 text-left absolute flex justify-between items-center"
+                    >
+                      <div className="">
+                        <strong className="block font-medium text-yellow-800">No $MATIC?</strong>
+                        <p className="text-sm text-yellow-700">Join our telegram group and request from there</p>
+                      </div>
+                      <div>
+                        <button className="bg-blue-500 rounded-full p-3" onClick={goToTelegram}>
+                          <TelegramIcon />
+                        </button>
+                      </div>
+                    </div>
                     {!imagePreview && (
                       <div className="h-full w-full flex justify-center items-center bg-gray-100">
                         <span>
@@ -179,7 +198,7 @@ const MintModal = (prop: Props) => {
 
                     <textarea
                       name="body"
-                      className="w-full border-none p-1 text-sm"
+                      className="w-full border-none p-1 mt-2 text-sm"
                       placeholder="Body text (Optional)"
                       id="body"
                       rows={8}
