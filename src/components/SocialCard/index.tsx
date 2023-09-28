@@ -11,6 +11,7 @@ interface SocialCardProp {
   public_key: String
   timestamp: number
   cid: string
+  showNoOfComments: boolean
   noOfComments?: number
   goToComments?: (cid: string, post: any) => void
 }
@@ -55,7 +56,7 @@ const SocialCard = (prop: SocialCardProp) => {
           </div>
 
           <div className={`flex mx-3 items-center gap-1 py-3 text-gray-500 justify-between`}>
-            {prop?.noOfComments && (
+            {prop?.showNoOfComments && (
               <span className="text-sm flex gap-1 items-center">
                 <CommentIcon />
                 {prop?.noOfComments}

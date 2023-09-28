@@ -30,7 +30,7 @@ const PageComment = () => {
   return (
     <div className="h-ful">
       <div className="grid gap-0 overflow-auto pb-[120px] h-full pt-3">
-        <SocialCard {...state.post} noOfComments={comments?.length} />
+        <SocialCard {...state.post} showNoOfComments="true" noOfComments={comments?.length} />
         {comments &&
           comments?.map((comment: any, index: number) => {
             return <CommentCard key={index} {...comment} />

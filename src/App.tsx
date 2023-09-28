@@ -15,23 +15,29 @@ import PageLogin from 'pages/Login'
 import PageDashboard from 'pages/Dashboard'
 import PageWall from 'pages/Wall'
 import PageComment from 'pages/Comment'
+import ActionBarLayout from 'layouts/ActionBarLayout'
+import { NavigationProvider } from 'hooks/use-navigation'
 
 const App = () => {
   return (
     <IpfsProvider>
       <Web3AuthProvider>
         <ApiProvider>
-          <Routes>
-            <Route element={<MainLayout children={undefined} />}>
-              <Route path="/dashboard" element={<PageDashboard />} />
-              <Route path="/wall/:token_address/:token_id/:chain_id/:key/" element={<PageWall />} />
-              <Route path="/comment/:token_address/:token_id/:chain_id/:cid/" element={<PageComment />} />
-            </Route>
-            <Route element={<PublicLayout children={undefined} />}>
-              <Route path="/" element={<PageIndex />} />
-              <Route path="/login" element={<PageLogin />} />
-            </Route>
-          </Routes>
+          <NavigationProvider>
+            <Routes>
+              <Route element={<MainLayout />}>
+                <Route path="/dashboard" element={<PageDashboard />} />
+                <Route path="/wall/:token_address/:token_id/:chain_id/:key/" element={<PageWall />} />
+              </Route>
+              <Route element={<PublicLayout children={undefined} />}>
+                <Route path="/" element={<PageIndex />} />
+                <Route path="/login" element={<PageLogin />} />
+              </Route>
+              <Route element={<ActionBarLayout />}>
+                <Route path="/comment/:token_address/:token_id/:chain_id/:cid/" element={<PageComment />} />
+              </Route>
+            </Routes>
+          </NavigationProvider>
         </ApiProvider>
       </Web3AuthProvider>
     </IpfsProvider>

@@ -38,8 +38,8 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-gray-50 fixed w-full max-w-md top-0 z-10">
-        <div className="px-4 py-2">
+      <header className="bg-gray-50 fixed w-full max-w-md top-0 z-10 toolbar flex items-center">
+        <div className="px-4 w-full">
           <div className="">
             <div className="flex justify-between items-center">
               <Link to="/dashboard" className="block shrink-0">
