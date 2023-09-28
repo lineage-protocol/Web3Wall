@@ -17,8 +17,10 @@ const SortCardDisplay = (prop: SocialCardProp) => {
   if (prop.text && prop.image) {
     return (
       <>
+
         <div className="px-3">{prop.text}</div>
         <div className="mx-auto mt-2">
+
           <img src={prop.image as string} className="w-full object-contain" alt="" />
         </div>
       </>

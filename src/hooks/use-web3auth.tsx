@@ -173,6 +173,7 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
   }
 
   async function mintCopy({ abi, contractAddress, data }: WriteContractArgs) {
+
     if (!provider) {
       return
     }

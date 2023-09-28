@@ -9,7 +9,9 @@ import { useBoundStore } from 'store'
 
 const PageWall = () => {
   const { token_address, token_id, chain_id, key } = useParams()
+
   const navigate = useNavigate()
+
   const { data: posts } = useGetPosts(key as string)
   const socials = posts
 
@@ -29,6 +31,7 @@ const PageWall = () => {
     setModalState({ poap: { isOpen: true } })
   }
 
+
   const goToComments = (cid: string, post: any) => {
     const { goToComments, ...rest } = post
     navigate(`/comment/${token_address}/${token_id}/${chain_id}/${cid}`, {
@@ -38,23 +41,28 @@ const PageWall = () => {
     })
   }
 
+
   const closePOAPModal = () => {
     setModalState({ poap: { isOpen: false } })
   }
 
+
   const closeCommentModal = () => {
     setModalState({ comment: { isOpen: false, tokenId: '', tokenAddress: '', chainId: '', postCid: '' } })
   }
+
 
   return (
     <div className="h-ful">
       <div className="grid gap-0 overflow-auto pb-[120px] h-full pt-3">
         {socials &&
           socials?.map((social: any, index: number) => {
+
             return <SocialCard key={index} {...social} goToComments={goToComments} />
           })}
       </div>
       <div className="fixed bottom-5 right-5">
+
         <button
           onClick={() => openPOAPModal()}
           className="bg-blue-500 text-white h-12 w-12 rounded-full flex items-center justify-center text-sm"
@@ -85,6 +93,7 @@ const PageWall = () => {
         isOpen={modal.comment.isOpen}
         onClose={closeCommentModal}
       />
+
     </div>
   )
 }
