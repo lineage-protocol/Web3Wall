@@ -18,6 +18,7 @@ export type Modal = {
   mint: ModalState
   poap: ModalState
   comment: ModalState & TokenState & { postCid: string }
+  proof: ModalState & { tokenId: string }
 }
 
 export interface ModalSlice {
@@ -33,6 +34,7 @@ const initialModal = {
     mint: { isOpen: false },
     poap: { isOpen: false },
     comment: { isOpen: false, tokenId: '', tokenAddress: '', chainId: '', postCid: '' },
+    proof: { isOpen: false, tokenId: '' },
   },
 }
 

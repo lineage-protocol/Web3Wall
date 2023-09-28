@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 interface Prop {
   name: string
   url: string
+  body: string
   disabled?: boolean
 }
 

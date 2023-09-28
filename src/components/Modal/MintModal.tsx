@@ -16,7 +16,7 @@ const MintModal = (prop: Props) => {
   const [imagePreview, setImagePreview] = useState('')
   const inputFileRef = useRef<HTMLInputElement>(null)
 
-  const [mint, setMint] = useState({ name: '', image: '' })
+  const [mint, setMint] = useState({ name: '', image: '', body: '' })
   const { data: url, mutateAsync: storeBlob } = useStoreBlob()
 
   const onSelectMedia = () => {
@@ -52,7 +52,7 @@ const MintModal = (prop: Props) => {
     prop.onClose()
   }
 
-  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setMint(prev => ({ ...prev, [name]: value }))
   }
@@ -127,7 +127,7 @@ const MintModal = (prop: Props) => {
                           {isLoading ? (
                             <p className="block shrink-0 p-2.5">Processing...</p>
                           ) : (
-                            <MintButton url={mint.image} name={mint.name} disabled={isLoading} />
+                            <MintButton url={mint.image} name={mint.name} body={mint.body} disabled={isLoading} />
                           )}
                         </div>
                       </div>
@@ -167,20 +167,25 @@ const MintModal = (prop: Props) => {
                     </div>
                   </div>
 
-                  <div className="text-left mt-5 p-3">
-                    <label htmlFor="name" className="block text-2xl font-semi text-gray-500">
-                      Start creating your event!
-                    </label>
-
+                  <div className="text-left mx-3">
                     <input
                       type="text"
                       name="name"
-                      placeholder="Give your event a title"
+                      placeholder="Title"
                       value={mint.name}
                       onChange={e => onInputChange(e)}
-                      className="w-full p-0 text-xl border-none mt-5 text-gray-400"
+                      className="w-full p-1 text-xl border-none mt-5 text-gray-500 font-medium"
                     />
-                    <hr />
+
+                    <textarea
+                      name="body"
+                      className="w-full border-none p-1 text-sm"
+                      placeholder="Body text (Optional)"
+                      id="body"
+                      rows={8}
+                      value={mint.body}
+                      onChange={e => onInputChange(e)}
+                    />
 
                     <div className="flex gap-5 justify-left p-3">
                       <input
