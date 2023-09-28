@@ -10,7 +10,7 @@ interface SocialCardProp {
   public_key: String
   timestamp: number
   cid: string
-  goToComments: (cid: string) => void
+  goToComments?: (cid: string, post: any) => void
 }
 
 const SortCardDisplay = (prop: SocialCardProp) => {
@@ -52,26 +52,32 @@ const SocialCard = (prop: SocialCardProp) => {
             <SortCardDisplay {...prop} />
           </div>
 
-          <div className="flex justify-between mx-3 items-center gap-1 py-3 text-gray-500">
-            <button
-              className="text-sm flex gap-2 items-center cursor-pointer"
-              onClick={() => prop.goToComments(prop.cid)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5"
+          <div
+            className={`flex mx-3 items-center gap-1 py-3 text-gray-500 ${
+              prop?.goToComments ? 'justify-between' : 'justify-end'
+            }`}
+          >
+            {prop?.goToComments && (
+              <button
+                className="text-sm flex gap-2 items-center cursor-pointer"
+                onClick={() => prop.goToComments?.(prop.cid, prop)}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
-                />
-              </svg>
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-5 h-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
+                  />
+                </svg>
+              </button>
+            )}
             <RWebShare
               data={{
                 title: 'W3wall',
