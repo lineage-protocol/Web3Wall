@@ -1,3 +1,4 @@
+import { CommentIcon } from 'components/Icons/icons'
 import { RWebShare } from 'react-web-share'
 import { timeAgo } from 'utils'
 
@@ -10,6 +11,7 @@ interface SocialCardProp {
   public_key: String
   timestamp: number
   cid: string
+  noOfComments?: number
   goToComments?: (cid: string, post: any) => void
 }
 
@@ -17,10 +19,8 @@ const SortCardDisplay = (prop: SocialCardProp) => {
   if (prop.text && prop.image) {
     return (
       <>
-
         <div className="px-3">{prop.text}</div>
         <div className="mx-auto mt-2">
-
           <img src={prop.image as string} className="w-full object-contain" alt="" />
         </div>
       </>
@@ -54,11 +54,13 @@ const SocialCard = (prop: SocialCardProp) => {
             <SortCardDisplay {...prop} />
           </div>
 
-          <div
-            className={`flex mx-3 items-center gap-1 py-3 text-gray-500 ${
-              prop?.goToComments ? 'justify-between' : 'justify-end'
-            }`}
-          >
+          <div className={`flex mx-3 items-center gap-1 py-3 text-gray-500 justify-between`}>
+            {prop?.noOfComments && (
+              <span className="text-sm flex gap-1 items-center">
+                <CommentIcon />
+                {prop?.noOfComments}
+              </span>
+            )}
             {prop?.goToComments && (
               <button
                 className="text-sm flex gap-2 items-center cursor-pointer"
