@@ -85,6 +85,11 @@ const MintModal = (prop: Props) => {
 
   const [isLoading, setIsLoading] = useState(false)
 
+  const resetMint = () => {
+    setImagePreview('')
+    setMint({ body: '', image: '', name: '' })
+  }
+
   useEffect(() => {
     async function upload() {
       setIsLoading(true)
@@ -161,7 +166,14 @@ const MintModal = (prop: Props) => {
                           {isLoading ? (
                             <p className="block shrink-0 p-2.5">Processing...</p>
                           ) : (
-                            <MintButton url={mint.image} name={mint.name} body={mint.body} disabled={isLoading} />
+                            <MintButton
+                              url={mint.image}
+                              name={mint.name}
+                              body={mint.body}
+                              disabled={isLoading}
+                              setIsLoading={setIsLoading}
+                              resetMint={resetMint}
+                            />
                           )}
                         </div>
                       </div>
@@ -190,7 +202,7 @@ const MintModal = (prop: Props) => {
                       </div>
                     )}
                     {imagePreview && <img className="h-full w-full object-cover" src={imagePreview} />}
-                    <div className="absolute">
+                    <div className="absolute h-0">
                       <GenericButton
                         onClick={() => {
                           inputFileRef?.current?.click()

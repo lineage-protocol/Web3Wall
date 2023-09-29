@@ -3,8 +3,9 @@ import { Web3Auth } from '@web3auth/modal'
 import { OpenloginAdapter, OpenloginUserInfo } from '@web3auth/openlogin-adapter'
 import { TorusWalletAdapter } from '@web3auth/torus-evm-adapter'
 import { TorusWalletConnectorPlugin } from '@web3auth/torus-wallet-connector-plugin'
+import { parseEther } from 'ethers'
 import { createContext, useContext, useEffect, useState } from 'react'
-import RPC from 'utils/ethers'
+import RPC, { CallContractMethodArgs } from 'utils/ethers'
 import Web3, { Bytes, eth } from 'web3'
 
 interface WriteContractArgs {
@@ -24,7 +25,7 @@ interface Web3AuthContextInterface {
   disconnect: () => Promise<void>
   isConnected: () => boolean
   signMessage: (message: string) => Promise<{ signature: string } | undefined>
-  writeContract: (data: WriteContractArgs) => Promise<Bytes | null>
+  callContractMethod: (data: CallContractMethodArgs) => Promise<Bytes | null>
   mintCopy: (data: WriteContractArgs) => Promise<Bytes | null>
   getAccounts: () => Promise<any>
   getUserInfo: () => Promise<any>
@@ -155,16 +156,24 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
     return web3Auth?.status === 'connected'
   }
 
-  async function writeContract({ abi, contractAddress, data }: WriteContractArgs) {
-    if (!provider) {
-      return
+  async function callContractMethod({ contractABI, contractAddress, data, method, options }: CallContractMethodArgs) {
+    if (!provider) return
+
+    if (options?.value) {
+      options = { value: parseEther(options.value) as any }
     }
 
     const rpc = new RPC(provider)
-    return await rpc.mint(abi as string, contractAddress, data as string[])
+    return await rpc.callContractMethod({
+      contractABI,
+      contractAddress,
+      data,
+      method,
+      options,
+    })
   }
 
-  async function mintCopy({ abi, contractAddress, data }: WriteContractArgs) {
+  async function mintCopy({ abi, contractAddress, data }: Omit<WriteContractArgs, 'method'>) {
     if (!provider) {
       return
     }
@@ -216,7 +225,7 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
         connect,
         disconnect,
         signMessage,
-        writeContract,
+        callContractMethod,
         mintCopy,
         isConnected,
         web3Auth,
