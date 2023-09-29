@@ -1,14 +1,38 @@
 import { Dialog, Transition } from '@headlessui/react'
 import GenericButton from 'components/Buttons/GenericButton'
 import MintButton from 'components/Buttons/MintButton'
-import { CameraIcon } from 'components/Icons/icons'
+import { CameraIcon, TelegramIcon } from 'components/Icons/icons'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { useStoreBlob } from 'repositories/rpc.repository'
 import imageCompression from 'browser-image-compression'
+import { useWeb3Auth } from 'hooks/use-web3auth'
+
 interface Props {
   isOpen: boolean
   onClose: () => void
   afterLeave?: () => void
+}
+
+const NoMaticModal = () => {
+  const goToTelegram = () => {
+    window.open('https://t.me/+H7Spt2NaASY0ZTE1', '_blank')
+  }
+  return (
+    <div
+      role="alert"
+      className="rounded border-s-4 border-yellow-500 bg-red-50 p-4 text-left absolute flex justify-between items-center"
+    >
+      <div className="">
+        <strong className="block font-medium text-yellow-800">No $MATIC?</strong>
+        <p className="text-sm text-yellow-700">Join our telegram group and request from there</p>
+      </div>
+      <div>
+        <button className="bg-blue-500 rounded-full p-3" onClick={goToTelegram}>
+          <TelegramIcon />
+        </button>
+      </div>
+    </div>
+  )
 }
 
 const MintModal = (prop: Props) => {
@@ -16,8 +40,10 @@ const MintModal = (prop: Props) => {
   const [imagePreview, setImagePreview] = useState('')
   const inputFileRef = useRef<HTMLInputElement>(null)
 
-  const [mint, setMint] = useState({ name: '', image: '' })
+  const [mint, setMint] = useState({ name: '', image: '', body: '' })
   const { data: url, mutateAsync: storeBlob } = useStoreBlob()
+  const { getUserBalance } = useWeb3Auth()
+  const [balance, setBalance] = useState<number>(0)
 
   const onSelectMedia = () => {
     return new Promise<void>((resolve, reject) => {
@@ -52,12 +78,17 @@ const MintModal = (prop: Props) => {
     prop.onClose()
   }
 
-  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setMint(prev => ({ ...prev, [name]: value }))
   }
 
   const [isLoading, setIsLoading] = useState(false)
+
+  const resetMint = () => {
+    setImagePreview('')
+    setMint({ body: '', image: '', name: '' })
+  }
 
   useEffect(() => {
     async function upload() {
@@ -78,6 +109,14 @@ const MintModal = (prop: Props) => {
 
     if (url) setURL()
   }, [url])
+
+  useEffect(() => {
+    async function getBalance() {
+      let balance = await getUserBalance()
+      setBalance(balance ? parseFloat(balance) : 0)
+    }
+    getBalance()
+  }, [])
 
   return (
     <>
@@ -127,13 +166,21 @@ const MintModal = (prop: Props) => {
                           {isLoading ? (
                             <p className="block shrink-0 p-2.5">Processing...</p>
                           ) : (
-                            <MintButton url={mint.image} name={mint.name} disabled={isLoading} />
+                            <MintButton
+                              url={mint.image}
+                              name={mint.name}
+                              body={mint.body}
+                              disabled={isLoading}
+                              setIsLoading={setIsLoading}
+                              resetMint={resetMint}
+                            />
                           )}
                         </div>
                       </div>
                     </div>
                   </header>
                   <div className="relative h-1/3 w-full">
+                    {balance <= 0 && <NoMaticModal />}
                     {!imagePreview && (
                       <div className="h-full w-full flex justify-center items-center bg-gray-100">
                         <span>
@@ -155,7 +202,7 @@ const MintModal = (prop: Props) => {
                       </div>
                     )}
                     {imagePreview && <img className="h-full w-full object-cover" src={imagePreview} />}
-                    <div className="absolute">
+                    <div className="absolute h-0">
                       <GenericButton
                         onClick={() => {
                           inputFileRef?.current?.click()
@@ -167,20 +214,25 @@ const MintModal = (prop: Props) => {
                     </div>
                   </div>
 
-                  <div className="text-left mt-5 p-3">
-                    <label htmlFor="name" className="block text-2xl font-semi text-gray-500">
-                      Start creating your event!
-                    </label>
-
+                  <div className="text-left mx-3">
                     <input
                       type="text"
                       name="name"
-                      placeholder="Give your event a title"
+                      placeholder="Title"
                       value={mint.name}
                       onChange={e => onInputChange(e)}
-                      className="w-full p-0 text-xl border-none mt-5 text-gray-400"
+                      className="w-full p-1 text-xl border-none mt-5 text-gray-500 font-medium"
                     />
-                    <hr />
+
+                    <textarea
+                      name="body"
+                      className="w-full border-none p-1 mt-2 text-sm"
+                      placeholder="Body text (Optional)"
+                      id="body"
+                      rows={8}
+                      value={mint.body}
+                      onChange={e => onInputChange(e)}
+                    />
 
                     <div className="flex gap-5 justify-left p-3">
                       <input

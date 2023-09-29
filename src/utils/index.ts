@@ -3,66 +3,6 @@ import { encode } from 'bs58'
 
 export * from './abbreviate-balance'
 
-export function getSongLength(arrayOfAudioBuffers: AudioBuffer[]) {
-  let totalLength = 0
-
-  for (const track of arrayOfAudioBuffers) {
-    if (track.length > totalLength) {
-      totalLength = track.length
-    }
-  }
-
-  return totalLength
-}
-
-export function mixAudioBuffer(
-  bufferList: AudioBuffer[],
-  totalLength: number,
-  numberOfChannels = 2,
-  context: AudioContext
-) {
-  //create a buffer using the totalLength and sampleRate of the first buffer node
-  const finalMix = context.createBuffer(numberOfChannels, totalLength, bufferList[0].sampleRate)
-
-  //first loop for buffer list
-  for (let i = 0; i < bufferList.length; i++) {
-    // second loop for each channel ie. left and right
-    for (let channel = 0; channel < numberOfChannels; channel++) {
-      //here we get a reference to the final mix buffer data
-      const buffer = finalMix.getChannelData(channel)
-
-      //last is loop for updating/summing the track buffer with the final mix buffer
-      for (let j = 0; j < bufferList[i].length; j++) {
-        buffer[j] += bufferList[i].getChannelData(channel)[j]
-      }
-    }
-  }
-
-  return finalMix
-}
-
-export const createMixedAudio = async (audioContext: AudioContext, dataKey: string) => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_LINEAGE_NODE_URL}metadata/${dataKey}`)
-  const metadata = await res.json()
-
-  const urls = []
-  for (const [key, value] of Object.entries(metadata)) {
-    if (key.startsWith('0x')) urls.push(value)
-  }
-
-  const promises = urls.map(url =>
-    fetch(url as URL)
-      .then(response => response.arrayBuffer())
-      .then(buffer => audioContext.decodeAudioData(buffer))
-  )
-
-  const buffers = await Promise.all(promises)
-
-  const songLength = getSongLength(buffers)
-  const mixed = mixAudioBuffer(buffers, songLength, 1, audioContext)
-
-  return mixed
-}
 export function classNames(...classes: (false | null | undefined | string)[]): string {
   return classes.filter(Boolean).join(' ')
 }
@@ -207,17 +147,17 @@ export function timeAgo(timestamp: number): string {
   const secondsPast = (Date.now() - timestamp) / 1000
 
   if (secondsPast < 60) {
-    return `${Math.floor(secondsPast)} seconds ago`
+    return `${Math.floor(secondsPast)}s`
   }
   if (secondsPast < 3600) {
-    return `${Math.floor(secondsPast / 60)} minutes ago`
+    return `${Math.floor(secondsPast / 60)}m`
   }
   if (secondsPast <= 86400) {
-    return `${Math.floor(secondsPast / 3600)} hours ago`
+    return `${Math.floor(secondsPast / 3600)}h`
   }
   if (secondsPast > 86400) {
     const days = Math.floor(secondsPast / 86400)
-    return `${days} day${days !== 1 ? 's' : ''} ago`
+    return `${days}d`
   }
 
   return ''

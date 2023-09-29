@@ -6,11 +6,19 @@ export type ModalState = {
   isSkipped?: boolean
 }
 
+export type TokenState = {
+  tokenId: String
+  tokenAddress: String
+  chainId: String
+}
+
 export type Modal = {
   signUpMain: ModalState
   signUpRainbow: ModalState
   mint: ModalState
   poap: ModalState
+  comment: ModalState & TokenState & { postCid: string }
+  proof: ModalState & { tokenId: string }
 }
 
 export interface ModalSlice {
@@ -25,6 +33,8 @@ const initialModal = {
     signUpRainbow: { isOpen: false },
     mint: { isOpen: false },
     poap: { isOpen: false },
+    comment: { isOpen: false, tokenId: '', tokenAddress: '', chainId: '', postCid: '' },
+    proof: { isOpen: false, tokenId: '' },
   },
 }
 
