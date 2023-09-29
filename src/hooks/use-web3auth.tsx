@@ -28,6 +28,7 @@ interface Web3AuthContextInterface {
   mintCopy: (data: WriteContractArgs) => Promise<Bytes | null>
   getAccounts: () => Promise<any>
   getUserInfo: () => Promise<any>
+  getUserBalance: () => Promise<string | undefined>
 }
 
 interface Web3AuthProviderProps {
@@ -188,6 +189,13 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
     return user
   }
 
+  async function getUserBalance() {
+    if (!provider) return
+
+    const rpc = new RPC(provider)
+    return await rpc.getBalance()
+  }
+
   useEffect(() => {
     const web3 = new Web3(provider as any)
     setWeb3(web3)
@@ -218,6 +226,7 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
         userInfo,
         getAccounts,
         getUserInfo,
+        getUserBalance,
       }}
     >
       {children}
