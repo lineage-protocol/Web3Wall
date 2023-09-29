@@ -14,7 +14,10 @@ const PageDashboard = () => {
   const navigate = useNavigate()
 
   const { modal, setModalState } = useBoundStore()
-  const { data: events } = useGetEvents({})
+  const { data: events } = useGetEvents({
+    //TODO: find a way to do abi decode with dynamic type
+    where: { blockNumber_gte: '40637174' },
+  })
   const [search, setSearch] = useState('')
   const [isLoggedIn, SetIsLoggedIn] = useState(false)
 
@@ -97,10 +100,8 @@ const PageDashboard = () => {
                 chainId={import.meta.env.VITE_DEFAULT_LINEAGE_CHAIN}
                 tokenId={item.tokenId}
                 title={item?.data.name}
-                content={
-                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sagittis neque ac erat tristique, ut imperdiet velit ornare. Nulla viverra arcu a ex dignissim, eu laoreet mi pulvinar.'
-                }
-                imageUrl={item?.data.title}
+                content={item?.data.body ?? ''}
+                imageUrl={item?.data.image}
                 onHandleShareClicked={() => {}}
                 totalUser={0}
                 totalPost={0}

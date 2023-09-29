@@ -16,7 +16,7 @@ export function decodeMinted(data: string) {
   }
 
   const [_, bytes] = abiCoder.decode(['string', 'bytes'], data)
-  return abiCoder.decode(['string', 'string'], bytes)
+  return abiCoder.decode(['string', 'string', 'string'], bytes, true)
 }
 
 export const format = (minted: MintedNft) => {

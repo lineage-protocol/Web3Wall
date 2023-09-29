@@ -30,10 +30,10 @@ const useGetEvents = (variables: ApolloClientFilter) => {
       const { data } = await apolloQuery<{ minteds: MintedEvent[] }>({ query, variables })
 
       return data?.minteds?.map(el => {
-        const [name, title] = decodeMinted(el.data)
+        const [name, image, body] = decodeMinted(el.data)
         return {
           ...el,
-          data: { name, title },
+          data: { name, image, body },
           data_key: formatDataKey(
             `${import.meta.env.VITE_DEFAULT_CHAIN_ID}`,
             `${import.meta.env.VITE_WEB3WALL_NFT}`,
