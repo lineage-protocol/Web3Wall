@@ -19,6 +19,7 @@ export type Modal = {
   poap: ModalState
   comment: ModalState & TokenState & { postCid: string }
   proof: ModalState & { tokenId: string }
+  mention: ModalState
 }
 
 export interface ModalSlice {
@@ -35,6 +36,7 @@ const initialModal = {
     poap: { isOpen: false },
     comment: { isOpen: false, tokenId: '', tokenAddress: '', chainId: '', postCid: '' },
     proof: { isOpen: false, tokenId: '' },
+    mention: { isOpen: false },
   },
 }
 

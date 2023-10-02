@@ -1,11 +1,13 @@
 import { Dialog, Transition } from '@headlessui/react'
 import GenericButton from 'components/Buttons/GenericButton'
-import { CameraIcon, LoadingSpinner } from 'components/Icons/icons'
+import { CameraIcon, LoadingSpinner, MentionIcon } from 'components/Icons/icons'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { usePublishTransaction, useStoreBlob } from 'repositories/rpc.repository'
 import imageCompression from 'browser-image-compression'
 import { v4 } from 'uuid'
+import MentionModal from './MentionModal'
+import { useBoundStore } from 'store'
 
 const LoadingOverlay = () => {
   return (
@@ -32,6 +34,8 @@ const NewPostModal = (prop: Props) => {
   const [disablePostBtn, setDisablePostBtn] = useState(true)
   const [textRows, setTextRows] = useState(8)
   const inputFileRef = useRef<HTMLInputElement>(null)
+  const { modal, setModalState } = useBoundStore()
+  const [isMentionOpened, setIsMentionOpened] = useState(false)
 
   const { mutateAsync: storeBlob } = useStoreBlob()
   const { mutateAsync: publishTx } = usePublishTransaction()
@@ -128,6 +132,10 @@ const NewPostModal = (prop: Props) => {
     prop.onClose()
   }
 
+  const closeMentionModal = () => {
+    setIsMentionOpened(false)
+  }
+
   useEffect(() => {
     if (file || text) {
       setDisablePostBtn(false)
@@ -159,7 +167,7 @@ const NewPostModal = (prop: Props) => {
             <div className="fixed inset-0 bg-black bg-opacity-25" />
           </Transition.Child>
 
-          <div className="fixed inset-0 overflow-y-auto">
+          <div className="fixed inset-0 overflow-y-auto max-w-md mx-auto">
             <div className="flex min-h-full items-center justify-center text-center">
               <Transition.Child
                 as={Fragment}
@@ -194,13 +202,13 @@ const NewPostModal = (prop: Props) => {
                   </header>
 
                   {isLoading && <LoadingOverlay />}
-                  <div className="w-screen flex flex-col">
+                  <div className="w-full flex flex-col">
                     <label className="sr-only" htmlFor="message">
                       Message
                     </label>
 
                     <textarea
-                      className="mt-5 border-none p-3 text-sm"
+                      className="mt-5 mx-1 max-w-md border-none p-3 text-sm"
                       placeholder="What's happening?"
                       id="message"
                       rows={textRows}
@@ -242,6 +250,14 @@ const NewPostModal = (prop: Props) => {
                         icon={<CameraIcon />}
                         className=""
                       />
+                      <GenericButton
+                        onClick={() => {
+                          setIsMentionOpened(true)
+                        }}
+                        name="Mentions"
+                        icon={<MentionIcon />}
+                        className=""
+                      />
                     </div>
                   </div>
                 </Dialog.Panel>
@@ -250,6 +266,7 @@ const NewPostModal = (prop: Props) => {
           </div>
         </Dialog>
       </Transition>
+      <MentionModal isOpen={isMentionOpened} onClose={closeMentionModal} />
     </>
   )
 }

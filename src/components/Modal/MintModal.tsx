@@ -20,7 +20,7 @@ const NoMaticModal = () => {
   return (
     <div
       role="alert"
-      className="rounded border-s-4 border-yellow-500 bg-red-50 p-4 text-left absolute flex justify-between items-center"
+      className="rounded border-s-4 border-yellow-500 bg-red-50 p-4 text-left absolute flex justify-between items-center w-full"
     >
       <div className="">
         <strong className="block font-medium text-yellow-800">No $MATIC?</strong>
@@ -112,7 +112,7 @@ const MintModal = (prop: Props) => {
 
   useEffect(() => {
     async function getBalance() {
-      let balance = await getUserBalance()
+      const balance = await getUserBalance()
       setBalance(balance ? parseFloat(balance) : 0)
     }
     getBalance()
@@ -141,7 +141,7 @@ const MintModal = (prop: Props) => {
             <div className="fixed inset-0 bg-black bg-opacity-25" />
           </Transition.Child>
 
-          <div className="fixed inset-0 overflow-y-auto">
+          <div className="fixed inset-0 overflow-y-auto max-w-md mx-auto">
             <div className="flex min-h-full items-center justify-center text-center">
               <Transition.Child
                 as={Fragment}

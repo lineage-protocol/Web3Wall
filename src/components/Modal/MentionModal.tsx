@@ -1,61 +1,33 @@
 import { Dialog, Transition } from '@headlessui/react'
-import { useWeb3Auth } from 'hooks/use-web3auth'
-import { useState, Fragment } from 'react'
-import { usePublishTransaction } from 'repositories/rpc.repository'
-import { useBoundStore } from 'store'
+import { Fragment, useState } from 'react'
 
 interface Props {
-  tokenId: String
-  tokenAddress: String
-  chainId: String
   isOpen: boolean
   onClose: () => void
   afterLeave?: () => void
 }
 
-const CommentModal = (prop: Props) => {
-  const [text, setText] = useState('')
-  const [textRows, setTextRows] = useState(8)
-  const { modal } = useBoundStore()
+interface SearchData {
+  chain: string
+  address: string
+}
 
-  const { mutateAsync: publishTx } = usePublishTransaction()
-  const { signMessage, getAccounts } = useWeb3Auth()
+const MentionModal = (prop: Props) => {
+  const [searchData, setSearchData] = useState<SearchData>({
+    chain: '',
+    address: '',
+  })
 
-  const closeDialog = () => {
-    setText('')
-    prop.onClose()
+  const onHandleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setSearchData(prevState => ({
+      ...prevState,
+      [name]: value,
+    }))
   }
 
-  const onClickReply = async () => {
-    const account = await getAccounts()
-    if (!account) return
-
-    const content = {
-      cid: modal.comment.postCid,
-      content: {
-        text,
-        medias: [],
-      },
-    }
-
-    const data = JSON.stringify(content)
-    const signed = await signMessage(data)
-
-    await publishTx({
-      alias: '',
-      chain_id: prop.chainId as string,
-      signature: signed?.signature as string,
-      data,
-      mcdata: JSON.stringify({ loose: 0 }),
-      meta_contract_id: `${import.meta.env.VITE_WEB3WALL_COMMENT_META_CONTRACT_ID}`,
-      method: 'metadata',
-      public_key: account as string,
-      token_address: prop.tokenAddress as string,
-      token_id: prop.tokenId as string,
-      version: modal.comment.postCid,
-    })
-
-    closeDialog()
+  const closeDialog = () => {
+    prop.onClose()
   }
 
   return (
@@ -102,33 +74,34 @@ const CommentModal = (prop: Props) => {
                               Cancel
                             </button>
                           </div>
-
-                          <button
-                            onClick={() => onClickReply()}
-                            className="block shrink-0 p-2.5 font-semibold  text-blue-600"
-                          >
-                            Reply
-                          </button>
                         </div>
                       </div>
                     </div>
                   </header>
 
-                  <div className="w-screen flex flex-col">
+                  <div className="w-screen flex flex-col max-w-md p-2">
                     <label className="sr-only" htmlFor="message">
-                      Message
+                      Address
                     </label>
 
-                    <textarea
-                      className="mt-5 border-none p-3 text-sm"
-                      placeholder="Add a comment"
-                      id="message"
-                      rows={textRows}
-                      value={text}
-                      onChange={e => {
-                        setText(e.target.value)
-                      }}
+                    <input
+                      type="text"
+                      name="address"
+                      placeholder="Contract address"
+                      value={searchData.address}
+                      onChange={e => onHandleInputChange(e)}
+                      className="w-full p-2 bg-gray-400 border-none rounded-sm text-gray-800 text-sm"
                     />
+
+                    <div className="grid gap-2 grid-cols-3 mt-3">
+                      <div className="">
+                        <img
+                          src="https://images.unsplash.com/photo-1593795899768-947c4929449d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2672&q=80"
+                          alt=""
+                          className="h-full w-full object-cover opacity-100 group-hover:opacity-0"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </Dialog.Panel>
               </Transition.Child>
@@ -140,4 +113,4 @@ const CommentModal = (prop: Props) => {
   )
 }
 
-export default CommentModal
+export default MentionModal
