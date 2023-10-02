@@ -1,4 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react'
+import { useOneSignal } from 'hooks/use-onesignal'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import { useState, Fragment } from 'react'
 import { usePublishTransaction } from 'repositories/rpc.repository'
@@ -20,6 +21,7 @@ const CommentModal = (prop: Props) => {
 
   const { mutateAsync: publishTx } = usePublishTransaction()
   const { signMessage, getAccounts } = useWeb3Auth()
+  const { sendNotification } = useOneSignal()
 
   const closeDialog = () => {
     setText('')
@@ -54,6 +56,8 @@ const CommentModal = (prop: Props) => {
       token_id: prop.tokenId as string,
       version: modal.comment.postCid,
     })
+
+    await sendNotification({ title: 'New comment', description: content.content.text })
 
     closeDialog()
   }

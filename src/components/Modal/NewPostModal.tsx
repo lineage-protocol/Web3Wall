@@ -6,6 +6,7 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 import { usePublishTransaction, useStoreBlob } from 'repositories/rpc.repository'
 import imageCompression from 'browser-image-compression'
 import { v4 } from 'uuid'
+import { useOneSignal } from 'hooks/use-onesignal'
 
 const LoadingOverlay = () => {
   return (
@@ -37,6 +38,7 @@ const NewPostModal = (prop: Props) => {
   const { mutateAsync: publishTx } = usePublishTransaction()
 
   const { signMessage, getAccounts } = useWeb3Auth()
+  const { sendNotification } = useOneSignal()
 
   const onPost = async (): Promise<void> => {
     const account = await getAccounts()
@@ -68,6 +70,8 @@ const NewPostModal = (prop: Props) => {
         token_id: prop.tokenId as string,
         version: v4(),
       })
+
+      await sendNotification({ title: 'New Post', description: content.text })
 
       onCloseDialog()
     } catch (e) {
