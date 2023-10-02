@@ -15,8 +15,7 @@ const PageDashboard = () => {
 
   const { modal, setModalState } = useBoundStore()
   const { data: events } = useGetEvents({
-    //TODO: find a way to do abi decode with dynamic type
-    where: { blockNumber_gte: '40637174' },
+    where: { blockNumber_gte: import.meta.env.VITE_WEB3WALL_SUBGRAPH_START_BLOCK },
   })
   const [search, setSearch] = useState('')
   const [isLoggedIn, SetIsLoggedIn] = useState(false)
