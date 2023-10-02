@@ -17,6 +17,7 @@ import PageWall from 'pages/Wall'
 import PageComment from 'pages/Comment'
 import ActionBarLayout from 'layouts/ActionBarLayout'
 import { NavigationProvider } from 'hooks/use-navigation'
+import { OneSignalProvider } from 'hooks/use-onesignal'
 
 const App = () => {
   return (
@@ -24,19 +25,21 @@ const App = () => {
       <Web3AuthProvider>
         <ApiProvider>
           <NavigationProvider>
-            <Routes>
-              <Route element={<MainLayout />}>
-                <Route path="/dashboard" element={<PageDashboard />} />
-                <Route path="/wall/:token_address/:token_id/:chain_id/:key/" element={<PageWall />} />
-              </Route>
-              <Route element={<PublicLayout children={undefined} />}>
-                <Route path="/" element={<PageIndex />} />
-                <Route path="/login" element={<PageLogin />} />
-              </Route>
-              <Route element={<ActionBarLayout />}>
-                <Route path="/comment/:token_address/:token_id/:chain_id/:cid/" element={<PageComment />} />
-              </Route>
-            </Routes>
+            <OneSignalProvider>
+              <Routes>
+                <Route element={<MainLayout />}>
+                  <Route path="/dashboard" element={<PageDashboard />} />
+                  <Route path="/wall/:token_address/:token_id/:chain_id/:key/" element={<PageWall />} />
+                </Route>
+                <Route element={<PublicLayout children={undefined} />}>
+                  <Route path="/" element={<PageIndex />} />
+                  <Route path="/login" element={<PageLogin />} />
+                </Route>
+                <Route element={<ActionBarLayout />}>
+                  <Route path="/comment/:token_address/:token_id/:chain_id/:cid/" element={<PageComment />} />
+                </Route>
+              </Routes>
+            </OneSignalProvider>
           </NavigationProvider>
         </ApiProvider>
       </Web3AuthProvider>
