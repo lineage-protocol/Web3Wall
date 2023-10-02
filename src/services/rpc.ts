@@ -78,7 +78,6 @@ const getMetadataUseKeyByBlock = (nftKey: String, meta_contract_id: String, vers
   })
 }
 
-
 const searchMetadatas = async ({ query = [], ordering = [], from = 0, to = 0 }: Partial<JSONRPCFilter<Metadata>>) => {
   const response = await rpc({
     method: 'POST',

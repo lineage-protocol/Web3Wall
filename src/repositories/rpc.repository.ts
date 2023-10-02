@@ -89,7 +89,6 @@ const useGetPosts = (nft_key: string) => {
   return useQuery({
     queryKey: [RQ_KEY.GET_POSTS],
     queryFn: async () => {
-
       const result = await rpc.searchMetadatas({
         query: [
           {
@@ -104,7 +103,6 @@ const useGetPosts = (nft_key: string) => {
           },
         ],
       })
-
 
       const promises = result?.map(async (curr: any) => {
         const res = await rpc.getContentFromIpfs(curr.cid as string)
@@ -171,7 +169,6 @@ const useGetComments = (cid: string) => {
       const flattened = results.flat() as Comment[]
 
       return flattened.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1))
-
     },
   })
 }
