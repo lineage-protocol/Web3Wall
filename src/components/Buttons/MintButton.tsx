@@ -56,7 +56,11 @@ const MintButton = (prop: Prop) => {
 
   return (
     <>
-      <button onClick={() => onMint()} className="block shrink-0 p-2.5 font-semibold text-blue-600">
+      <button
+        onClick={() => onMint()}
+        className="block shrink-0 p-2.5 font-semibold text-blue-600"
+        disabled={prop.disabled}
+      >
         Create
       </button>
     </>

@@ -29,7 +29,6 @@ const NewPostModal = (prop: Props) => {
   const [isLoading, setIsLoading] = useState(false)
   const [text, setText] = useState('')
   const [file, setFile] = useState<File | Blob>()
-  const [disablePostBtn, setDisablePostBtn] = useState(true)
   const [textRows, setTextRows] = useState(8)
   const inputFileRef = useRef<HTMLInputElement>(null)
 
@@ -80,7 +79,6 @@ const NewPostModal = (prop: Props) => {
     setFile(undefined)
 
     prop.onClose()
-
     setIsLoading(false)
   }
 
@@ -128,14 +126,6 @@ const NewPostModal = (prop: Props) => {
     prop.onClose()
   }
 
-  useEffect(() => {
-    if (file || text) {
-      setDisablePostBtn(false)
-    } else {
-      setDisablePostBtn(true)
-    }
-  }, [file, text])
-
   return (
     <>
       <Transition
@@ -180,20 +170,22 @@ const NewPostModal = (prop: Props) => {
                               Cancel
                             </button>
                           </div>
-
-                          <button
-                            disabled={disablePostBtn}
-                            onClick={() => onPost()}
-                            className="block shrink-0 p-2.5 font-semibold text-blue-600"
-                          >
-                            Post
-                          </button>
+                          {isLoading ? (
+                            <p className="block shrink-0 p-2.5">Processing...</p>
+                          ) : (
+                            <button
+                              disabled={text.length <= 0}
+                              onClick={() => onPost()}
+                              className="block shrink-0 p-2.5 font-semibold text-blue-600"
+                            >
+                              Post
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
                   </header>
 
-                  {isLoading && <LoadingOverlay />}
                   <div className="w-screen flex flex-col">
                     <label className="sr-only" htmlFor="message">
                       Message
