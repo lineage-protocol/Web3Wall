@@ -12,12 +12,15 @@ interface Prop {
 }
 
 const MintButton = (prop: Prop) => {
-  const { callContractMethod } = useWeb3Auth()
+  const { callContractMethod, getAccounts } = useWeb3Auth()
   const { setModalState } = useBoundStore()
 
   const abiCoder = new AbiCoder()
   const encoded = abiCoder.encode(['string', 'string', 'string'], [prop.name, prop.url, prop.body])
   const onMint = async () => {
+    let account = await getAccounts()
+    if (!account) return
+
     prop.setIsLoading(true)
     try {
       const contractABI = [

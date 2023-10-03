@@ -20,6 +20,7 @@ interface Web3AuthContextInterface {
   web3Auth: Web3Auth | null
   web3: Web3 | undefined
   userInfo: Partial<OpenloginUserInfo> | undefined
+  provider: SafeEventEmitterProvider | null
   initWeb3AuthModal: () => Promise<void>
   connect: () => Promise<void>
   disconnect: () => Promise<void>
@@ -236,6 +237,7 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
         getAccounts,
         getUserInfo,
         getUserBalance,
+        provider,
       }}
     >
       {children}

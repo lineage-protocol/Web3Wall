@@ -7,10 +7,13 @@ interface Prop {
 }
 
 const PoapButton = (prop: Prop) => {
-  const { mintCopy } = useWeb3Auth()
+  const { mintCopy, getAccounts } = useWeb3Auth()
   const { setModalState } = useBoundStore()
 
   const onPoap = async () => {
+    const account = await getAccounts()
+    if (!account) return
+
     try {
       const abi = [
         {
