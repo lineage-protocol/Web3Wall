@@ -86,10 +86,9 @@ const SocialCard = (prop: SocialCardProp) => {
             <RWebShare
               data={{
                 title: 'W3wall',
-                url: `${window.location.href}`,
+                url: `${window.location.host}/dashboard`,
                 text: 'Check this out',
               }}
-              onClick={() => {}}
             >
               <div className="text-sm flex gap-2 items-center cursor-pointer">
                 <svg
