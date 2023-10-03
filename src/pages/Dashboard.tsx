@@ -2,6 +2,7 @@ import GenericButton from 'components/Buttons/GenericButton'
 import EventCard from 'components/EventCard'
 import { AddIcon } from 'components/Icons/icons'
 import MintModal from 'components/Modal/MintModal'
+import ProofModal from 'components/Modal/ProofModal'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -13,7 +14,10 @@ const PageDashboard = () => {
   const navigate = useNavigate()
 
   const { modal, setModalState } = useBoundStore()
-  const { data: events } = useGetEvents({})
+  const { data: events } = useGetEvents({
+    //TODO: find a way to do abi decode with dynamic type
+    where: { blockNumber_gte: '40637174' },
+  })
   const [search, setSearch] = useState('')
   const [isLoggedIn, SetIsLoggedIn] = useState(false)
 
@@ -34,8 +38,16 @@ const PageDashboard = () => {
     setModalState({ mint: { isOpen: true } })
   }
 
+  const openProofModal = (tokenId: string) => {
+    setModalState({ proof: { isOpen: true, tokenId: tokenId } })
+  }
+
   const closeModal = () => {
     setModalState({ mint: { isOpen: false } })
+  }
+
+  const closeProofModal = () => {
+    setModalState({ proof: { isOpen: false, tokenId: '' } })
   }
 
   const filteredEvents = events?.filter(event => event?.data.name.toLowerCase().includes(search.toLowerCase()))
@@ -53,7 +65,7 @@ const PageDashboard = () => {
             className="h-10 w-full p-6 border border-black bg-white pe-10 ps-4 text-sm shadow-sm"
             id="search"
             type="search"
-            placeholder="Search event..."
+            placeholder="Search..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -78,7 +90,7 @@ const PageDashboard = () => {
 
         <GenericButton className="flex-none ml-3" name="" icon={<AddIcon />} onClick={() => openModal()} />
       </div>
-      <div className="grid gap-3 p-3">
+      <div className="grid gap-0.5 p-1">
         {filteredEvents &&
           filteredEvents.map((item, index) => {
             return (
@@ -88,15 +100,18 @@ const PageDashboard = () => {
                 chainId={import.meta.env.VITE_DEFAULT_LINEAGE_CHAIN}
                 tokenId={item.tokenId}
                 title={item?.data.name}
-                imageUrl={item?.data.title}
+                content={item?.data.body ?? ''}
+                imageUrl={item?.data.image}
                 onHandleShareClicked={() => {}}
                 totalUser={0}
                 totalPost={0}
+                onProofClicked={() => openProofModal(item.tokenId)}
               />
             )
           })}
       </div>
       <MintModal isOpen={modal.mint.isOpen} onClose={closeModal} />
+      <ProofModal tokenId={modal.proof.tokenId} isOpen={modal.proof.isOpen} onClose={closeProofModal} />
     </div>
   )
 }

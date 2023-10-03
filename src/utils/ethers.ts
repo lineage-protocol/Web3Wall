@@ -2,6 +2,16 @@
 import type { SafeEventEmitterProvider } from '@web3auth/base'
 import { ethers } from 'ethers'
 
+export type CallContractMethodArgs = {
+  contractABI: any[]
+  contractAddress: string
+  data: string[]
+  method: string
+  options?: {
+    value: string
+  }
+}
+
 export default class EthereumRpc {
   private provider: SafeEventEmitterProvider
 
@@ -95,6 +105,31 @@ export default class EthereumRpc {
 
       // Submit transaction to the blockchain
       const tx = await contract.mintCopy(data)
+
+      // Wait for transaction to be mined
+      const receipt = await tx.wait()
+
+      return receipt
+    } catch (error) {
+      return error as string
+    }
+  }
+
+  async callContractMethod({
+    contractABI,
+    contractAddress,
+    data,
+    method,
+    options,
+  }: CallContractMethodArgs): Promise<any> {
+    console.log(contractABI, contractAddress, options, method, data)
+    try {
+      const ethersProvider = new ethers.BrowserProvider(this.provider)
+      const signer = await ethersProvider.getSigner()
+      const contract = new ethers.Contract(contractAddress, contractABI, signer)
+
+      // Submit transaction to the blockchain
+      const tx = await contract[method](...data, options)
 
       // Wait for transaction to be mined
       const receipt = await tx.wait()

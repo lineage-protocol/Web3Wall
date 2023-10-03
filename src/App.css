@@ -20,6 +20,17 @@ select {
 
 @layer base {
   html {
-    @apply bg-yellow-100;
+    @apply bg-gray-200;
+  }
+}
+
+.toolbar {
+  height: 56px;
+}
+
+/* For tablet or desktop screens */
+@media (min-width: 768px) {
+  .toolbar {
+    height: 64px;
   }
 }

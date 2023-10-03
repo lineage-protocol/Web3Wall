@@ -1,4 +1,5 @@
 import rpc from 'adapter/jsonrpc'
+import { Metadata } from 'lib'
 import { formatDataKey } from 'utils'
 
 export type RPCResponse<T> = {
@@ -19,8 +20,8 @@ export type NftMetadata = {
 }
 
 export type JSONRPCFilter<C> = {
-  query?: Array<{ column: keyof C; op: '='; query: string }>
-  ordering?: Array<{ column: keyof C; sort: 'desc' | 'asc' }>
+  query: Array<{ column: keyof C; op: '='; query: string }>
+  ordering: Array<{ column: keyof C; sort: 'desc' | 'asc' }>
   from: number
   to: number
 }
@@ -77,7 +78,7 @@ const getMetadataUseKeyByBlock = (nftKey: String, meta_contract_id: String, vers
   })
 }
 
-const getAllMetadataByDataKeyAndBlock = async (nftKey: String, meta_contract_id: String) => {
+const searchMetadatas = async ({ query = [], ordering = [], from = 0, to = 0 }: Partial<JSONRPCFilter<Metadata>>) => {
   const response = await rpc({
     method: 'POST',
     data: JSON.stringify({
@@ -86,24 +87,16 @@ const getAllMetadataByDataKeyAndBlock = async (nftKey: String, meta_contract_id:
       params: {
         query: [
           {
-            column: 'data_key',
-            op: '=',
-            query: nftKey,
-          },
-          {
-            column: 'meta_contract_id',
-            op: '=',
-            query: meta_contract_id,
-          },
-          {
             column: 'loose',
             op: '=',
             query: '0',
           },
+
+          ...query,
         ],
-        ordering: [],
-        from: 0,
-        to: 0,
+        ordering,
+        from,
+        to,
       },
       id: '1',
     }),
@@ -208,5 +201,5 @@ export default {
   getMetaContractById,
   getCompleteTransactions,
   getTransactions,
-  getAllMetadataByDataKeyAndBlock,
+  searchMetadatas,
 }

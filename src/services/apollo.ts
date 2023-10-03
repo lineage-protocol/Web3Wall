@@ -10,7 +10,7 @@ export type ApolloClientResponse<T> = {
 export type ApolloClientFilter = {
   first?: number
   skip?: number
-  where?: { to?: string; from: string }
+  where?: Record<string, string>
 }
 
 export const apolloQuery = async <R>(
