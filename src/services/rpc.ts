@@ -179,13 +179,23 @@ const getCompleteTransactions = async (from = 0, to = 0) => {
   return response.data?.result?.transactions
 }
 
-const getTransactions = async (filter: JSONRPCFilter<Transaction>) => {
+const getTransactions = async ({
+  query = [],
+  ordering = [],
+  from = 0,
+  to = 0,
+}: Partial<JSONRPCFilter<Transaction>>) => {
   const response = await rpc({
     method: 'POST',
     data: JSON.stringify({
       jsonrpc: '2.0',
       method: 'get_transactions',
-      params: filter,
+      params: {
+        query: [...query],
+        ordering,
+        from,
+        to,
+      },
       id: '1',
     }),
   })
