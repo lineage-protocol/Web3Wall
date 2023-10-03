@@ -1,15 +1,16 @@
 import CommentCard from 'components/CommentCard'
 import CommentModal from 'components/Modal/CommentModal'
 import SocialCard from 'components/SocialCard'
-import { useLocation, useParams } from 'react-router-dom'
-import { useGetComments } from 'repositories/rpc.repository'
+import { useParams } from 'react-router-dom'
+import { useGetComments, useGetPost } from 'repositories/rpc.repository'
 import { useBoundStore } from 'store'
 
 const PageComment = () => {
   const { token_address, token_id, chain_id, cid } = useParams()
-  const { state } = useLocation()
   const { data: comments } = useGetComments(cid as string)
   const { modal, setModalState } = useBoundStore()
+
+  const { data: post } = useGetPost(cid as string)
 
   const openNewCommentModal = () => {
     setModalState({
@@ -30,7 +31,7 @@ const PageComment = () => {
   return (
     <div className="h-ful">
       <div className="grid gap-0 overflow-auto pb-[120px] h-full pt-3">
-        <SocialCard {...state.post} showNoOfComments="true" noOfComments={comments?.length} />
+        {post && <SocialCard {...post} showNoOfComments={true} noOfComments={comments?.length ?? 0} />}
         {comments &&
           comments?.map((comment: any, index: number) => {
             return <CommentCard key={index} {...comment} />

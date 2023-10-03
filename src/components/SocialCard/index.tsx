@@ -3,17 +3,17 @@ import { RWebShare } from 'react-web-share'
 import { timeAgo } from 'utils'
 
 interface SocialCardProp {
-  tokenId: String
-  tokenAddress: String
-  chainId: String
-  text: String
-  image: String
-  public_key: String
+  token_id: string
+  token_address: string
+  chain_id: string
+  text?: string
+  image?: string
+  public_key: string
   timestamp: number
   cid: string
   showNoOfComments: boolean
   noOfComments?: number
-  goToComments?: (cid: string, post: any) => void
+  goToComments?: (cid: string) => void
 }
 
 const SortCardDisplay = (prop: SocialCardProp) => {
@@ -46,7 +46,7 @@ const SocialCard = (prop: SocialCardProp) => {
         <div className="bg-white border-b-[1px] mb-1 border-gray-200 mx-1">
           <div className="flex px-3 pt-3 mb-1 text-xs">
             <div className="font-bold">
-              {prop.public_key.substring(0, 6) + '...' + prop.public_key.substring(prop.public_key.length - 4)}
+              {prop.public_key?.substring(0, 6) + '...' + prop.public_key?.substring(prop.public_key.length - 4)}
             </div>
             <div className="ml-2 text-gray-400">{timeAgo(prop.timestamp)}</div>
           </div>
@@ -65,7 +65,7 @@ const SocialCard = (prop: SocialCardProp) => {
             {prop?.goToComments && (
               <button
                 className="text-sm flex gap-2 items-center cursor-pointer"
-                onClick={() => prop.goToComments?.(prop.cid, prop)}
+                onClick={() => prop.goToComments?.(prop.cid)}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -86,7 +86,7 @@ const SocialCard = (prop: SocialCardProp) => {
             <RWebShare
               data={{
                 title: 'W3wall',
-                url: `${window.location.href}`,
+                url: `${window.location.origin}/comment/${prop.token_address}/${prop.token_id}/${prop.chain_id}/${prop.cid}/`,
                 text: 'Check this out',
               }}
               onClick={() => {}}
