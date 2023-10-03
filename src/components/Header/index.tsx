@@ -1,35 +1,23 @@
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useBoundStore } from 'store'
 
 export default function Header() {
-  const { getAccounts, disconnect } = useWeb3Auth()
+  const { provider, getAccounts, disconnect } = useWeb3Auth()
   const navigate = useNavigate()
-  const { setWallState } = useBoundStore()
 
   const [address, setAddress] = useState('')
   const [isLoaded, setIsLoaded] = useState(false)
 
-  const setShareURL = () => {
-    const url = new URL(window.location.href)
-    const isShare = url.searchParams.get('share')
-    if (isShare) setWallState({ shareURL: url.pathname.split('?')[0] })
-  }
-
   useEffect(() => {
     const getAccount = async () => {
       const acc = await getAccounts()
-      if (!acc) {
-        navigate('/login')
-      }
-      setAddress(acc)
+      setAddress(acc.startsWith('0x') ? acc : '')
       setIsLoaded(true)
     }
 
-    setShareURL()
     getAccount()
-  }, [getAccounts, navigate])
+  }, [provider])
 
   const onLogOut = async () => {
     await disconnect()
@@ -51,12 +39,21 @@ export default function Header() {
                 <Link to="/login" className="block shrink-0">
                   {isLoaded && address && address.substring(0, 6) + '...' + address.substring(address.length - 4)}
                 </Link>
-                <button
-                  onClick={() => onLogOut()}
-                  className="block shrink-0 text-right w-full font-semibold text-red-800"
-                >
-                  Logout
-                </button>
+                {isLoaded && address ? (
+                  <button
+                    onClick={() => onLogOut()}
+                    className="block shrink-0 text-right w-full font-semibold text-red-800"
+                  >
+                    Logout
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => navigate('/login')}
+                    className="block shrink-0 text-right w-full font-semibold text-red-800"
+                  >
+                    Login
+                  </button>
+                )}{' '}
               </div>
             </div>
           </div>
