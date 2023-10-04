@@ -12,12 +12,17 @@ export default function Header() {
   useEffect(() => {
     const getAccount = async () => {
       const acc = await getAccounts()
-      setAddress(acc.startsWith('0x') ? acc : '')
+      if (acc && acc.length > 0) {
+        setAddress(acc.startsWith('0x') ? (acc as string) : '')
+      }
+
       setIsLoaded(true)
     }
 
-    getAccount()
-  }, [provider])
+    getAccount().catch(e => {
+      console.log(e)
+    })
+  }, [getAccounts, provider])
 
   const onLogOut = async () => {
     await disconnect()

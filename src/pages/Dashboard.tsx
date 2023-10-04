@@ -15,7 +15,7 @@ const PageDashboard = () => {
 
   const { modal, setModalState } = useBoundStore()
   const { data: events } = useGetEvents({
-    where: { blockNumber_gte: import.meta.env.VITE_WEB3WALL_SUBGRAPH_START_BLOCK },
+    where: { blockNumber_gte: import.meta.env.VITE_WEB3WALL_SUBGRAPH_START_BLOCK, data_not: '0x', tokenId_gte: '3' },
   })
   const [search, setSearch] = useState('')
   const [isLoggedIn, SetIsLoggedIn] = useState(false)
