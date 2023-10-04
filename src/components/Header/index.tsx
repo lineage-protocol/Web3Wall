@@ -12,7 +12,7 @@ export default function Header() {
   useEffect(() => {
     const getAccount = async () => {
       const acc = await getAccounts()
-      setAddress(acc.startsWith('0x') ? acc : '')
+      setAddress(acc?.startsWith('0x') ? acc : '')
       setIsLoaded(true)
     }
 
