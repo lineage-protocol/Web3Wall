@@ -14,6 +14,7 @@ interface Props {
 }
 
 const CommentModal = (prop: Props) => {
+  const [isLoading, setIsLoading] = useState(false)
   const [text, setText] = useState('')
   const [textRows, setTextRows] = useState(8)
   const { modal } = useBoundStore()
@@ -29,6 +30,7 @@ const CommentModal = (prop: Props) => {
   const onClickReply = async () => {
     const account = await getAccounts()
     if (!account) return
+    setIsLoading(true)
 
     const content = {
       cid: modal.comment.postCid,
@@ -56,6 +58,7 @@ const CommentModal = (prop: Props) => {
     })
 
     closeDialog()
+    setIsLoading(false)
   }
 
   return (
@@ -103,12 +106,17 @@ const CommentModal = (prop: Props) => {
                             </button>
                           </div>
 
-                          <button
-                            onClick={() => onClickReply()}
-                            className="block shrink-0 p-2.5 font-semibold  text-blue-600"
-                          >
-                            Reply
-                          </button>
+                          {isLoading ? (
+                            <p className="block shrink-0 p-2.5">Processing...</p>
+                          ) : (
+                            <button
+                              onClick={() => onClickReply()}
+                              className="block shrink-0 p-2.5 font-semibold  text-blue-600"
+                              disabled={text.length <= 0}
+                            >
+                              Reply
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>

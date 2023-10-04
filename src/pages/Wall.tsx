@@ -31,13 +31,8 @@ const PageWall = () => {
     setModalState({ poap: { isOpen: true } })
   }
 
-  const goToComments = (cid: string, post: any) => {
-    const { goToComments, ...rest } = post
-    navigate(`/comment/${token_address}/${token_id}/${chain_id}/${cid}`, {
-      state: {
-        post: rest,
-      },
-    })
+  const goToComments = (cid: string) => {
+    navigate(`/comment/${token_address}/${token_id}/${chain_id}/${cid}`)
   }
 
   const closePOAPModal = () => {

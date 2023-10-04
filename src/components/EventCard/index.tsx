@@ -58,7 +58,7 @@ const EventCard = (prop: VersionCardProp) => {
               <RWebShare
                 data={{
                   title: 'W3wall',
-                  url: `${window.location.href}`,
+                  url: `${window.location.origin}/wall/${prop.tokenAddress}/${prop.tokenId}/${prop.chainId}/${nftKey}/`,
                   text: 'Check this out',
                 }}
                 onClick={() => {}}

@@ -1,5 +1,6 @@
 import { useBoundStore } from 'store'
 import { useWeb3Auth } from 'hooks/use-web3auth'
+import { useState } from 'react'
 
 interface Prop {
   tokenId: string
@@ -7,10 +8,15 @@ interface Prop {
 }
 
 const PoapButton = (prop: Prop) => {
-  const { mintCopy } = useWeb3Auth()
+  const { mintCopy, getAccounts } = useWeb3Auth()
   const { setModalState } = useBoundStore()
+  const [isLoading, setIsLoading] = useState(false)
 
   const onPoap = async () => {
+    const account = await getAccounts()
+    if (!account) return
+    setIsLoading(true)
+
     try {
       const abi = [
         {
@@ -29,6 +35,7 @@ const PoapButton = (prop: Prop) => {
       })
 
       setModalState({ poap: { isOpen: false } })
+      setIsLoading(false)
     } catch (e: unknown) {
       console.log('e', e)
     }
@@ -36,8 +43,12 @@ const PoapButton = (prop: Prop) => {
 
   return (
     <>
-      <button onClick={() => onPoap()} className="block shrink-0 p-2.5 font-semibold  text-blue-600">
-        Mint POAP
+      <button
+        onClick={() => onPoap()}
+        className="block shrink-0 p-2.5 font-semibold  text-blue-600"
+        disabled={isLoading}
+      >
+        {isLoading ? 'Processing...' : 'Mint POAP'}
       </button>
     </>
   )
