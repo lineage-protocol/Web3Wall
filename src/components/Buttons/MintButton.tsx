@@ -20,8 +20,6 @@ const MintButton = (prop: Prop) => {
 
   const [isDisabled, setIsDisable] = useState(true)
 
-  const abiCoder = new AbiCoder()
-  const encoded = abiCoder.encode(['string', 'string', 'string'], [prop.name, prop.url, prop.body])
   const onMint = async () => {
     const account = await getAccounts()
     if (!account) {
@@ -31,6 +29,7 @@ const MintButton = (prop: Prop) => {
 
     setIsDisable(false)
     prop.setIsLoading(true)
+
     try {
       const contractABI = [
         {
@@ -48,13 +47,15 @@ const MintButton = (prop: Prop) => {
         },
       ]
 
+      const abiCoder = new AbiCoder()
+      const encoded = abiCoder.encode(['string', 'string', 'string'], [prop.name, prop.url, prop.body])
       await callContractMethod({
         contractABI,
         contractAddress: `${import.meta.env.VITE_WEB3WALL_UTILITY}`,
         data: [encoded],
         method: contractABI[0].name,
         options: {
-          value: '0.000',
+          value: '0.015',
         },
       })
 
@@ -62,6 +63,7 @@ const MintButton = (prop: Prop) => {
       prop.setIsLoading(false)
       prop.resetMint()
     } catch (e: any) {
+      console.log(e)
       let msg = `Oops! We couldn't create your new topic. Please try again.`
       if (e.reason) {
         msg += `(${e.reason})`

@@ -77,12 +77,12 @@ const PageWall = () => {
             })}
         </div>
       )}
-      <div className="fixed bottom-5 right-5">
+      <div className="fixed bottom-5 right-5 flex flex-col space-y-2 items-end">
         <button
           onClick={() => openPOAPModal()}
-          className="bg-blue-500 text-white h-12 w-12 rounded-full flex items-center justify-center text-sm"
+          className="bg-blue-500 text-white px-4 py-2 rounded-full flex items-center justify-center text-sm"
         >
-          POAP
+          Mint Ownership
         </button>
         <button
           onClick={() => openModal()}
