@@ -112,7 +112,7 @@ const MintModal = (prop: Props) => {
 
   useEffect(() => {
     async function getBalance() {
-      let balance = await getUserBalance()
+      const balance = await getUserBalance()
       setBalance(balance ? parseFloat(balance) : 0)
     }
     getBalance()
