@@ -122,22 +122,17 @@ export default class EthereumRpc {
     method,
     options,
   }: CallContractMethodArgs): Promise<any> {
-    console.log(contractABI, contractAddress, options, method, data)
-    try {
-      const ethersProvider = new ethers.BrowserProvider(this.provider)
-      const signer = await ethersProvider.getSigner()
-      const contract = new ethers.Contract(contractAddress, contractABI, signer)
+    const ethersProvider = new ethers.BrowserProvider(this.provider)
+    const signer = await ethersProvider.getSigner()
+    const contract = new ethers.Contract(contractAddress, contractABI, signer)
 
-      // Submit transaction to the blockchain
-      const tx = await contract[method](...data, options)
+    // Submit transaction to the blockchain
+    const tx = await contract[method](...data, options)
 
-      // Wait for transaction to be mined
-      const receipt = await tx.wait()
+    // Wait for transaction to be mined
+    const receipt = await tx.wait()
 
-      return receipt
-    } catch (error) {
-      return error as string
-    }
+    return receipt
   }
 
   async signMessage(message: string) {

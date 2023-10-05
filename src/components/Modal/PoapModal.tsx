@@ -37,7 +37,7 @@ const PoapModal = (prop: Props) => {
             <div className="fixed inset-0 bg-black bg-opacity-25" />
           </Transition.Child>
 
-          <div className="fixed inset-0 overflow-y-auto">
+          <div className="max-w-md mx-auto fixed inset-0 overflow-y-auto">
             <div className="flex min-h-full items-center justify-center text-center">
               <Transition.Child
                 as={Fragment}
@@ -65,8 +65,19 @@ const PoapModal = (prop: Props) => {
                     </div>
                   </header>
 
-                  <div className="w-full text-center mt-5 p-3">
-                    <h3>Mint this moments as POAP</h3>
+                  <div className="w-full text-left mt-5 p-3">
+                    <h3 className="font-semibold text-xl">Become Co-owner of this Subject</h3>
+                    <p className="text-sm text-gray-500 mt-2">
+                      By acquiring a share, you don't just own a piece; you play an integral role in the forum's
+                      evolution. Each share you hold signifies your influence in the discussions, decisions, and the
+                      overall direction of this community. It's not just about ownership—it's about being a part of
+                      shaping our collective future.
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      <strong>Coming Up Next:</strong> Stay tuned as we introduce a feature where all ad revenues
+                      generated from this forum will be evenly distributed among its shareholders. Your share isn’t just
+                      symbolic—it has real value.
+                    </p>
                   </div>
                 </Dialog.Panel>
               </Transition.Child>
