@@ -170,7 +170,7 @@ const MintModal = (prop: Props) => {
                               url={mint.image}
                               name={mint.name}
                               body={mint.body}
-                              disabled={isLoading || mint.name.length <= 0}
+                              disabled={isLoading || mint.name.length <= 0 || balance < 0.015}
                               setIsLoading={setIsLoading}
                               resetMint={resetMint}
                             />

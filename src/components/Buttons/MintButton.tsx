@@ -15,7 +15,7 @@ interface Prop {
 
 const MintButton = (prop: Prop) => {
   const { callContractMethod, getAccounts } = useWeb3Auth()
-  const { showError } = useAlertMessage()
+  const { showError, showSuccess } = useAlertMessage()
   const { setModalState } = useBoundStore()
 
   const [isDisabled, setIsDisable] = useState(true)
@@ -59,6 +59,7 @@ const MintButton = (prop: Prop) => {
         },
       })
 
+      showSuccess(`Creating topic in progress, you'll see it in list once completed.`)
       setModalState({ mint: { isOpen: false } })
       prop.setIsLoading(false)
       prop.resetMint()
@@ -70,6 +71,8 @@ const MintButton = (prop: Prop) => {
       }
 
       showError(msg)
+
+      prop.setIsLoading(false)
     }
   }
 
