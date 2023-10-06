@@ -31,7 +31,6 @@ const App = () => {
                   <Route path="/wall/:token_address/:token_id/:chain_id/:key/" element={<PageWall />} />
                 </Route>
                 <Route element={<PublicLayout children={undefined} />}>
-                  {/* <Route path="/" element={<PageIndex />} /> */}
                   <Route path="/login" element={<PageLogin />} />
                 </Route>
                 <Route element={<ActionBarLayout />}>
