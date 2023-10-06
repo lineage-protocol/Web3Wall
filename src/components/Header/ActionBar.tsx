@@ -13,7 +13,7 @@ export default function HeaderActionBar() {
       popFromStack()
       navigate(-1)
     } else {
-      navigate('/dashboard')
+      navigate('/')
     }
   }
 

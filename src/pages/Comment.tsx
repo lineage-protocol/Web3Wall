@@ -4,7 +4,7 @@ import SocialCard from 'components/SocialCard'
 import { useAlertMessage } from 'hooks/use-alert-message'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { useGetComments, useGetPost } from 'repositories/rpc.repository'
 import { useBoundStore } from 'store'
 
@@ -81,9 +81,16 @@ const PageComment = () => {
           </span>
         </div>
       )}
+
       {!isLoading && (
         <div className="grid gap-0 overflow-auto pb-[120px] h-full pt-3">
           {post && <SocialCard {...post} showNoOfComments={true} noOfComments={comments?.length ?? 0} />}
+          <div className="text-gray-400 px-4 my-2 text-sm font-semibold uppercase">Comments</div>
+          {!account && (
+            <div className="bg-white border-b-[1px] text-center py-2 text-red-400 font-semibold border-gray-200 mx-1">
+              <Link to="/login">Login</Link>
+            </div>
+          )}
           {comments.length > 0 &&
             comments &&
             comments?.map((comment: any, index: number) => {
