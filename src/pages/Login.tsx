@@ -77,7 +77,7 @@ const PageLogin = () => {
               <div className="text-3xl font-medium text-transparent bg-clip-text bg-[conic-gradient(at_top_right,_var(--tw-gradient-stops))] from-indigo-600 via-indigo-300 to-indigo-900">
                 w3wall
               </div>
-              <div className="text-6xl pt-10 text-gray-900">wall it up!</div>
+              <div className="text-6xl pt-4 text-gray-900">wall it up!</div>
             </div>
           </div>
           <div className="flex-none h-1/3 flex items-center justify-center">
@@ -110,7 +110,7 @@ const PageLogin = () => {
                   <div className="mt-5 text-xs">
                     Powered by
                     <a href="https://lineageprotocol.com" target="_blank" className="ml-1 text-indigo-600">
-                      Lineage
+                      Lineage Protocol
                     </a>
                   </div>
                 </div>
