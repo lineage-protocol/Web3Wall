@@ -35,7 +35,7 @@ export default function Header() {
         <div className="px-4 w-full">
           <div className="">
             <div className="flex justify-between items-center">
-              <Link to="/dashboard" className="block shrink-0">
+              <Link to="/" className="block shrink-0">
                 <span className="sr-only">Logo</span>
                 <img alt="Man" src="/logo-w3wall.png" className="h-10 w-10" />
               </Link>
