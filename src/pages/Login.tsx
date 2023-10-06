@@ -7,7 +7,7 @@ import { useBoundStore } from 'store'
 
 const PageLogin = () => {
   const [isPWA, setIsPWA] = useState(false)
-  const [deferredPrompt, setDeferredPrompt] = useState(null)
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
 
   const navigate = useNavigate()
   const { userInfo, connect } = useWeb3Auth()
@@ -42,7 +42,6 @@ const PageLogin = () => {
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
-      console.log('test')
       e.preventDefault()
       const evt = e as any
       setDeferredPrompt(evt)
