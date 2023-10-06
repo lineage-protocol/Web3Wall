@@ -3,35 +3,16 @@ import EventCard from 'components/EventCard'
 import { AddIcon } from 'components/Icons/icons'
 import MintModal from 'components/Modal/MintModal'
 import ProofModal from 'components/Modal/ProofModal'
-import { useWeb3Auth } from 'hooks/use-web3auth'
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import { useGetEvents } from 'repositories/subgraph.repository'
 import { useBoundStore } from 'store'
 
 const PageDashboard = () => {
-  const { getAccounts } = useWeb3Auth()
-  const navigate = useNavigate()
-
   const { modal, setModalState } = useBoundStore()
   const { data: events } = useGetEvents({
     where: { blockNumber_gte: import.meta.env.VITE_WEB3WALL_SUBGRAPH_START_BLOCK, data_not: '0x', tokenId_gte: '3' },
   })
   const [search, setSearch] = useState('')
-  const [isLoggedIn, SetIsLoggedIn] = useState(false)
-
-  useEffect(() => {
-    const checkLoggedIn = async () => {
-      const account = await getAccounts()
-      if (account) {
-        SetIsLoggedIn(true)
-      } else {
-        SetIsLoggedIn(false)
-      }
-    }
-
-    checkLoggedIn()
-  }, [navigate, getAccounts, isLoggedIn])
 
   const openModal = () => {
     setModalState({ mint: { isOpen: true } })
