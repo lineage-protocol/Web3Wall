@@ -2,6 +2,8 @@ import CommentModal from 'components/Modal/CommentModal'
 import NewPostModal from 'components/Modal/NewPostModal'
 import PoapModal from 'components/Modal/PoapModal'
 import SocialCard from 'components/SocialCard'
+import { useAlertMessage } from 'hooks/use-alert-message'
+import { useWeb3Auth } from 'hooks/use-web3auth'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useGetPosts } from 'repositories/rpc.repository'
@@ -19,9 +21,17 @@ const PageWall = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [account, setAccount] = useState('')
+
+  const { showError } = useAlertMessage()
+  const { getAccounts } = useWeb3Auth()
 
   const openModal = () => {
-    setIsModalOpen(true)
+    if (account) {
+      setIsModalOpen(true)
+    } else {
+      showError(`Please login to post content`)
+    }
   }
 
   const closeModal = () => {
@@ -60,6 +70,21 @@ const PageWall = () => {
     }
   }, [data])
 
+  useEffect(() => {
+    const getAccount = async () => {
+      try {
+        const acc = await getAccounts()
+        if (acc) {
+          setAccount(acc as string)
+        }
+      } catch (e) {
+        setAccount('')
+      }
+    }
+
+    getAccount().catch(e => console.log(e))
+  })
+
   return (
     <div className="h-full">
       {isLoading && (
@@ -78,12 +103,14 @@ const PageWall = () => {
         </div>
       )}
       <div className="fixed bottom-5 right-5 flex flex-col space-y-2 items-end">
-        <button
-          onClick={() => openPOAPModal()}
-          className="bg-blue-500 text-white px-4 py-2 rounded-full flex items-center justify-center text-sm"
-        >
-          Mint Ownership
-        </button>
+        {account && (
+          <button
+            onClick={() => openPOAPModal()}
+            className="bg-blue-500 text-white px-4 py-2 rounded-full flex items-center justify-center text-sm"
+          >
+            Mint Ownership
+          </button>
+        )}
         <button
           onClick={() => openModal()}
           className="bg-blue-500 text-white h-12 w-12 rounded-full flex items-center justify-center text-2xl"

@@ -188,8 +188,7 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
       return ''
     }
     const rpc = new RPC(provider)
-    const addresses = await rpc.getAccounts()
-    return addresses
+    return rpc.getAccounts()
   }
 
   async function getUserInfo() {

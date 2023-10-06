@@ -1,11 +1,18 @@
 import CommentCard from 'components/CommentCard'
 import CommentModal from 'components/Modal/CommentModal'
 import SocialCard from 'components/SocialCard'
+import { useAlertMessage } from 'hooks/use-alert-message'
+import { useWeb3Auth } from 'hooks/use-web3auth'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useGetComments, useGetPost } from 'repositories/rpc.repository'
 import { useBoundStore } from 'store'
 
 const PageComment = () => {
+  const [account, setAccount] = useState('')
+  const { getAccounts } = useWeb3Auth()
+  const { showError } = useAlertMessage()
+
   const { token_address, token_id, chain_id, cid } = useParams()
   const { data: comments } = useGetComments(cid as string)
   const { modal, setModalState } = useBoundStore()
@@ -13,23 +20,41 @@ const PageComment = () => {
   const { data: post } = useGetPost(cid as string)
 
   const openNewCommentModal = () => {
-    setModalState({
-      comment: {
-        isOpen: true,
-        tokenId: token_id as string,
-        tokenAddress: token_address as string,
-        chainId: chain_id as string,
-        postCid: cid as string,
-      },
-    })
+    if (account) {
+      setModalState({
+        comment: {
+          isOpen: true,
+          tokenId: token_id as string,
+          tokenAddress: token_address as string,
+          chainId: chain_id as string,
+          postCid: cid as string,
+        },
+      })
+    } else {
+      showError(`Please login to comment`)
+    }
   }
 
   const closeCommentModal = () => {
     setModalState({ comment: { isOpen: false, tokenId: '', tokenAddress: '', chainId: '', postCid: '' } })
   }
 
+  useEffect(() => {
+    const getAccount = async () => {
+      try {
+        const acc = await getAccounts()
+        if (acc) {
+          setAccount(acc as string)
+        }
+      } catch (e) {
+        setAccount('')
+      }
+    }
+
+    getAccount().catch(e => console.log(e))
+  })
   return (
-    <div className="h-ful">
+    <div className="h-full">
       <div className="grid gap-0 overflow-auto pb-[120px] h-full pt-3">
         {post && <SocialCard {...post} showNoOfComments={true} noOfComments={comments?.length ?? 0} />}
         {comments &&

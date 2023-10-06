@@ -17,6 +17,7 @@ const NoMaticModal = () => {
   const goToTelegram = () => {
     window.open('https://t.me/+H7Spt2NaASY0ZTE1', '_blank')
   }
+
   return (
     <div
       role="alert"
