@@ -138,6 +138,7 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
 
   async function disconnect() {
     if (web3Auth) await web3Auth.logout()
+    setProvider(null)
     setUserInfo(undefined)
   }
 
@@ -187,9 +188,9 @@ export const Web3AuthProvider = ({ children }: Web3AuthProviderProps) => {
     if (!provider) {
       return ''
     }
+
     const rpc = new RPC(provider)
-    const addresses = await rpc.getAccounts()
-    return addresses
+    return rpc.getAccounts()
   }
 
   async function getUserInfo() {

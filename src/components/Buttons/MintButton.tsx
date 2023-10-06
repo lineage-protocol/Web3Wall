@@ -21,16 +21,16 @@ const MintButton = (prop: Prop) => {
   const [isDisabled, setIsDisable] = useState(true)
 
   const onMint = async () => {
-    const account = await getAccounts()
-    if (!account) {
-      setIsDisable(true)
-      return
-    }
-
-    setIsDisable(false)
-    prop.setIsLoading(true)
-
     try {
+      const account = await getAccounts()
+      if (!account) {
+        setIsDisable(true)
+        return
+      }
+
+      setIsDisable(false)
+      prop.setIsLoading(true)
+
       const contractABI = [
         {
           inputs: [

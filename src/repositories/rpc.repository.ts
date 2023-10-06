@@ -104,7 +104,7 @@ const useGetPosts = (nft_key: string) => {
         ],
       })
 
-      let txs = await rpc.getTransactions({
+      const txs = await rpc.getTransactions({
         query: [
           {
             column: 'data_key',
@@ -119,7 +119,7 @@ const useGetPosts = (nft_key: string) => {
         ],
       })
 
-      let reduced = txs.reduce(
+      const reduced = txs.reduce(
         (acc, curr) => {
           acc[curr.version] = curr
           return acc
@@ -170,7 +170,7 @@ const useGetPost = (cid: string) => {
 
       console.log('usegetpostresutlt', result)
 
-      let txs = await rpc.getTransactions({
+      const txs = await rpc.getTransactions({
         query: [
           {
             column: 'version',
@@ -242,6 +242,30 @@ const useGetComments = (cid: string) => {
   })
 }
 
+const useGetCommentCount = (cid: string) => {
+  return useQuery({
+    queryKey: [RQ_KEY.GET_COMMENT_COUNT, cid],
+    queryFn: async () => {
+      const result = await rpc.searchMetadataCount({
+        query: [
+          {
+            column: 'version',
+            op: '=',
+            query: cid,
+          },
+          {
+            column: 'meta_contract_id',
+            op: '=',
+            query: `${import.meta.env.VITE_WEB3WALL_COMMENT_META_CONTRACT_ID}`,
+          },
+        ],
+      })
+
+      return result
+    },
+  })
+}
+
 export {
   useGetCompleteTransactions,
   useGetTransactions,
@@ -249,5 +273,6 @@ export {
   useStoreBlob,
   useGetPosts,
   useGetComments,
+  useGetCommentCount,
   useGetPost,
 }

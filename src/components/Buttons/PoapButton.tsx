@@ -13,11 +13,11 @@ const PoapButton = (prop: Prop) => {
   const [isLoading, setIsLoading] = useState(false)
 
   const onPoap = async () => {
-    const account = await getAccounts()
-    if (!account) return
-    setIsLoading(true)
-
     try {
+      const account = await getAccounts()
+      if (!account) return
+      setIsLoading(true)
+
       const abi = [
         {
           inputs: [{ internalType: 'uint256', name: 'tokenId', type: 'uint256' }],

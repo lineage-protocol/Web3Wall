@@ -1,6 +1,8 @@
+import { useAlertMessage } from 'hooks/use-alert-message'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { isEmptyObject } from 'utils'
 
 export default function Header() {
   const { provider, getAccounts, disconnect } = useWeb3Auth()
@@ -8,23 +10,31 @@ export default function Header() {
 
   const [address, setAddress] = useState('')
   const [isLoaded, setIsLoaded] = useState(false)
+  const { showError } = useAlertMessage()
 
   useEffect(() => {
     const getAccount = async () => {
-      const acc = await getAccounts()
-      if (acc && acc.length > 0) {
-        setAddress(acc.startsWith('0x') ? (acc as string) : '')
+      try {
+        const acc = await getAccounts()
+        if (acc && acc.length > 0) {
+          setAddress(acc.startsWith('0x') ? (acc as string) : '')
+        }
+      } catch (e) {
+        e
       }
 
       setIsLoaded(true)
     }
 
-    getAccount().catch(e => {
-      console.log(e)
-    })
-  }, [getAccounts, provider])
+    if (!isLoaded && provider && !isEmptyObject(provider as object)) {
+      getAccount().catch(e => {
+        console.log(e)
+      })
+    }
+  }, [getAccounts, provider, showError])
 
   const onLogOut = async () => {
+    setAddress('')
     await disconnect()
     navigate('/login')
   }
@@ -35,7 +45,7 @@ export default function Header() {
         <div className="px-4 w-full">
           <div className="">
             <div className="flex justify-between items-center">
-              <Link to="/dashboard" className="block shrink-0">
+              <Link to="/" className="block shrink-0">
                 <span className="sr-only">Logo</span>
                 <img alt="Man" src="/logo-w3wall.png" className="h-10 w-10" />
               </Link>

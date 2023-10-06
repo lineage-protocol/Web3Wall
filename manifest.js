@@ -26,7 +26,7 @@ const manifestForPlugIn = {
   background_color: '#f0e7db',
   display: 'standalone',
   scope: '/',
-  start_url: '/login',
+  start_url: '/',
 }
 
 export default manifestForPlugIn
