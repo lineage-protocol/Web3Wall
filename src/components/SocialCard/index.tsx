@@ -67,7 +67,14 @@ const SocialCard = (prop: SocialCardProp) => {
   return (
     <>
       <article className="transition" ref={ref as React.RefObject<HTMLDivElement>}>
-        <div className="bg-white border-b-[1px] mb-1 border-gray-200 mx-1">
+        <div
+          className="bg-white border-b-[1px] mb-1 border-gray-200 mx-1"
+          onClick={() => {
+            if (prop?.goToComments) {
+              prop.goToComments?.(prop.cid)
+            }
+          }}
+        >
           <div className="flex px-3 pt-3 mb-1 text-xs">
             <div className="font-bold">
               {prop.public_key?.substring(0, 6) + '...' + prop.public_key?.substring(prop.public_key.length - 4)}
@@ -80,16 +87,9 @@ const SocialCard = (prop: SocialCardProp) => {
           </div>
 
           <div className={`flex mx-3 items-center gap-1 py-3 text-gray-500 justify-between`}>
-            <span
-              className="text-sm flex gap-1 items-center cursor-pointer"
-              onClick={() => {
-                if (prop?.goToComments) {
-                  prop.goToComments?.(prop.cid)
-                }
-              }}
-            >
+            <span className="text-sm flex gap-1 items-center cursor-pointer">
               <CommentIcon />
-              {commentCount}
+              <span className="text-xs">{commentCount}</span>
             </span>
             <RWebShare
               data={{

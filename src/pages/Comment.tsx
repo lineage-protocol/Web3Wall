@@ -10,11 +10,14 @@ import { useBoundStore } from 'store'
 
 const PageComment = () => {
   const [account, setAccount] = useState('')
+  const [comments, setComments] = useState<any>([])
+  const [isLoading, setIsLoading] = useState(true)
+
   const { getAccounts } = useWeb3Auth()
   const { showError } = useAlertMessage()
 
   const { token_address, token_id, chain_id, cid } = useParams()
-  const { data: comments } = useGetComments(cid as string)
+  const { data } = useGetComments(cid as string)
   const { modal, setModalState } = useBoundStore()
 
   const { data: post } = useGetPost(cid as string)
@@ -40,6 +43,22 @@ const PageComment = () => {
   }
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+
+    if (data) {
+      timeoutId = setTimeout(() => {
+        setComments(data)
+        setIsLoading(false)
+      }, 1000)
+    }
+
+    return () => {
+      clearTimeout(timeoutId)
+      setComments([])
+    }
+  }, [data])
+
+  useEffect(() => {
     const getAccount = async () => {
       try {
         const acc = await getAccounts()
@@ -55,13 +74,24 @@ const PageComment = () => {
   })
   return (
     <div className="h-full">
-      <div className="grid gap-0 overflow-auto pb-[120px] h-full pt-3">
-        {post && <SocialCard {...post} showNoOfComments={true} noOfComments={comments?.length ?? 0} />}
-        {comments &&
-          comments?.map((comment: any, index: number) => {
-            return <CommentCard key={index} {...comment} />
-          })}
-      </div>
+      {isLoading && (
+        <div className="text-center mt-5">
+          <span className="whitespace-nowrap rounded-full bg-purple-100 px-2.5 py-0.5 text-sm text-purple-700">
+            Loading
+          </span>
+        </div>
+      )}
+      {!isLoading && (
+        <div className="grid gap-0 overflow-auto pb-[120px] h-full pt-3">
+          {post && <SocialCard {...post} showNoOfComments={true} noOfComments={comments?.length ?? 0} />}
+          {comments.length > 0 &&
+            comments &&
+            comments?.map((comment: any, index: number) => {
+              return <CommentCard key={index} {...comment} />
+            })}
+        </div>
+      )}
+
       <div className="fixed bottom-5 right-5">
         <button
           onClick={() => openNewCommentModal()}
