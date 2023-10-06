@@ -18,7 +18,7 @@ const CommentCard = (prop: CommentCardProp) => {
   return (
     <>
       <article className="transition">
-        <div className="bg-white border-b-[1px] mb-1 border-gray-200 mx-1">
+        <div className="bg-yellow-100/90 border-b-[1px] mb-1 border-gray-200 mx-1">
           <div className="flex px-3 pt-2 mb-1 text-xs">
             <div className="font-bold">
               {prop.from.substring(0, 6) + '...' + prop.from.substring(prop.from.length - 4)}

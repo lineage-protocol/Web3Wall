@@ -9,7 +9,7 @@ export default function HeaderActionBar() {
   const navigate = useNavigate()
 
   const goBack = () => {
-    if (historyStack.length > 0) {
+    if (historyStack.length > 0 && historyStack.length !== 1) {
       popFromStack()
       navigate(-1)
     } else {

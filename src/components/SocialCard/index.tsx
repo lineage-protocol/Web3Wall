@@ -67,14 +67,7 @@ const SocialCard = (prop: SocialCardProp) => {
   return (
     <>
       <article className="transition" ref={ref as React.RefObject<HTMLDivElement>}>
-        <div
-          className="bg-white border-b-[1px] mb-1 border-gray-200 mx-1"
-          onClick={() => {
-            if (prop?.goToComments) {
-              prop.goToComments?.(prop.cid)
-            }
-          }}
-        >
+        <div className="bg-white border-b-[1px] mb-1 border-gray-200 mx-1">
           <div className="flex px-3 pt-3 mb-1 text-xs">
             <div className="font-bold">
               {prop.public_key?.substring(0, 6) + '...' + prop.public_key?.substring(prop.public_key.length - 4)}
@@ -82,7 +75,13 @@ const SocialCard = (prop: SocialCardProp) => {
             <div className="ml-2 text-gray-400">{timeAgo(prop.timestamp)}</div>
           </div>
 
-          <div>
+          <div
+            onClick={() => {
+              if (prop?.goToComments) {
+                prop.goToComments?.(prop.cid)
+              }
+            }}
+          >
             <SortCardDisplay {...prop} />
           </div>
 
