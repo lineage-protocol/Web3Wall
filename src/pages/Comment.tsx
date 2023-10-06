@@ -88,7 +88,7 @@ const PageComment = () => {
           <div className="text-gray-400 px-4 my-2 text-sm font-semibold uppercase">Comments</div>
           {!account && (
             <div className="bg-white border-b-[1px] text-center py-2 text-red-400 font-semibold border-gray-200 mx-1">
-              <Link to="/login">Login</Link>
+              <Link to="/login">Login to comment</Link>
             </div>
           )}
           {comments.length > 0 &&
