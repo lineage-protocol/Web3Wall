@@ -162,3 +162,7 @@ export function timeAgo(timestamp: number): string {
 
   return ''
 }
+
+export function isEmptyObject(obj: object): boolean {
+  return Object.keys(obj).length === 0 && obj.constructor === Object
+}

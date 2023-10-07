@@ -105,6 +105,30 @@ const searchMetadatas = async ({ query = [], ordering = [], from = 0, to = 0 }: 
   return response.data?.result?.metadatas
 }
 
+const searchMetadataCount = async ({
+  query = [],
+  ordering = [],
+  from = 0,
+  to = 0,
+}: Partial<JSONRPCFilter<Metadata>>) => {
+  const response = await rpc({
+    method: 'POST',
+    data: JSON.stringify({
+      jsonrpc: '2.0',
+      method: 'search_metadatas_count',
+      params: {
+        query: [...query],
+        ordering,
+        from,
+        to,
+      },
+      id: '1',
+    }),
+  })
+
+  return response.data?.result
+}
+
 const getContentFromIpfs = (cid: String) => {
   return rpc({
     method: 'POST',
@@ -212,4 +236,5 @@ export default {
   getCompleteTransactions,
   getTransactions,
   searchMetadatas,
+  searchMetadataCount,
 }

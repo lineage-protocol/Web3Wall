@@ -8,7 +8,7 @@ interface CommentCardProp {
 
 const SortCardDisplay = (prop: CommentCardProp) => {
   if (prop.message) {
-    return <p className="px-3 pb-2">{prop.message}</p>
+    return <p className="px-3 pb-2 text-sm">{prop.message}</p>
   } else {
     return <></>
   }
@@ -17,7 +17,7 @@ const SortCardDisplay = (prop: CommentCardProp) => {
 const CommentCard = (prop: CommentCardProp) => {
   return (
     <>
-      <article className="transition">
+      <article>
         <div className="bg-white border-b-[1px] mb-1 border-gray-200 mx-1">
           <div className="flex px-3 pt-2 mb-1 text-xs">
             <div className="font-bold">

@@ -1,5 +1,5 @@
 import { ErrorMessage, SuccessMessage } from '../components/Icons/icons'
-import React, { createContext, useState, ReactNode, useEffect } from 'react'
+import React, { createContext, useState, ReactNode, useEffect, useContext } from 'react'
 
 interface AlertMessageContextInterface {
   errorMessage: string | null
@@ -47,13 +47,13 @@ export const AlertMessageProvider = ({ children }: AlertMessageProviderProps) =>
     if (errorMessage) {
       timeout = setTimeout(() => {
         hideError()
-      }, 3000)
+      }, 5000)
     }
 
     if (successMessage) {
       timeout = setTimeout(() => {
         hideSuccess()
-      }, 3000)
+      }, 5000)
     }
 
     return () => {
@@ -70,4 +70,12 @@ export const AlertMessageProvider = ({ children }: AlertMessageProviderProps) =>
       {children}
     </AlertMessageContext.Provider>
   )
+}
+
+export const useAlertMessage = () => {
+  const context = useContext(AlertMessageContext)
+  if (!context) {
+    throw new Error('useAlert must be used within an AlertMessageProvider')
+  }
+  return context
 }

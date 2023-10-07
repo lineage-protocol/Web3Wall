@@ -6,6 +6,7 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 import { usePublishTransaction, useStoreBlob } from 'repositories/rpc.repository'
 import imageCompression from 'browser-image-compression'
 import { v4 } from 'uuid'
+import { useAlertMessage } from 'hooks/use-alert-message'
 
 const LoadingOverlay = () => {
   return (
@@ -36,6 +37,7 @@ const NewPostModal = (prop: Props) => {
   const { mutateAsync: publishTx } = usePublishTransaction()
 
   const { signMessage, getAccounts } = useWeb3Auth()
+  const { showError, showSuccess } = useAlertMessage()
 
   const onPost = async (): Promise<void> => {
     const account = await getAccounts()
@@ -68,8 +70,10 @@ const NewPostModal = (prop: Props) => {
         version: v4(),
       })
 
+      showSuccess(`Publishing your post to network...`)
       onCloseDialog()
     } catch (e) {
+      showError(`Error submitting your post. Try again.`)
       onCloseDialog()
     }
   }
@@ -149,7 +153,7 @@ const NewPostModal = (prop: Props) => {
             <div className="fixed inset-0 bg-black bg-opacity-25" />
           </Transition.Child>
 
-          <div className="fixed inset-0 overflow-y-auto">
+          <div className="max-w-md mx-auto fixed inset-0 overflow-y-auto">
             <div className="flex min-h-full items-center justify-center text-center">
               <Transition.Child
                 as={Fragment}

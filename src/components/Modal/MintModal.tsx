@@ -17,10 +17,11 @@ const NoMaticModal = () => {
   const goToTelegram = () => {
     window.open('https://t.me/+H7Spt2NaASY0ZTE1', '_blank')
   }
+
   return (
     <div
       role="alert"
-      className="rounded border-s-4 border-yellow-500 bg-red-50 p-4 text-left absolute flex justify-between items-center"
+      className="w-full rounded border-s-4 border-yellow-500 bg-red-50 p-4 text-left absolute flex justify-between items-center"
     >
       <div className="">
         <strong className="block font-medium text-yellow-800">No $MATIC?</strong>
@@ -112,7 +113,7 @@ const MintModal = (prop: Props) => {
 
   useEffect(() => {
     async function getBalance() {
-      let balance = await getUserBalance()
+      const balance = await getUserBalance()
       setBalance(balance ? parseFloat(balance) : 0)
     }
     getBalance()
@@ -141,7 +142,7 @@ const MintModal = (prop: Props) => {
             <div className="fixed inset-0 bg-black bg-opacity-25" />
           </Transition.Child>
 
-          <div className="fixed inset-0 overflow-y-auto">
+          <div className="max-w-md mx-auto fixed inset-0 overflow-y-auto">
             <div className="flex min-h-full items-center justify-center text-center">
               <Transition.Child
                 as={Fragment}
@@ -170,7 +171,7 @@ const MintModal = (prop: Props) => {
                               url={mint.image}
                               name={mint.name}
                               body={mint.body}
-                              disabled={isLoading || mint.name.length <= 0}
+                              disabled={isLoading || mint.name.length <= 0 || balance < 0.015}
                               setIsLoading={setIsLoading}
                               resetMint={resetMint}
                             />

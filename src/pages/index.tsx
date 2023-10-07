@@ -1,4 +1,3 @@
-import AddToHomeScreenModal from 'components/Modal/AddToHomeScreenModal'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -61,7 +60,7 @@ const PageIndex = () => {
   return (
     <>
       <div className="flex flex-col h-screen justify-center items-center p-2 w-full mx-auto">
-        {!isPWA && <AddToHomeScreenModal />}
+        {/* {!isPWA && <AddToHomeScreenModal />} */}
       </div>
     </>
   )
