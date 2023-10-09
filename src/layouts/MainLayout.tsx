@@ -9,6 +9,8 @@ const MainLayout = () => {
   const { pushToStack, popFromStack, historyStack } = useNavigationContext()
   const location = useLocation()
 
+  const { isLoading, LoadingSpinnerComponent } = LoadingSpinner()
+
   useEffect(() => {
     if (historyStack.length > 0 && historyStack[historyStack.length - 1] !== location.pathname) {
       popFromStack()
@@ -20,7 +22,7 @@ const MainLayout = () => {
 
   return (
     <Web3Wrapper>
-      <LoadingSpinner />
+      {isLoading && <LoadingSpinnerComponent />}
       <div className="container md:max-w-md mx-auto text-black bg-gray-200 h-screen pb-[100px]">
         <Header />
         <div className="pt-[55px]">

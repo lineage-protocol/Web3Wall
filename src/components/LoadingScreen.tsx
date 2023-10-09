@@ -1,4 +1,4 @@
-import React, { StyleHTMLAttributes, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 export const LoadingSpinner = () => {
   const [isLoading, setIsLoading] = useState(true)
@@ -6,13 +6,13 @@ export const LoadingSpinner = () => {
   useEffect(() => {
     const duration = setTimeout(() => {
       setIsLoading(false)
-    }, 3000)
-    // return () => {
-    //   clearTimeout(duration)
-    // }
+    }, 10000)
+    return () => {
+      clearTimeout(duration)
+    }
   }, [])
 
-  const spinnerStyle = {
+  const spinnerStyle: React.CSSProperties = {
     border: '4px solid rgba(0, 0, 0, 0.1)',
     borderTop: '4px solid #3498db',
     borderRadius: '50%',
@@ -21,7 +21,7 @@ export const LoadingSpinner = () => {
     animation: 'spin 1s linear infinite',
   }
 
-  const overlayStyle: StyleHTMLAttributes = {
+  const overlayStyle: React.CSSProperties = {
     position: 'fixed',
     top: 0,
     left: 0,
@@ -34,13 +34,11 @@ export const LoadingSpinner = () => {
     zIndex: 9999,
   }
 
-  return (
-    <>
-      {isLoading && (
-        <div style={overlayStyle}>
-          <div style={spinnerStyle}></div>
-        </div>
-      )}
-    </>
+  const LoadingSpinnerComponent = () => (
+    <div style={overlayStyle}>
+      <div style={spinnerStyle}></div>
+    </div>
   )
+
+  return { isLoading, LoadingSpinnerComponent }
 }
