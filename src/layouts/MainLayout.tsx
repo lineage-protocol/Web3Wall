@@ -3,6 +3,7 @@ import Header from '../components/Header'
 import { Web3Wrapper } from 'App'
 import { useNavigationContext } from 'hooks/use-navigation'
 import { useEffect } from 'react'
+import { LoadingSpinner } from 'components/LoadingScreen'
 
 const MainLayout = () => {
   const { pushToStack, popFromStack, historyStack } = useNavigationContext()
@@ -19,6 +20,7 @@ const MainLayout = () => {
 
   return (
     <Web3Wrapper>
+      <LoadingSpinner />
       <div className="container md:max-w-md mx-auto text-black bg-gray-200 h-screen pb-[100px]">
         <Header />
         <div className="pt-[55px]">
