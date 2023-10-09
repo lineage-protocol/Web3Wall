@@ -6,7 +6,7 @@ export const LoadingSpinner = () => {
   useEffect(() => {
     const duration = setTimeout(() => {
       setIsLoading(false)
-    }, 10000)
+    }, 3000)
     return () => {
       clearTimeout(duration)
     }
