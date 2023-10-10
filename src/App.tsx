@@ -5,9 +5,8 @@ import './App.css'
 import { IpfsProvider } from 'hooks/use-ipfs'
 import { AlertMessageProvider } from 'hooks/use-alert-message'
 // Router
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, useLocation } from 'react-router-dom'
 
-import PageIndex from 'pages'
 import { ApiProvider } from 'hooks/use-api'
 import PublicLayout from 'layouts/PublicLayout'
 import { Web3AuthProvider } from 'hooks/use-web3auth'
@@ -17,8 +16,14 @@ import PageWall from 'pages/Wall'
 import PageComment from 'pages/Comment'
 import ActionBarLayout from 'layouts/ActionBarLayout'
 import { NavigationProvider } from 'hooks/use-navigation'
+import ReactGA from 'react-ga4'
+import useGoogleAnalytic from 'hooks/useGoogleAnalytic'
+ReactGA.initialize(import.meta.env.VITE_GA_MEASUREMENT_ID as string)
 
 const App = () => {
+  const location = useLocation()
+  useGoogleAnalytic(location)
+
   return (
     <IpfsProvider>
       <Web3AuthProvider>
