@@ -63,7 +63,7 @@ const CommentModal = (prop: Props) => {
       closeDialog()
       setIsLoading(false)
 
-      showSuccess(`Publishing your post to network..`)
+      showSuccess(`Publishing your comment to network..`)
     } catch (e) {
       showError(`Error publishing your post. Try again.`)
     }

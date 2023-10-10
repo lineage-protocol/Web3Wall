@@ -145,7 +145,7 @@ const PageWall = () => {
         </RWebShare>
         <button
           onClick={() => openModal()}
-          className="bg-blue-500 text-white hover:bg-blue-400  h-12 w-12 rounded-full flex items-center justify-center text-2xl"
+          className="bg-purple-500 text-white hover:bg-purple-400  h-14 w-14 shadow-mg rounded-full flex items-center justify-center text-2xl"
         >
           <WallAddIcon />
         </button>
