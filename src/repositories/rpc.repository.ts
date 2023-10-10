@@ -236,7 +236,7 @@ const useGetComments = (cid: string) => {
 
       const results = await Promise.all(promises)
       const flattened = results.flat() as Comment[]
-      return flattened.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1))
+      return flattened.sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1))
     },
   })
 }
