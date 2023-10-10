@@ -2,6 +2,7 @@ import CommentModal from 'components/Modal/CommentModal'
 import NewPostModal from 'components/Modal/NewPostModal'
 import PoapModal from 'components/Modal/PoapModal'
 import SocialCard from 'components/SocialCard'
+import { RWebShare } from 'react-web-share'
 import { useAlertMessage } from 'hooks/use-alert-message'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import { useEffect, useState } from 'react'
@@ -106,16 +107,50 @@ const PageWall = () => {
         {account && (
           <button
             onClick={() => openPOAPModal()}
-            className="bg-blue-500 text-white px-4 py-2 rounded-full flex items-center justify-center text-sm"
+            className="bg-blue-500 text-white hover:bg-blue-400 px-4 py-2 rounded-full flex items-center justify-center text-sm"
           >
             Mint Ownership
           </button>
         )}
+        <RWebShare
+          data={{
+            title: 'W3wall',
+            url: `${window.location.origin}/wall/${token_address}/${token_id}/${chain_id}/${key}`,
+            text: 'Check this out',
+          }}
+          onClick={() => {}}
+        >
+          <div className="bg-blue-500 text-white hover:bg-blue-400 h-12 w-12 rounded-full flex items-center justify-center text-2xl">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"
+              />
+            </svg>
+          </div>
+        </RWebShare>
         <button
           onClick={() => openModal()}
-          className="bg-blue-500 text-white h-12 w-12 rounded-full flex items-center justify-center text-2xl"
+          className="bg-blue-500 text-white hover:bg-blue-400  h-12 w-12 rounded-full flex items-center justify-center text-2xl"
         >
-          +
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
         </button>
       </div>
       <NewPostModal

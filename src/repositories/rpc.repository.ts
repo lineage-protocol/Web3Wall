@@ -168,8 +168,6 @@ const useGetPost = (cid: string) => {
 
       const { version } = result[0]
 
-      console.log('usegetpostresutlt', result)
-
       const txs = await rpc.getTransactions({
         query: [
           {
@@ -179,7 +177,6 @@ const useGetPost = (cid: string) => {
           },
         ],
       })
-      console.log('usegetposttx', txs)
 
       const curr = result[0]
       const tx = txs[0]
@@ -225,6 +222,9 @@ const useGetComments = (cid: string) => {
             query: 'comments',
           },
         ],
+        ordering: [],
+        from: 0,
+        to: 0
       })
 
       const promises = result?.map(async (curr: any) => {
@@ -236,7 +236,6 @@ const useGetComments = (cid: string) => {
 
       const results = await Promise.all(promises)
       const flattened = results.flat() as Comment[]
-
       return flattened.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1))
     },
   })
