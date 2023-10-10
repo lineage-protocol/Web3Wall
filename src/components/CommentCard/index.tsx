@@ -8,7 +8,7 @@ interface CommentCardProp {
 
 const SortCardDisplay = (prop: CommentCardProp) => {
   if (prop.message) {
-    return <p className="px-3 pb-2 text-sm">{prop.message}</p>
+    return <p className="px-3 pb-2 text-sm content">{prop.message}</p>
   } else {
     return <></>
   }

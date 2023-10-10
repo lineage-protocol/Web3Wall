@@ -23,7 +23,7 @@ const SortCardDisplay = (prop: SocialCardProp) => {
   if (prop.text && prop.image) {
     return (
       <>
-        <div className="px-3">{prop.text}</div>
+        <div className="px-3 content">{prop.text}</div>
         <div className="mx-auto mt-2">
           <img src={prop.image} className="w-full object-contain" alt="" />
         </div>
@@ -36,7 +36,7 @@ const SortCardDisplay = (prop: SocialCardProp) => {
       </div>
     )
   } else if (prop.text) {
-    return <div className="px-3">{prop.text}</div>
+    return <div className="px-3 content">{prop.text}</div>
   } else {
     return <></>
   }
