@@ -1,10 +1,7 @@
-import axios from 'axios'
+import Moralis from 'moralis'
 
-const instance = axios.create({
-  baseURL: `${import.meta.env.VITE_LINEAGE_NODE_URL}/api/v0/json-rpc`,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+const instance = Moralis.start({
+  apiKey: import.meta.env.VITE_MORALIS_API_KEY,
 })
 
 export default instance

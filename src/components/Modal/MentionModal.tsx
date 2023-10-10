@@ -1,5 +1,19 @@
 import { Dialog, Transition } from '@headlessui/react'
+import GenericButton from 'components/Buttons/GenericButton'
 import { Fragment, useState } from 'react'
+
+const collections = [
+  {
+    name: 'W3Wall',
+    address: '0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d',
+    chain: 'eth',
+  },
+  {
+    name: 'Bored Ape Yacht Club',
+    address: '0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d',
+    chain: 'eth',
+  },
+]
 
 interface Props {
   isOpen: boolean
@@ -80,18 +94,39 @@ const MentionModal = (prop: Props) => {
                   </header>
 
                   <div className="w-screen flex flex-col max-w-md p-2">
-                    <label className="sr-only" htmlFor="message">
-                      Address
-                    </label>
+                    <div>
+                      <div className="relative mt-2 rounded-md shadow-sm">
+                        <input
+                          type="text"
+                          name="price"
+                          id="price"
+                          className="block w-full rounded-md border-0 py-1.5 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          placeholder="Contract Address"
+                        />
+                        <div className="absolute inset-y-0 right-0 flex items-center">
+                          <label htmlFor="currency" className="sr-only">
+                            Network
+                          </label>
+                          <select
+                            id="currency"
+                            name="currency"
+                            className="h-full rounded-md border-0 bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
+                          >
+                            <option>Ethereum</option>
+                            <option>Polygon</option>
+                            <option>Binance</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
 
-                    <input
-                      type="text"
-                      name="address"
-                      placeholder="Contract address"
-                      value={searchData.address}
-                      onChange={e => onHandleInputChange(e)}
-                      className="w-full p-2 bg-gray-400 border-none rounded-sm text-gray-800 text-sm"
-                    />
+                    <div className="mt-3 flex flex-cols gap-2">
+                      {collections.map(collection => (
+                        <button className="p-0 rounded-lg px-4 py-2 bg-gray-200 text-gray-700 text-sm">
+                          {collection.name}
+                        </button>
+                      ))}
+                    </div>
 
                     <div className="grid gap-2 grid-cols-3 mt-3">
                       <div className="">
