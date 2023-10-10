@@ -9,11 +9,11 @@ import manifestForPlugIn from './manifest'
 export default defineConfig({
   plugins: [react(), tsconfigPaths(), VitePWA({ registerType: 'autoUpdate', manifest: manifestForPlugIn })],
   base: process.env.VITE_PUBLIC_URL,
+  /*
   define: {
     'process.env': {},
     'global': '({})',
   },
-  /*
   optimizeDeps: {
     esbuildOptions: {
       // Node.js global to browser globalThis
