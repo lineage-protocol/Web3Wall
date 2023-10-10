@@ -16,6 +16,7 @@
     "@ethersproject/keccak256": "^5.7.0",
     "@headlessui/react": "^1.7.15",
     "@heroicons/react": "^2.0.18",
+    "@lottiefiles/react-lottie-player": "^3.5.3",
     "@near-wallet-selector/core": "^8.5.0",
     "@near-wallet-selector/modal-ui": "^8.5.0",
     "@near-wallet-selector/my-near-wallet": "^8.5.0",
