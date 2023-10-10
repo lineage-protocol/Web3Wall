@@ -89,7 +89,6 @@ const useGetPosts = (nft_key: string) => {
   return useQuery({
     queryKey: [RQ_KEY.GET_POSTS],
     queryFn: async () => {
-
       const result = await rpc.searchMetadatas({
         query: [
           {
@@ -105,27 +104,92 @@ const useGetPosts = (nft_key: string) => {
         ],
       })
 
+      const txs = await rpc.getTransactions({
+        query: [
+          {
+            column: 'data_key',
+            op: '=',
+            query: nft_key,
+          },
+          {
+            column: 'meta_contract_id',
+            op: '=',
+            query: `${import.meta.env.VITE_WEB3WALL_META_CONTRACT_ID}`,
+          },
+        ],
+      })
+
+      const reduced = txs.reduce(
+        (acc, curr) => {
+          acc[curr.version] = curr
+          return acc
+        },
+        {} as Record<string, any>
+      )
 
       const promises = result?.map(async (curr: any) => {
         const res = await rpc.getContentFromIpfs(curr.cid as string)
         const content = JSON.parse(res.data.result.content as string)
         const data = content.content as { text: string; image: string }
+        const tx = reduced[curr.version]
 
         return {
           ...data,
           public_key: curr.public_key,
           timestamp: content.timestamp as number,
-
           cid: curr.cid,
-          token_address: curr.token_address,
+          token_address: tx?.token_address,
           token_id: curr.token_id,
-          chain_id: curr.chain_id,
+          chain_id: tx?.chain_id,
+          test: curr,
         }
       })
 
       const results = await Promise.all(promises)
 
       return results
+    },
+  })
+}
+
+const useGetPost = (cid: string) => {
+  return useQuery({
+    queryKey: [RQ_KEY.GET_POST, cid],
+    queryFn: async () => {
+      const result = await rpc.searchMetadatas({
+        query: [
+          {
+            column: 'cid',
+            op: '=',
+            query: cid,
+          },
+        ],
+      })
+
+      const { version } = result[0]
+
+      const txs = await rpc.getTransactions({
+        query: [
+          {
+            column: 'version',
+            op: '=',
+            query: version,
+          },
+        ],
+      })
+
+      const curr = result[0]
+      const tx = txs[0]
+
+      const res = await rpc.getContentFromIpfs(curr.cid as string)
+      const content = JSON.parse(res.data.result.content as string)
+      const data = content.content as { text: string; image: string }
+
+      return {
+        ...data,
+        ...curr,
+        ...tx,
+      }
     },
   })
 }
@@ -158,6 +222,9 @@ const useGetComments = (cid: string) => {
             query: 'comments',
           },
         ],
+        ordering: [],
+        from: 0,
+        to: 0
       })
 
       const promises = result?.map(async (curr: any) => {
@@ -169,9 +236,31 @@ const useGetComments = (cid: string) => {
 
       const results = await Promise.all(promises)
       const flattened = results.flat() as Comment[]
+      return flattened.sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1))
+    },
+  })
+}
 
-      return flattened.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1))
+const useGetCommentCount = (cid: string) => {
+  return useQuery({
+    queryKey: [RQ_KEY.GET_COMMENT_COUNT, cid],
+    queryFn: async () => {
+      const result = await rpc.searchMetadataCount({
+        query: [
+          {
+            column: 'version',
+            op: '=',
+            query: cid,
+          },
+          {
+            column: 'meta_contract_id',
+            op: '=',
+            query: `${import.meta.env.VITE_WEB3WALL_COMMENT_META_CONTRACT_ID}`,
+          },
+        ],
+      })
 
+      return result
     },
   })
 }
@@ -183,4 +272,6 @@ export {
   useStoreBlob,
   useGetPosts,
   useGetComments,
+  useGetCommentCount,
+  useGetPost,
 }

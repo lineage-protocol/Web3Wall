@@ -36,7 +36,7 @@ const ProofModal = (prop: Props) => {
             <div className="fixed inset-0 bg-black bg-opacity-25" />
           </Transition.Child>
 
-          <div className="fixed inset-0 overflow-y-auto max-w-md mx-auto">
+          <div className="max-w-md mx-auto fixed inset-0 overflow-y-auto">
             <div className="flex min-h-full items-center justify-center text-center">
               <Transition.Child
                 as={Fragment}

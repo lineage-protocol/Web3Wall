@@ -1,45 +1,108 @@
 import CommentCard from 'components/CommentCard'
 import CommentModal from 'components/Modal/CommentModal'
 import SocialCard from 'components/SocialCard'
-import { useLocation, useParams } from 'react-router-dom'
-import { useGetComments } from 'repositories/rpc.repository'
+import { useAlertMessage } from 'hooks/use-alert-message'
+import { useWeb3Auth } from 'hooks/use-web3auth'
+import { useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import { useGetComments, useGetPost } from 'repositories/rpc.repository'
 import { useBoundStore } from 'store'
 
 const PageComment = () => {
+  const [account, setAccount] = useState('')
+  const [comments, setComments] = useState<any>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  const { getAccounts } = useWeb3Auth()
+  const { showError } = useAlertMessage()
+
   const { token_address, token_id, chain_id, cid } = useParams()
-  const { state } = useLocation()
-  const { data: comments } = useGetComments(cid as string)
+  const { data } = useGetComments(cid as string)
   const { modal, setModalState } = useBoundStore()
 
+  const { data: post } = useGetPost(cid as string)
+
   const openNewCommentModal = () => {
-    setModalState({
-      comment: {
-        isOpen: true,
-        tokenId: token_id as string,
-        tokenAddress: token_address as string,
-        chainId: chain_id as string,
-        postCid: cid as string,
-      },
-    })
+    if (account) {
+      setModalState({
+        comment: {
+          isOpen: true,
+          tokenId: token_id as string,
+          tokenAddress: token_address as string,
+          chainId: chain_id as string,
+          postCid: cid as string,
+        },
+      })
+    } else {
+      showError(`Please login to comment`)
+    }
   }
 
   const closeCommentModal = () => {
     setModalState({ comment: { isOpen: false, tokenId: '', tokenAddress: '', chainId: '', postCid: '' } })
   }
 
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout
+
+    if (data) {
+      timeoutId = setTimeout(() => {
+        setComments(data)
+        setIsLoading(false)
+      }, 1000)
+    }
+
+    return () => {
+      clearTimeout(timeoutId)
+      setComments([])
+    }
+  }, [data])
+
+  useEffect(() => {
+    const getAccount = async () => {
+      try {
+        const acc = await getAccounts()
+        if (acc) {
+          setAccount(acc as string)
+        }
+      } catch (e) {
+        setAccount('')
+      }
+    }
+
+    getAccount().catch(e => console.log(e))
+  })
   return (
-    <div className="h-ful">
-      <div className="grid gap-0 overflow-auto pb-[120px] h-full pt-3">
-        <SocialCard {...state.post} showNoOfComments="true" noOfComments={comments?.length} />
-        {comments &&
-          comments?.map((comment: any, index: number) => {
-            return <CommentCard key={index} {...comment} />
-          })}
-      </div>
+    <div className="h-full">
+      {isLoading && (
+        <div className="text-center mt-5">
+          <span className="whitespace-nowrap rounded-full bg-purple-100 px-2.5 py-0.5 text-sm text-purple-700">
+            Loading
+          </span>
+        </div>
+      )}
+
+      {!isLoading && (
+        <div className="grid gap-0 overflow-auto pb-[120px] h-full pt-3">
+          {post && <SocialCard {...post} showNoOfComments={true} noOfComments={comments?.length ?? 0} />}
+          <div className="text-gray-400 px-4 my-2 text-sm font-semibold uppercase">Comments</div>
+          {!account && (
+            <div className="bg-white border-b-[1px] text-center py-2 text-red-400 font-semibold border-gray-200 mx-1">
+              <Link to="/login">Login to comment</Link>
+            </div>
+          )}
+          {comments.length > 0 &&
+            comments &&
+            comments?.map((comment: any, index: number) => {
+              return <CommentCard key={index} {...comment} />
+            })}
+        </div>
+      )}
+
       <div className="fixed bottom-5 right-5">
         <button
           onClick={() => openNewCommentModal()}
-          className="bg-blue-500 text-white h-12 w-12 rounded-full flex items-center justify-center text-2xl"
+          className="bg-purple-500 text-white h-14 w-14 shadow-md rounded-full flex items-center justify-center text-2xl"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

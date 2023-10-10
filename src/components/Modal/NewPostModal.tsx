@@ -6,8 +6,9 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 import { usePublishTransaction, useStoreBlob } from 'repositories/rpc.repository'
 import imageCompression from 'browser-image-compression'
 import { v4 } from 'uuid'
-import MentionModal from './MentionModal'
+import { useAlertMessage } from 'hooks/use-alert-message'
 import { useBoundStore } from 'store'
+import MentionModal from './MentionModal'
 
 const LoadingOverlay = () => {
   return (
@@ -31,7 +32,6 @@ const NewPostModal = (prop: Props) => {
   const [isLoading, setIsLoading] = useState(false)
   const [text, setText] = useState('')
   const [file, setFile] = useState<File | Blob>()
-  const [disablePostBtn, setDisablePostBtn] = useState(true)
   const [textRows, setTextRows] = useState(8)
   const inputFileRef = useRef<HTMLInputElement>(null)
   const { modal, setModalState } = useBoundStore()
@@ -41,6 +41,7 @@ const NewPostModal = (prop: Props) => {
   const { mutateAsync: publishTx } = usePublishTransaction()
 
   const { signMessage, getAccounts } = useWeb3Auth()
+  const { showError, showSuccess } = useAlertMessage()
 
   const onPost = async (): Promise<void> => {
     const account = await getAccounts()
@@ -73,8 +74,10 @@ const NewPostModal = (prop: Props) => {
         version: v4(),
       })
 
+      showSuccess(`Publishing your post to network...`)
       onCloseDialog()
     } catch (e) {
+      showError(`Error submitting your post. Try again.`)
       onCloseDialog()
     }
   }
@@ -84,7 +87,6 @@ const NewPostModal = (prop: Props) => {
     setFile(undefined)
 
     prop.onClose()
-
     setIsLoading(false)
   }
 
@@ -136,14 +138,6 @@ const NewPostModal = (prop: Props) => {
     setIsMentionOpened(false)
   }
 
-  useEffect(() => {
-    if (file || text) {
-      setDisablePostBtn(false)
-    } else {
-      setDisablePostBtn(true)
-    }
-  }, [file, text])
-
   return (
     <>
       <Transition
@@ -167,7 +161,7 @@ const NewPostModal = (prop: Props) => {
             <div className="fixed inset-0 bg-black bg-opacity-25" />
           </Transition.Child>
 
-          <div className="fixed inset-0 overflow-y-auto max-w-md mx-auto">
+          <div className="max-w-md mx-auto fixed inset-0 overflow-y-auto">
             <div className="flex min-h-full items-center justify-center text-center">
               <Transition.Child
                 as={Fragment}
@@ -179,7 +173,7 @@ const NewPostModal = (prop: Props) => {
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="w-full h-screen text-center transform overflow-hidden bg-white align-middle shadow-xl transition-all">
-                  <header className="bg-gray-50">
+                  <header className="bg-gray-50 w-full">
                     <div className="px-4 py-2">
                       <div className="">
                         <div className="flex justify-between">
@@ -188,35 +182,39 @@ const NewPostModal = (prop: Props) => {
                               Cancel
                             </button>
                           </div>
-
-                          <button
-                            disabled={disablePostBtn}
-                            onClick={() => onPost()}
-                            className="block shrink-0 p-2.5 font-semibold text-blue-600"
-                          >
-                            Post
-                          </button>
+                          {isLoading ? (
+                            <p className="block shrink-0 p-2.5">Processing...</p>
+                          ) : (
+                            <button
+                              disabled={text.length <= 0}
+                              onClick={() => onPost()}
+                              className="block shrink-0 p-2.5 font-semibold text-blue-600"
+                            >
+                              Post
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
                   </header>
 
-                  {isLoading && <LoadingOverlay />}
                   <div className="w-full flex flex-col">
                     <label className="sr-only" htmlFor="message">
                       Message
                     </label>
 
-                    <textarea
-                      className="mt-5 mx-1 max-w-md border-none p-3 text-sm"
-                      placeholder="What's happening?"
-                      id="message"
-                      rows={textRows}
-                      value={text}
-                      onChange={e => {
-                        setText(e.target.value)
-                      }}
-                    />
+                    <div className="m-1">
+                      <textarea
+                        className="mt-5 w-full border-none text-sm bg-gray-100 radius-sm"
+                        placeholder="What's happening?"
+                        id="message"
+                        rows={textRows}
+                        value={text}
+                        onChange={e => {
+                          setText(e.target.value)
+                        }}
+                      />
+                    </div>
 
                     <input
                       id="media"

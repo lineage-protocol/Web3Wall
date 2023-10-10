@@ -1,4 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react'
+import { useAlertMessage } from 'hooks/use-alert-message'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import { useState, Fragment } from 'react'
 import { usePublishTransaction } from 'repositories/rpc.repository'
@@ -14,12 +15,14 @@ interface Props {
 }
 
 const CommentModal = (prop: Props) => {
+  const [isLoading, setIsLoading] = useState(false)
   const [text, setText] = useState('')
   const [textRows, setTextRows] = useState(8)
   const { modal } = useBoundStore()
 
   const { mutateAsync: publishTx } = usePublishTransaction()
   const { signMessage, getAccounts } = useWeb3Auth()
+  const { showError, showSuccess } = useAlertMessage()
 
   const closeDialog = () => {
     setText('')
@@ -27,35 +30,43 @@ const CommentModal = (prop: Props) => {
   }
 
   const onClickReply = async () => {
-    const account = await getAccounts()
-    if (!account) return
+    try {
+      const account = await getAccounts()
+      if (!account) return
+      setIsLoading(true)
 
-    const content = {
-      cid: modal.comment.postCid,
-      content: {
-        text,
-        medias: [],
-      },
+      const content = {
+        cid: modal.comment.postCid,
+        content: {
+          text,
+          medias: [],
+        },
+      }
+
+      const data = JSON.stringify(content)
+      const signed = await signMessage(data)
+
+      await publishTx({
+        alias: '',
+        chain_id: prop.chainId as string,
+        signature: signed?.signature as string,
+        data,
+        mcdata: JSON.stringify({ loose: 0 }),
+        meta_contract_id: `${import.meta.env.VITE_WEB3WALL_COMMENT_META_CONTRACT_ID}`,
+        method: 'metadata',
+        public_key: account as string,
+        token_address: prop.tokenAddress as string,
+        token_id: prop.tokenId as string,
+        version: modal.comment.postCid,
+      })
+
+      closeDialog()
+      setIsLoading(false)
+
+      showSuccess(`Publishing your comment to network..`)
+    } catch (e) {
+      showError(`Error publishing your post. Try again.`)
     }
-
-    const data = JSON.stringify(content)
-    const signed = await signMessage(data)
-
-    await publishTx({
-      alias: '',
-      chain_id: prop.chainId as string,
-      signature: signed?.signature as string,
-      data,
-      mcdata: JSON.stringify({ loose: 0 }),
-      meta_contract_id: `${import.meta.env.VITE_WEB3WALL_COMMENT_META_CONTRACT_ID}`,
-      method: 'metadata',
-      public_key: account as string,
-      token_address: prop.tokenAddress as string,
-      token_id: prop.tokenId as string,
-      version: modal.comment.postCid,
-    })
-
-    closeDialog()
   }
 
   return (
@@ -81,7 +92,7 @@ const CommentModal = (prop: Props) => {
             <div className="fixed inset-0 bg-black bg-opacity-25" />
           </Transition.Child>
 
-          <div className="fixed inset-0 overflow-y-auto max-w-md mx-auto">
+          <div className="max-w-md mx-auto fixed inset-0 overflow-y-auto">
             <div className="flex min-h-full items-center justify-center text-center">
               <Transition.Child
                 as={Fragment}
@@ -93,7 +104,7 @@ const CommentModal = (prop: Props) => {
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="w-full h-screen text-center transform overflow-hidden bg-white align-middle shadow-xl transition-all">
-                  <header className="bg-gray-50">
+                  <header className="bg-gray-50 w-full">
                     <div className="px-4 py-2">
                       <div className="">
                         <div className="flex justify-between">
@@ -103,32 +114,39 @@ const CommentModal = (prop: Props) => {
                             </button>
                           </div>
 
-                          <button
-                            onClick={() => onClickReply()}
-                            className="block shrink-0 p-2.5 font-semibold  text-blue-600"
-                          >
-                            Reply
-                          </button>
+                          {isLoading ? (
+                            <p className="block shrink-0 p-2.5">Processing...</p>
+                          ) : (
+                            <button
+                              onClick={() => onClickReply()}
+                              className="block shrink-0 p-2.5 font-semibold  text-blue-600"
+                              disabled={text.length <= 0}
+                            >
+                              Reply
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
                   </header>
 
-                  <div className="w-screen flex flex-col">
+                  <div className="flex flex-col w-full">
                     <label className="sr-only" htmlFor="message">
                       Message
                     </label>
 
-                    <textarea
-                      className="mt-5 border-none p-3 text-sm"
-                      placeholder="Add a comment"
-                      id="message"
-                      rows={textRows}
-                      value={text}
-                      onChange={e => {
-                        setText(e.target.value)
-                      }}
-                    />
+                    <div className="m-1">
+                      <textarea
+                        className="mt-5 w-full border-none text-sm bg-gray-100 radius-sm"
+                        placeholder="Add a comment"
+                        id="message"
+                        rows={textRows}
+                        value={text}
+                        onChange={e => {
+                          setText(e.target.value)
+                        }}
+                      />
+                    </div>
                   </div>
                 </Dialog.Panel>
               </Transition.Child>

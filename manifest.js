@@ -1,7 +1,7 @@
 const manifestForPlugIn = {
-  name: 'Web3Wall',
-  short_name: 'W3wall',
-  description: 'Content Created by users from Token2049 events. Developed by Lineage Protocol',
+  name: 'w3Wall',
+  short_name: 'w3wall',
+  description: 'Decentralise forum',
   icons: [
     {
       src: '/android-chrome-192x192.png',
@@ -26,7 +26,8 @@ const manifestForPlugIn = {
   background_color: '#f0e7db',
   display: 'standalone',
   scope: '/',
-  start_url: '/login',
+  start_url: '/',
+  id: '/',
 }
 
 export default manifestForPlugIn

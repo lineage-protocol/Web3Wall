@@ -78,7 +78,6 @@ const getMetadataUseKeyByBlock = (nftKey: String, meta_contract_id: String, vers
   })
 }
 
-
 const searchMetadatas = async ({ query = [], ordering = [], from = 0, to = 0 }: Partial<JSONRPCFilter<Metadata>>) => {
   const response = await rpc({
     method: 'POST',
@@ -104,6 +103,30 @@ const searchMetadatas = async ({ query = [], ordering = [], from = 0, to = 0 }: 
   })
 
   return response.data?.result?.metadatas
+}
+
+const searchMetadataCount = async ({
+  query = [],
+  ordering = [],
+  from = 0,
+  to = 0,
+}: Partial<JSONRPCFilter<Metadata>>) => {
+  const response = await rpc({
+    method: 'POST',
+    data: JSON.stringify({
+      jsonrpc: '2.0',
+      method: 'search_metadatas_count',
+      params: {
+        query: [...query],
+        ordering,
+        from,
+        to,
+      },
+      id: '1',
+    }),
+  })
+
+  return response.data?.result
 }
 
 const getContentFromIpfs = (cid: String) => {
@@ -180,13 +203,23 @@ const getCompleteTransactions = async (from = 0, to = 0) => {
   return response.data?.result?.transactions
 }
 
-const getTransactions = async (filter: JSONRPCFilter<Transaction>) => {
+const getTransactions = async ({
+  query = [],
+  ordering = [],
+  from = 0,
+  to = 0,
+}: Partial<JSONRPCFilter<Transaction>>) => {
   const response = await rpc({
     method: 'POST',
     data: JSON.stringify({
       jsonrpc: '2.0',
       method: 'get_transactions',
-      params: filter,
+      params: {
+        query: [...query],
+        ordering,
+        from,
+        to,
+      },
       id: '1',
     }),
   })
@@ -203,4 +236,5 @@ export default {
   getCompleteTransactions,
   getTransactions,
   searchMetadatas,
+  searchMetadataCount,
 }

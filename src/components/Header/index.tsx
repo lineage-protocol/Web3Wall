@@ -1,37 +1,40 @@
+import { useAlertMessage } from 'hooks/use-alert-message'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useBoundStore } from 'store'
+import { isEmptyObject } from 'utils'
 
 export default function Header() {
-  const { getAccounts, disconnect } = useWeb3Auth()
+  const { provider, getAccounts, disconnect } = useWeb3Auth()
   const navigate = useNavigate()
-  const { setWallState } = useBoundStore()
 
   const [address, setAddress] = useState('')
   const [isLoaded, setIsLoaded] = useState(false)
-
-  const setShareURL = () => {
-    const url = new URL(window.location.href)
-    const isShare = url.searchParams.get('share')
-    if (isShare) setWallState({ shareURL: url.pathname.split('?')[0] })
-  }
+  const { showError } = useAlertMessage()
 
   useEffect(() => {
     const getAccount = async () => {
-      const acc = await getAccounts()
-      if (!acc) {
-        navigate('/login')
+      try {
+        const acc = await getAccounts()
+        if (acc && acc.length > 0) {
+          setAddress(acc.startsWith('0x') ? (acc as string) : '')
+        }
+      } catch (e) {
+        e
       }
-      setAddress(acc)
+
       setIsLoaded(true)
     }
 
-    setShareURL()
-    getAccount()
-  }, [getAccounts, navigate])
+    if (!isLoaded && provider && !isEmptyObject(provider as object)) {
+      getAccount().catch(e => {
+        console.log(e)
+      })
+    }
+  }, [getAccounts, provider, showError])
 
   const onLogOut = async () => {
+    setAddress('')
     await disconnect()
     navigate('/login')
   }
@@ -42,7 +45,7 @@ export default function Header() {
         <div className="px-4 w-full">
           <div className="">
             <div className="flex justify-between items-center">
-              <Link to="/dashboard" className="block shrink-0">
+              <Link to="/" className="block shrink-0">
                 <span className="sr-only">Logo</span>
                 <img alt="Man" src="/logo-w3wall.png" className="h-10 w-10" />
               </Link>
@@ -51,12 +54,21 @@ export default function Header() {
                 <Link to="/login" className="block shrink-0">
                   {isLoaded && address && address.substring(0, 6) + '...' + address.substring(address.length - 4)}
                 </Link>
-                <button
-                  onClick={() => onLogOut()}
-                  className="block shrink-0 text-right w-full font-semibold text-red-800"
-                >
-                  Logout
-                </button>
+                {isLoaded && address ? (
+                  <button
+                    onClick={() => onLogOut()}
+                    className="block shrink-0 text-right w-full font-semibold text-red-800"
+                  >
+                    Logout
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => navigate('/login')}
+                    className="block shrink-0 text-right w-full font-semibold text-red-800"
+                  >
+                    Login
+                  </button>
+                )}{' '}
               </div>
             </div>
           </div>

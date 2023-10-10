@@ -9,4 +9,6 @@ export enum RQ_KEY {
   GET_EVENTS = 'get_events',
   GET_POSTS = 'get_posts',
   GET_COMMENTS = 'get_comments',
+  GET_COMMENT_COUNT = 'get_comment_count',
+  GET_POST = 'post',
 }

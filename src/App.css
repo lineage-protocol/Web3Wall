@@ -24,6 +24,10 @@ select {
   }
 }
 
+.content {
+    white-space: pre-line;
+}
+
 .toolbar {
   height: 56px;
 }
