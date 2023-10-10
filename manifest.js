@@ -27,6 +27,7 @@ const manifestForPlugIn = {
   display: 'standalone',
   scope: '/',
   start_url: '/',
+  id: '/',
 }
 
 export default manifestForPlugIn
