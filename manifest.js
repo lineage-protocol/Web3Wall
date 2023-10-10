@@ -27,10 +27,7 @@ const manifestForPlugIn = {
   display: 'standalone',
   scope: '/',
   start_url: '/',
-<<<<<<< HEAD
   id: '/',
-=======
->>>>>>> ac740aa857f83ca4f5652f9426878399c20d5b41
 }
 
 export default manifestForPlugIn
