@@ -10,7 +10,6 @@ const useGoogleAnalytic = (location: any) => {
 
     const pageTitle = getTitle(location.pathname as string)
     try {
-      console.log(pageTitle)
       ReactGA.send({ hitType: 'pageview', page: location.pathname, title: pageTitle })
     } catch (error) {
       console.error('Error sending GA pageview:', error)
