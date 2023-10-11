@@ -3,12 +3,15 @@ import NewPostModal from 'components/Modal/NewPostModal'
 import PoapModal from 'components/Modal/PoapModal'
 import SocialCard from 'components/SocialCard'
 import { RWebShare } from 'react-web-share'
+import { Player } from '@lottiefiles/react-lottie-player'
+import empty from '../components/Animation/empty.json'
 import { useAlertMessage } from 'hooks/use-alert-message'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useGetPosts } from 'repositories/rpc.repository'
 import { useBoundStore } from 'store'
+import { WallAddIcon, WallShareIcon } from 'components/Icons/icons'
 
 const PageWall = () => {
   const { token_address, token_id, chain_id, key } = useParams()
@@ -95,6 +98,7 @@ const PageWall = () => {
           </span>
         </div>
       )}
+
       {!isLoading && socials.length > 0 && (
         <div className="grid gap-0 overflow-auto pb-[120px] h-full pt-3">
           {socials &&
@@ -103,15 +107,30 @@ const PageWall = () => {
             })}
         </div>
       )}
-      <div className="fixed bottom-5 right-5 flex flex-col space-y-2 items-end">
-        {account && (
+
+      {!isLoading && socials.length === 0 && (
+        <div className="min-h-screen flex flex-col justify-center gap-2">
+          <Player autoplay loop src={empty} className="h-72 m-72" />
+
+          <p className="text-center capitalize font-semibold">No Posts Yet</p>
+          <p className="text-center text-slate-500 ">
+            No one has posted in this wall. <br />
+            Be the first one!
+          </p>
+        </div>
+      )}
+
+      <aside className="fixed bottom-5 right-5 flex flex-col space-y-2 items-end">
+        {/* Mint Ownership */}
+        {/* {account && (
           <button
             onClick={() => openPOAPModal()}
             className="bg-blue-500 text-white hover:bg-blue-400 px-4 py-2 rounded-full flex items-center justify-center text-sm"
           >
             Mint Ownership
           </button>
-        )}
+        )} */}
+
         <RWebShare
           data={{
             title: 'W3wall',
@@ -121,38 +140,17 @@ const PageWall = () => {
           onClick={() => {}}
         >
           <div className="bg-blue-500 text-white hover:bg-blue-400 h-12 w-12 rounded-full flex items-center justify-center text-2xl">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"
-              />
-            </svg>
+            <WallShareIcon />
           </div>
         </RWebShare>
         <button
           onClick={() => openModal()}
-          className="bg-blue-500 text-white hover:bg-blue-400  h-12 w-12 rounded-full flex items-center justify-center text-2xl"
+          className="bg-purple-500 text-white hover:bg-purple-400  h-14 w-14 shadow-mg rounded-full flex items-center justify-center text-2xl"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
+          <WallAddIcon />
         </button>
-      </div>
+      </aside>
+
       <NewPostModal
         id={key as String}
         tokenId={token_id as String}
@@ -163,6 +161,7 @@ const PageWall = () => {
       />
 
       <PoapModal tokenId={token_id as string} isOpen={modal.poap.isOpen} onClose={closePOAPModal} />
+
       <CommentModal
         tokenAddress={token_address as String}
         chainId={chain_id as String}
