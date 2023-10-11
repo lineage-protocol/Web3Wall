@@ -63,7 +63,7 @@ const CommentModal = (prop: Props) => {
       closeDialog()
       setIsLoading(false)
 
-      showSuccess(`Publishing your post to network..`)
+      showSuccess(`Publishing your comment to network..`)
     } catch (e) {
       showError(`Error publishing your post. Try again.`)
     }
@@ -104,7 +104,7 @@ const CommentModal = (prop: Props) => {
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="w-full h-screen text-center transform overflow-hidden bg-white align-middle shadow-xl transition-all">
-                  <header className="bg-gray-50">
+                  <header className="bg-gray-50 w-full">
                     <div className="px-4 py-2">
                       <div className="">
                         <div className="flex justify-between">
@@ -130,21 +130,23 @@ const CommentModal = (prop: Props) => {
                     </div>
                   </header>
 
-                  <div className="w-screen flex flex-col">
+                  <div className="flex flex-col w-full">
                     <label className="sr-only" htmlFor="message">
                       Message
                     </label>
 
-                    <textarea
-                      className="mt-5 border-none p-3 text-sm"
-                      placeholder="Add a comment"
-                      id="message"
-                      rows={textRows}
-                      value={text}
-                      onChange={e => {
-                        setText(e.target.value)
-                      }}
-                    />
+                    <div className="m-1">
+                      <textarea
+                        className="mt-5 w-full border-none text-sm bg-gray-100 radius-sm"
+                        placeholder="Add a comment"
+                        id="message"
+                        rows={textRows}
+                        value={text}
+                        onChange={e => {
+                          setText(e.target.value)
+                        }}
+                      />
+                    </div>
                   </div>
                 </Dialog.Panel>
               </Transition.Child>

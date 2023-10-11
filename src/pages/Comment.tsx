@@ -102,7 +102,7 @@ const PageComment = () => {
       <div className="fixed bottom-5 right-5">
         <button
           onClick={() => openNewCommentModal()}
-          className="bg-blue-500 text-white h-12 w-12 rounded-full flex items-center justify-center text-2xl"
+          className="bg-purple-500 text-white h-14 w-14 shadow-md rounded-full flex items-center justify-center text-2xl"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
