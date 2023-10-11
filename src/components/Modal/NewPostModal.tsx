@@ -7,6 +7,7 @@ import { usePublishTransaction, useStoreBlob } from 'repositories/rpc.repository
 import imageCompression from 'browser-image-compression'
 import { v4 } from 'uuid'
 import { useAlertMessage } from 'hooks/use-alert-message'
+import DOMPurify from 'dompurify'
 
 const LoadingOverlay = () => {
   return (
@@ -49,7 +50,7 @@ const NewPostModal = (prop: Props) => {
     if (file) url = await storeBlob(new Blob([file]))
 
     const content = {
-      text,
+      text: DOMPurify.sanitize(text.replace(/'/g, '’')),
       image: url,
     }
 

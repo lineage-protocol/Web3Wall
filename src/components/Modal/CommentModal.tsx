@@ -1,4 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react'
+import DOMPurify from 'dompurify'
 import { useAlertMessage } from 'hooks/use-alert-message'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import { useState, Fragment } from 'react'
@@ -38,7 +39,7 @@ const CommentModal = (prop: Props) => {
       const content = {
         cid: modal.comment.postCid,
         content: {
-          text,
+          text: DOMPurify.sanitize(text.replace(/'/g, '’')),
           medias: [],
         },
       }
