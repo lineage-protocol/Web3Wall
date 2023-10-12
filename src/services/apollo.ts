@@ -11,6 +11,7 @@ export type ApolloClientFilter = {
   first?: number
   skip?: number
   where?: Record<string, string>
+  orderDirection?: 'asc' | 'desc'
 }
 
 export const apolloQuery = async <R>(
