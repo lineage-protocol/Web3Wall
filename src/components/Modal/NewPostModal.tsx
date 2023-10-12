@@ -47,13 +47,7 @@ const NewPostModal = (prop: Props) => {
     }
     setIsLoading(true)
     let url = ''
-    if (!file) {
-      showError(`Internal error. Try again`)
-      setIsLoading(false)
-      return
-    }
-
-    url = await storeBlob(new Blob([file]))
+    if (file) url = await storeBlob(new Blob([file]))
 
     const content = {
       text: DOMPurify.sanitize(text.replace(/'/g, '’')),

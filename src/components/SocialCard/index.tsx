@@ -1,4 +1,4 @@
-import { CommentIcon } from 'components/Icons/icons'
+import { CloseIcon, CommentIcon, CommentSolidIcon } from 'components/Icons/icons'
 import useInViewport from 'hooks/useInViewport'
 import { useEffect, useState } from 'react'
 import { RWebShare } from 'react-web-share'
@@ -94,7 +94,8 @@ const SocialCard = (prop: SocialCardProp) => {
                 }
               }}
             >
-              <CommentIcon />
+              {commentCount == 0 && <CommentIcon />}
+              {commentCount == 1 && <CommentSolidIcon />}
               <span className="text-xs">{commentCount}</span>
             </span>
             <RWebShare

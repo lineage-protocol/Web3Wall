@@ -11,6 +11,7 @@ const PageDashboard = () => {
   const { modal, setModalState } = useBoundStore()
   const { data: events } = useGetEvents({
     where: { blockNumber_gte: import.meta.env.VITE_WEB3WALL_SUBGRAPH_START_BLOCK, data_not: '0x', tokenId_gte: '3' },
+    orderDirection: 'desc',
   })
   const [search, setSearch] = useState('')
 
