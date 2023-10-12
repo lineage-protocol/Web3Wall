@@ -1,6 +1,20 @@
 import { Dialog, Transition } from '@headlessui/react'
+import { EvmChain } from '@moralisweb3/common-evm-utils'
+import instance from 'adapter/moralis'
 import GenericButton from 'components/Buttons/GenericButton'
-import { Fragment, useState } from 'react'
+import {
+  ArbitrumIcon,
+  BNBIcon,
+  CeloIcon,
+  EthereumIcon,
+  MumbaiIcon,
+  NearIcon,
+  PolygonIcon,
+  SolanaIcon,
+} from 'components/Icons/icons'
+import Moralis from "moralis"
+import { Fragment, ChangeEvent, useState } from 'react'
+import { getNftsCollection } from 'services/nft'
 
 const collections = [
   {
@@ -21,6 +35,56 @@ interface Props {
   afterLeave?: () => void
 }
 
+// Data and its interface
+interface Chains {
+  name: string
+  value: string
+  svg: JSX.Element
+}
+
+const chainsLogo: Chains[] = [
+  {
+    name: 'Ethereum',
+    value: 'eth',
+    svg: <EthereumIcon />,
+  },
+  {
+    name: 'Polygon',
+    value: 'pgn',
+    svg: <PolygonIcon />,
+  },
+  {
+    name: 'BNB Smart Chain',
+    value: 'bnb',
+    svg: <BNBIcon />,
+  },
+  {
+    name: 'Arbitrum',
+    value: 'arb',
+    svg: <ArbitrumIcon />,
+  },
+  {
+    name: 'Celo',
+    value: 'clo',
+    svg: <CeloIcon />,
+  },
+  {
+    name: 'Solana',
+    value: 'sln',
+    svg: <SolanaIcon />,
+  },
+  {
+    name: 'Near',
+    value: 'nar',
+    svg: <NearIcon />,
+  },
+  {
+    name: 'Mumbai',
+    value: 'mba',
+    svg: <MumbaiIcon />,
+  },
+]
+
 interface SearchData {
   chain: string
   address: string
@@ -32,7 +96,7 @@ const MentionModal = (prop: Props) => {
     address: '',
   })
 
-  const onHandleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onHandleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setSearchData(prevState => ({
       ...prevState,
@@ -43,6 +107,35 @@ const MentionModal = (prop: Props) => {
   const closeDialog = () => {
     prop.onClose()
   }
+
+  // Handling data changes
+  const [selectedValue, setSelectedValue] = useState<string>(chainsLogo[0].value)
+
+  const handleSelectValueChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedValue(event.target.value)
+  }
+
+  // Fetch Endpoint
+  const fetchAPI = async () => {
+    try {
+      const address = '0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB'
+
+      let chain = ''
+
+      switch (EvmChain.ETHEREUM) {
+        case EvmChain.ETHEREUM:
+          chain = 'eth'
+          break;
+      }
+      const response = await getNftsCollection(address, chain)
+
+      console.log(response.toJSON())
+
+    } catch (error) {
+      console.error((error as Error).message)
+    }
+  }
+  void fetchAPI()
 
   return (
     <>
@@ -81,45 +174,55 @@ const MentionModal = (prop: Props) => {
                 <Dialog.Panel className="w-full h-screen text-center transform overflow-hidden bg-white align-middle shadow-xl transition-all">
                   <header className="bg-gray-50">
                     <div className="px-4 py-2">
-                      <div className="">
-                        <div className="flex justify-between">
-                          <div className="relative flex items-center">
-                            <button onClick={() => closeDialog()} className="p-2.5 text-gray-600">
-                              Cancel
-                            </button>
-                          </div>
+                      {/* <div className=""> */}
+                      <div className="flex justify-between">
+                        <div className="relative flex justify-between min-w-full">
+                          <button onClick={() => closeDialog()} className="p-2.5 text-gray-600">
+                            Cancel
+                          </button>
+                          <button onClick={() => closeDialog()} className="p-2.5 text-gray-600">
+                            Select
+                          </button>
                         </div>
                       </div>
+                      {/* </div> */}
                     </div>
                   </header>
 
                   <div className="w-screen flex flex-col max-w-md p-2">
                     <div>
-                      <div className="relative mt-2 rounded-md shadow-sm">
+                      <div className="relative mt-2 border border-gray-300 rounded-md shadow-md flex justify-between ">
                         <input
                           type="text"
                           name="price"
                           id="price"
-                          className="block w-full rounded-md border-0 py-1.5 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          className="block w-1/2 rounded-md border-0 py-1.5 pr-2 text-gray-900 placeholder:text-gray-400 text-sm sm:leading-6 outline-indigo-600"
                           placeholder="Contract Address"
                         />
-                        <div className="absolute inset-y-0 right-0 flex items-center">
+                        <div className="absolute w-1/2 inset-y-0 right-0 flex items-center">
                           <label htmlFor="currency" className="sr-only">
                             Network
                           </label>
+
+                          <span className="grid place-content-center pl-3 pr-2">
+                            {chainsLogo.find(chainLogo => chainLogo.value === selectedValue)?.svg}
+                          </span>
                           <select
                             id="currency"
                             name="currency"
-                            className="h-full rounded-md border-0 bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
+                            value={selectedValue}
+                            onChange={handleSelectValueChange}
+                            className="h-full rounded-md border-0 bg-transparent py-0  text-gray-500 text-sm outline-indigo-600"
                           >
-                            <option>Ethereum</option>
-                            <option>Polygon</option>
-                            <option>Binance</option>
+                            {chainsLogo.map(chainLogo => (
+                              <option key={chainLogo.value} value={chainLogo.value}>
+                                {chainLogo.name}
+                              </option>
+                            ))}
                           </select>
                         </div>
                       </div>
                     </div>
-
                     <div className="mt-3 flex flex-cols gap-2">
                       {collections.map(collection => (
                         <button className="p-0 rounded-lg px-4 py-2 bg-gray-200 text-gray-700 text-sm">
