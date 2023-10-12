@@ -11,6 +11,7 @@ const PageDashboard = () => {
   const { modal, setModalState } = useBoundStore()
   const { data: events } = useGetEvents({
     where: { blockNumber_gte: import.meta.env.VITE_WEB3WALL_SUBGRAPH_START_BLOCK, data_not: '0x', tokenId_gte: '3' },
+    orderDirection: 'desc',
   })
   const [search, setSearch] = useState('')
 
@@ -70,7 +71,7 @@ const PageDashboard = () => {
 
         <GenericButton className="flex-none ml-3" name="" icon={<AddIcon />} onClick={() => openModal()} />
       </div>
-      <div className="grid gap-0.5 p-1">
+      <div className="grid gap-2 p-1">
         {filteredEvents &&
           filteredEvents.map((item, index) => {
             return (

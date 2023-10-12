@@ -3,6 +3,10 @@ import ReactGA from 'react-ga4'
 
 const useGoogleAnalytic = (location: any) => {
   useEffect(() => {
+    if (import.meta.env.VITE_MODE !== 'production') {
+      return
+    }
+
     const getTitle = (pathname: string) => {
       const segments = pathname.split('/')
       return `/${segments[1]}`
