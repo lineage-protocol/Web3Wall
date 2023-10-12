@@ -86,11 +86,14 @@ const SocialCard = (prop: SocialCardProp) => {
           </div>
 
           <div className={`flex mx-3 items-center gap-1 py-3 text-gray-500 justify-between`}>
-            <span className="text-sm flex gap-1 items-center cursor-pointer" onClick={() => {
-              if (prop?.goToComments) {
-                prop.goToComments?.(prop.cid)
-              }
-            }}>
+            <span
+              className="text-sm flex gap-1 items-center cursor-pointer"
+              onClick={() => {
+                if (prop?.goToComments) {
+                  prop.goToComments?.(prop.cid)
+                }
+              }}
+            >
               <CommentIcon />
               <span className="text-xs">{commentCount}</span>
             </span>
