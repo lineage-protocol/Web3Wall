@@ -38,7 +38,7 @@ const EventCard = (prop: VersionCardProp) => {
             {prop.imageUrl && (
               <img
                 src={prop.imageUrl as string}
-                className="h-32 w-full object-cover cursor-pointer"
+                className="w-full object-scale-down h-52 p-2 cursor-pointer"
                 onClick={() => goToWall(nftKey)}
               />
             )}

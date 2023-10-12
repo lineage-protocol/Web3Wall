@@ -6,6 +6,7 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 import { useStoreBlob } from 'repositories/rpc.repository'
 import imageCompression from 'browser-image-compression'
 import { useWeb3Auth } from 'hooks/use-web3auth'
+import { useAlertMessage } from 'hooks/use-alert-message'
 
 interface Props {
   isOpen: boolean
@@ -45,20 +46,23 @@ const MintModal = (prop: Props) => {
   const { data: url, mutateAsync: storeBlob } = useStoreBlob()
   const { getUserBalance } = useWeb3Auth()
   const [balance, setBalance] = useState<number>(0)
+  const { showError } = useAlertMessage()
 
-  const onSelectMedia = () => {
-    return new Promise<void>((resolve, reject) => {
-      const filePicker = document.getElementById('image') as HTMLInputElement
+  const onSelectMedia = (e: React.FormEvent<HTMLInputElement>) => {
+    const filePicker = e.target as HTMLInputElement & {
+      files: FileList
+    }
 
-      if (!filePicker || !filePicker.files || filePicker.files.length <= 0) {
-        reject('No file selected')
-        return
-      }
+    if (!filePicker || !filePicker.files || filePicker.files.length <= 0) {
+      showError('No file selected')
+      return
+    }
 
-      const pickedFile = filePicker.files[0]
+    const pickedFile = filePicker.files[0]
 
+    if (pickedFile.type.includes('image')) {
       const options = {
-        maxSizeMB: 300,
+        maxSizeMB: 0.3,
         maxWidthOrHeight: 400,
       }
 
@@ -70,9 +74,9 @@ const MintModal = (prop: Props) => {
         .catch(e => {
           console.log(e)
         })
-
-      resolve()
-    })
+    } else {
+      setFile(pickedFile)
+    }
   }
 
   const closeDialog = () => {
@@ -242,7 +246,7 @@ const MintModal = (prop: Props) => {
                         name="image"
                         type="file"
                         accept="image/x-png, image/jpeg, image/gif"
-                        onChange={() => onSelectMedia()}
+                        onChange={onSelectMedia}
                         className="bg-gray-400 p-3 hidden"
                       />
                     </div>
