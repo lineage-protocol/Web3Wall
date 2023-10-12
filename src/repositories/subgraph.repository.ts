@@ -28,12 +28,8 @@ const useGetEvents = (variables: ApolloClientFilter) => {
     queryKey: [RQ_KEY.GET_SHEETS],
     queryFn: async () => {
       const { data } = await apolloQuery<{ minteds: MintedEvent[] }>({ query, variables })
-      const sortedData = data.minteds.sort((a, b) => {
-        return parseInt(a.tokenId) - parseInt(b.tokenId)
-      })
 
-      console.log(sortedData)
-      return sortedData.map(el => {
+      return data.minteds?.map(el => {
         const [name, image, body] = decodeMinted(el.data)
         return {
           ...el,
