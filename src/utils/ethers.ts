@@ -53,11 +53,6 @@ export default class EthereumRpc {
       // Get user's Ethereum public address
       const address = signer.getAddress()
 
-      // Get user's balance in ether
-      // For ethers v5
-      // const balance = ethers.utils.formatEther(
-      // await ethersProvider.getBalance(address) // Balance is in wei
-      // );
       const balance = ethers.formatEther(
         await ethersProvider.getBalance(address) // Balance is in wei
       )

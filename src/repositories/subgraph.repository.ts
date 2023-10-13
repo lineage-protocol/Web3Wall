@@ -15,7 +15,7 @@ type MintedEvent = {
 const useGetEvents = (variables: ApolloClientFilter) => {
   const query = `
   query Minteds($first: Int, $skip: Int, $where: Minted_filter, $orderDirection: OrderDirection) {
-    minteds(first: $first, skip: $skip, where: $where, orderBy: id, orderDirection: $orderDirection) {
+    minteds(first: $first, skip: $skip, where: $where, orderBy: blockTimestamp, orderDirection: $orderDirection) {
       tokenId
       id
       data

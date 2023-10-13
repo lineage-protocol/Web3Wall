@@ -122,14 +122,14 @@ const PageWall = () => {
 
       <aside className="fixed bottom-5 right-5 flex flex-col space-y-2 items-end">
         {/* Mint Ownership */}
-        {/* {account && (
+        {
           <button
             onClick={() => openPOAPModal()}
-            className="bg-blue-500 text-white hover:bg-blue-400 px-4 py-2 rounded-full flex items-center justify-center text-sm"
+            className="bg-blue-500 text-white hover:bg-blue-400 h-12 w-12 rounded-full flex items-center justify-center text-sm"
           >
-            Mint Ownership
+            NFT
           </button>
-        )} */}
+        }
 
         <RWebShare
           data={{
