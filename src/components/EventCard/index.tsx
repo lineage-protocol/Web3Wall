@@ -47,7 +47,7 @@ const EventCard = (prop: VersionCardProp) => {
                 <h3 className="grow font-medium text-ellipsis">{prop.title}</h3>
               </div>
               <div className="items-center gap-2 text-xs text-gray-500">
-                <div className="text-xs">{prop.content}</div>
+                <div className="text-xs content">{prop.content}</div>
               </div>
             </div>
 
