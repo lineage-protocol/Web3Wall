@@ -1,8 +1,8 @@
-import Moralis from 'moralis'
+import instance from 'adapter/moralis'
 
 export const getNftsCollection = (address: string, chain: string) => {
-  return Moralis.EvmApi.nft.getWalletNFTCollections({
-    address,
-    chain,
+  return instance({
+    method: 'GET',
+    url: `/${address}/nft?chain=${chain}&format=decimal&media_items=false`,
   })
 }

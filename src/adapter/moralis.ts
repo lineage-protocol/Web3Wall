@@ -1,7 +1,11 @@
-import Moralis from 'moralis'
+import axios from 'axios'
 
-const instance = Moralis.start({
-  apiKey: import.meta.env.VITE_MORALIS_API_KEY,
+const instance = axios.create({
+  baseURL: `${import.meta.env.VITE_MORALIS_URL}`,
+  headers: {
+    'Content-Type': 'application/json',
+    'X-API-KEY': `${import.meta.env.VITE_MORALIS_API_KEY}`,
+  },
 })
 
 export default instance

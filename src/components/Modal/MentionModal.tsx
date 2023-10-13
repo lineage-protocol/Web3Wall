@@ -1,6 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react'
 import { EvmChain } from '@moralisweb3/common-evm-utils'
-import instance from 'adapter/moralis'
 import GenericButton from 'components/Buttons/GenericButton'
 import {
   ArbitrumIcon,
@@ -12,8 +11,8 @@ import {
   PolygonIcon,
   SolanaIcon,
 } from 'components/Icons/icons'
-import Moralis from "moralis"
-import { Fragment, ChangeEvent, useState } from 'react'
+
+import { Fragment, ChangeEvent, useState, useEffect } from 'react'
 import { getNftsCollection } from 'services/nft'
 
 const collections = [
@@ -116,26 +115,27 @@ const MentionModal = (prop: Props) => {
   }
 
   // Fetch Endpoint
-  const fetchAPI = async () => {
-    try {
-      const address = '0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB'
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const address = '0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB'
+        let chain = ''
+        switch(EvmChain.ETHEREUM) {
+          case EvmChain.ETHEREUM:
+            chain = 'eth'
+            break
+        }
 
-      let chain = ''
+        const response = await getNftsCollection(address, chain)
 
-      switch (EvmChain.ETHEREUM) {
-        case EvmChain.ETHEREUM:
-          chain = 'eth'
-          break;
+        console.log(response.data)
+      } catch (error) {
+        console.log((error as Error).message)
       }
-      const response = await getNftsCollection(address, chain)
-
-      console.log(response.toJSON())
-
-    } catch (error) {
-      console.error((error as Error).message)
     }
-  }
-  void fetchAPI()
+
+    void fetchData()
+  }, [])
 
   return (
     <>
