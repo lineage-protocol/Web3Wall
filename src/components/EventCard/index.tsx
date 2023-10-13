@@ -1,3 +1,4 @@
+import { NewNFTIcon } from 'components/Icons/icons'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { RWebShare } from 'react-web-share'
@@ -10,6 +11,7 @@ interface VersionCardProp {
   chainId: String
   tokenAddress: String
   tokenId: String
+  timestamp: number
   totalUser: number
   totalPost: number
   onHandleShareClicked: (chainId: String, tokenAddress: String, tokenId: String, version: String) => void
@@ -30,6 +32,14 @@ const EventCard = (prop: VersionCardProp) => {
     navigate(`/wall/${prop.tokenAddress}/${prop.tokenId}/${prop.chainId}/${id}`)
   }
 
+  const isWithinAWeek = () => {
+    const currentTime = Date.now()
+    const timestampInMilliseconds = prop.timestamp * 1000
+    const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000
+    console.log(currentTime, prop.timestamp)
+    return currentTime - timestampInMilliseconds <= oneWeekInMilliseconds
+  }
+
   return (
     <>
       <div className="overflow-hidden shadow border-black transition">
@@ -45,6 +55,11 @@ const EventCard = (prop: VersionCardProp) => {
             <div className="p-2 w-full cursor-pointer" onClick={() => goToWall(nftKey)}>
               <div className="flex items-center">
                 <h3 className="grow font-medium text-ellipsis">{prop.title}</h3>
+                {isWithinAWeek() && (
+                  <div className="mb-1">
+                    <span className=" bg-purple-200 text-purple-800 px-2 py-1 rounded text-xs">NEW</span>
+                  </div>
+                )}
               </div>
               <div className="items-center gap-2 text-xs text-gray-500">
                 <div className="text-xs content">{prop.content}</div>
