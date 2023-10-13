@@ -1,4 +1,4 @@
-import { NewNFTIcon } from 'components/Icons/icons'
+import { JustInIcon, NewNFTIcon } from 'components/Icons/icons'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { RWebShare } from 'react-web-share'
@@ -18,6 +18,33 @@ interface VersionCardProp {
   onProofClicked: () => void
 }
 
+const RecentlyAdded = ({ timestamp }: { timestamp: number }) => {
+  const isWithinAWeek = () => {
+    const currentTime = Date.now()
+    const timestampInMilliseconds = timestamp * 1000
+    const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000
+    return currentTime - timestampInMilliseconds <= oneWeekInMilliseconds
+  }
+
+  const isWithinDay = () => {
+    const currentTime = Date.now()
+    const timestampInMilliseconds = timestamp * 1000
+    const oneWeekInMilliseconds = 3 * 24 * 60 * 60 * 1000
+    return currentTime - timestampInMilliseconds <= oneWeekInMilliseconds
+  }
+
+  if (isWithinDay()) {
+    return (
+      <div className="text-xs text-orange-800 p-2 flex items-center gap-1">
+        <JustInIcon />
+        New Post
+      </div>
+    )
+  } else if (isWithinAWeek()) {
+    return <div className="text-xs text-purple-800 p-2">Recently added</div>
+  }
+}
+
 const EventCard = (prop: VersionCardProp) => {
   const navigate = useNavigate()
 
@@ -32,19 +59,12 @@ const EventCard = (prop: VersionCardProp) => {
     navigate(`/wall/${prop.tokenAddress}/${prop.tokenId}/${prop.chainId}/${id}`)
   }
 
-  const isWithinAWeek = () => {
-    const currentTime = Date.now()
-    const timestampInMilliseconds = prop.timestamp * 1000
-    const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000
-    console.log(currentTime, prop.timestamp)
-    return currentTime - timestampInMilliseconds <= oneWeekInMilliseconds
-  }
-
   return (
     <>
       <div className="overflow-hidden shadow border-black transition">
         <div className="h-full transform items-end bg-white transition-transform">
           <div className="bg-white">
+            <RecentlyAdded timestamp={prop.timestamp} />
             {prop.imageUrl && (
               <img
                 src={prop.imageUrl as string}
@@ -55,11 +75,6 @@ const EventCard = (prop: VersionCardProp) => {
             <div className="p-2 w-full cursor-pointer" onClick={() => goToWall(nftKey)}>
               <div className="flex items-center">
                 <h3 className="grow font-medium text-ellipsis">{prop.title}</h3>
-                {isWithinAWeek() && (
-                  <div className="mb-1">
-                    <span className=" bg-purple-200 text-purple-800 px-2 py-1 rounded text-xs">NEW</span>
-                  </div>
-                )}
               </div>
               <div className="items-center gap-2 text-xs text-gray-500">
                 <div className="text-xs content">{prop.content}</div>
