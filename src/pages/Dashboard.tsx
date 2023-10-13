@@ -83,6 +83,7 @@ const PageDashboard = () => {
                 title={item?.data.name}
                 content={item?.data.body ?? ''}
                 imageUrl={item?.data.image}
+                timestamp={parseInt(item?.blockTimestamp)}
                 onHandleShareClicked={() => {}}
                 totalUser={0}
                 totalPost={0}
