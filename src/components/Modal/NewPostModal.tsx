@@ -101,8 +101,8 @@ const NewPostModal = (prop: Props) => {
 
     if (pickedFile.type.includes('image')) {
       const options = {
-        maxSizeMB: 0.3,
-        maxWidthOrHeight: 400,
+        maxSizeMB: 0.8,
+        maxWidthOrHeight: 1280,
       }
 
       imageCompression(pickedFile, options)
