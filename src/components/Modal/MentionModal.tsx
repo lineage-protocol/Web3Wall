@@ -1,19 +1,10 @@
 import { Fragment, ChangeEvent, useState, useEffect, FC } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { EvmChain } from '@moralisweb3/common-evm-utils'
-import GenericButton from 'components/Buttons/GenericButton'
-import {
-  ArbitrumIcon,
-  BNBIcon,
-  CeloIcon,
-  EthereumIcon,
-  MumbaiIcon,
-  NearIcon,
-  PolygonIcon,
-  SolanaIcon,
-} from 'components/Icons/icons'
-import { getNftsCollection } from 'services/nft'
-import instance from 'adapter/moralis'
+import presets from 'data/preset_nft.json'
+import { ArbitrumIcon, BNBIcon, CeloIcon, EthereumIcon, PolygonIcon, SolanaIcon } from 'components/Icons/icons'
+import { getNFTMetadata } from 'services/nft'
+import ExpandableInput from 'components/ExpandableInput'
+import { Nft } from 'lib'
 
 interface Props {
   isOpen: boolean
@@ -37,55 +28,37 @@ const chainsLogo: Chains[] = [
   },
   {
     name: 'Polygon',
-    value: 'pgn',
+    value: 'polygon',
     svg: <PolygonIcon />,
   },
   {
-    name: 'BNB',
-    value: 'bnb',
+    name: 'Binance',
+    value: 'bsc',
     svg: <BNBIcon />,
   },
   {
     name: 'Arbitrum',
-    value: 'arb',
+    value: 'arbitrum',
     svg: <ArbitrumIcon />,
   },
-  {
-    name: 'Celo',
-    value: 'clo',
-    svg: <CeloIcon />,
-  },
-  {
-    name: 'Solana',
-    value: 'sln',
-    svg: <SolanaIcon />,
-  },
-  {
-    name: 'Near',
-    value: 'nar',
-    svg: <NearIcon />,
-  },
-  {
-    name: 'Mumbai',
-    value: 'mba',
-    svg: <MumbaiIcon />,
-  },
+  // {
+  //   name: 'Solana',
+  //   value: 'sln',
+  //   svg: <SolanaIcon />,
+  // },
 ]
 
 interface SearchData {
   chain: string
   address: string
-}
-
-interface Collections {
-  name: string
-  metadata?: string
+  token_id: string
 }
 
 const MentionModal = (prop: Props) => {
   const [searchData, setSearchData] = useState<SearchData>({
     chain: '',
     address: '',
+    token_id: '',
   })
 
   const onHandleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -100,45 +73,74 @@ const MentionModal = (prop: Props) => {
     prop.onClose()
   }
 
-  // Handling data changes
-  const [selectedValue, setSelectedValue] = useState<string>(chainsLogo[0].value)
-
-  const handleSelectValueChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setSelectedValue(event.target.value)
+  const handleSelectValueChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target
+    setSearchData(prevState => ({
+      ...prevState,
+      [name]: value,
+    }))
   }
 
-  const [collections, setCollections] = useState<Collections[]>([])
+  const [collections, setCollections] = useState<Nft[]>([])
+  const [selectedImages, setSelectedImages] = useState<Nft[]>([])
 
-  // Fetch Endpoint
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await instance
-
-        const address = '0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB'
-        const chain = EvmChain.ETHEREUM
-
-        const response = await getNftsCollection(address, chain)
-        setCollections(response.raw.result)
-      } catch (error) {
-        console.log((error as Error).message)
+  const toggleCheckbox = (index: number) => {
+    const nft = collections[index]
+    setSelectedImages(prevSelectedImages => {
+      const found = prevSelectedImages.findIndex(
+        item => item.token_id === nft.token_id && item.token_address === nft.token_address
+      )
+      if (found !== -1) {
+        return [...prevSelectedImages.slice(0, found), ...prevSelectedImages.slice(found + 1)]
+      } else {
+        return [...prevSelectedImages, { ...nft }]
       }
+    })
+  }
+
+  const fetchData = async () => {
+    if (!searchData.address || searchData.address.length < 42 || !searchData.chain) return
+
+    const existingNft = collections.find(
+      nft => nft.token_address === searchData.address && nft.token_id === searchData.token_id
+    )
+
+    if (existingNft) return
+
+    try {
+      const response = await getNFTMetadata(searchData.address, searchData.chain, searchData.token_id)
+
+      const nft: Nft = response.data
+      nft.metaObject = JSON.parse(nft.metadata as string)
+      const imageURL = (nft.metaObject as any).image
+      if (imageURL && imageURL.startsWith('ipfs://')) {
+        nft.imageUrl = imageURL.replace('ipfs://', import.meta.env.VITE_IPFS_GATEWAY_URL)
+      }
+
+      setCollections(prevCollections => [...prevCollections, nft])
+    } catch (error) {
+      console.log((error as Error).message)
     }
+  }
 
-    void fetchData()
-  }, [])
+  const onDialogClose = () => {
+    closeDialog()
+    setCollections([])
+    setSelectedImages([])
+    setSearchData({
+      chain: '',
+      address: '',
+      token_id: '',
+    })
+  }
 
-  // Handle Image Selection
-  const [selectedImages, setSelectedImages] = useState<any[]>([])
-  const maxSelection = 3
-
-  const toggleCheckbox = (collection: any) => {
-    const { imageId } = collection
-    if (selectedImages.find(clt => clt.imageId === imageId)) {
-      setSelectedImages(selectedImages.filter(clt => clt.imageId !== imageId))
-    } else if (selectedImages.length < maxSelection) {
-      setSelectedImages([...selectedImages, collection])
-    }
+  const onClickFastNFT = (index: number) => {
+    const nft = presets[index]
+    setSearchData({
+      chain: nft.chain,
+      address: nft.address,
+      token_id: '0',
+    })
   }
 
   return (
@@ -151,7 +153,7 @@ const MentionModal = (prop: Props) => {
           prop?.afterLeave ? prop.afterLeave() : () => {}
         }}
       >
-        <Dialog as="div" className="relative z-10" onClose={closeDialog}>
+        <Dialog as="div" className="relative z-10" onClose={onDialogClose}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -181,12 +183,12 @@ const MentionModal = (prop: Props) => {
                       <div className="">
                         <div className="flex justify-between">
                           <div className="relative flex justify-between min-w-full">
-                            <button onClick={() => closeDialog()} className="p-2.5 text-gray-600">
+                            <button onClick={() => onDialogClose()} className="p-2.5 text-gray-600">
                               Cancel
                             </button>
                             <button
                               onClick={() => {
-                                closeDialog()
+                                onDialogClose()
                                 prop.onClickSelect(selectedImages)
                               }}
                               className={`p-2.5 text-gray-600 rounded-md cursor-default ${
@@ -203,36 +205,45 @@ const MentionModal = (prop: Props) => {
 
                   <div className="w-screen flex flex-col max-w-md p-2">
                     <div>
-                      <div className="relative mt-2 border border-gray-300 rounded-md shadow-md flex justify-between ">
-                        <input
-                          type="text"
-                          name="price"
-                          id="price"
-                          className="block w-8/12 rounded-md border-0 py-1.5 text-gray-900 placeholder:text-gray-400 text-sm sm:leading-6 outline-indigo-600"
-                          placeholder="Contract Address"
-                        />
-                        <div className="absolute w-4/12 inset-y-0 right-0 flex items-center">
-                          <label htmlFor="currency" className="sr-only">
-                            Network
-                          </label>
-
-                          <span className="grid place-content-center pr-2">
-                            {chainsLogo.find(chainLogo => chainLogo.value === selectedValue)?.svg}
-                          </span>
-                          <select
-                            id="currency"
-                            name="currency"
-                            value={selectedValue}
-                            onChange={handleSelectValueChange}
-                            className="h-full rounded-md border-0 bg-transparent py-0  text-gray-500 text-sm outline-indigo-600"
-                          >
-                            {chainsLogo.map(chainLogo => (
-                              <option key={chainLogo.value} value={chainLogo.value}>
-                                {chainLogo.name}
-                              </option>
-                            ))}
-                          </select>
+                      <div className="relative mt-2 gap-2 flex items-center">
+                        <div className="flex items-center">
+                          <span className="text-gray-500 text-sm mr-2">NFT with Token ID</span>
+                          <ExpandableInput
+                            name="token_id"
+                            onBlur={fetchData}
+                            onChange={onHandleInputChange}
+                            placeholder="0"
+                            initialWidth={20}
+                            extraPadding={10}
+                          />
                         </div>
+                        <span className="text-gray-500 text-sm">at</span>
+                        <select
+                          id="chain"
+                          name="chain"
+                          value={searchData.chain}
+                          onChange={handleSelectValueChange}
+                          onBlur={fetchData}
+                          className="h-full border-b-2 rounded-none text-md border-0 bg-transparent py-0  text-black font-medium border-b-black outline-indigo-600"
+                        >
+                          <option value="">None</option>
+                          {chainsLogo.map(chainLogo => (
+                            <option key={chainLogo.value} value={chainLogo.value}>
+                              {chainLogo.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="relative mt-2 gap-2 flex items-center">
+                        <span className="text-gray-500 text-sm">and</span>
+                        <ExpandableInput
+                          name="address"
+                          onBlur={fetchData}
+                          onChange={onHandleInputChange}
+                          placeholder="Contract address"
+                          initialWidth={150}
+                          extraPadding={-50}
+                        />
                       </div>
                     </div>
                     <div
@@ -240,12 +251,13 @@ const MentionModal = (prop: Props) => {
                       style={{ scrollbarWidth: 'thin', scrollbarColor: '#ccc #f5f5f5' }}
                     >
                       <div className="flex gap-1">
-                        {collections.map((collection, index) => (
+                        {presets.map((preset, index) => (
                           <button
                             key={index}
-                            className="p-0 rounded-lg px-4 py-2 m-1 bg-gray-200 text-gray-700 text-sm whitespace-nowrap"
+                            onClick={() => onClickFastNFT(index)}
+                            className="p-0 rounded-lg px-4 py-2 m-1 bg-gray-200 text-gray-700 text-xs whitespace-nowrap"
                           >
-                            {collection.name}
+                            {preset.name}
                           </button>
                         ))}
                       </div>
@@ -255,23 +267,22 @@ const MentionModal = (prop: Props) => {
                       className="grid gap-2 grid-cols-3 mt-3 overflow-auto max-h-[540px]"
                       style={{ scrollbarWidth: 'thin', scrollbarColor: '#ccc #f5f5f5' }}
                     >
-                      {collections.map((collection, index) => {
-                        const metadataString = collection.metadata
-                        const metadataConvertObject = JSON.parse(metadataString!)
-                        const imageURL = metadataConvertObject?.image
-                        const imageId = index
-                        const collectionWithIndex = { imageId, ...collection }
-                        const isSelected = selectedImages.find(collection => collection.imageId === imageId)
+                      {collections.map((nft, index) => {
+                        const isSelected = selectedImages.some(
+                          collection =>
+                            collection.token_address === nft.token_address && collection.token_id === nft.token_id
+                        )
 
                         return (
-                          <div key={imageId} className="relative hover:brightness-75">
+                          <div key={index} className="relative hover:brightness-75">
                             <img
-                              src={imageURL}
-                              alt="placeholder"
-                              onClick={() => toggleCheckbox(collectionWithIndex)}
-                              className=" w-32 h-32 grid place-content-center border rounded-md cursor-pointer"
+                              src={nft.imageUrl as string}
+                              onClick={() => toggleCheckbox(index)}
+                              className={`w-32 h-32 grid place-content-center rounded-md cursor-pointer border-2 ${
+                                isSelected ? 'border-blue-400' : 'border-white'
+                              }`}
                             />
-                            <p className=" text-sm p-2 font-thin">{collection.name}</p>
+                            <p className=" text-sm p-2 font-thin">{(nft.metaObject as any).name}</p>
                             {isSelected && (
                               <div className="absolute top-0 left-0 p-2 h-5 w-5">
                                 <input type="checkbox" checked={isSelected} readOnly />

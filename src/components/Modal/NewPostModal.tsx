@@ -137,8 +137,7 @@ const NewPostModal = (prop: Props) => {
   }
 
   const handleSelectedImages = (selectedImages: []) => {
-    // selected
-    console.log('It is working')
+    console.log(selectedImages)
   }
 
   return (

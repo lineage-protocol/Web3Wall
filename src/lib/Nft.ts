@@ -1,7 +1,8 @@
 export interface Nft {
-  title: String,
-  image: String,
-  address: String,
-  token_id: String | number,
-  metadata: object
+  name: String
+  token_address: String
+  token_id: String | number
+  metadata: String
+  metaObject?: object
+  imageUrl?: String
 }

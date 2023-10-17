@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Pudgy Penguin",
+    "address": "0xbd3531da5cf5857e7cfaa92426877b022e612cf8",
+    "chain": "eth"
+  },
+  {
+    "name": "Degods",
+    "address": "0x8821bee2ba0df28761afff119d66390d594cd280",
+    "chain": "eth"
+  },
+  {
+    "name": "BAYC",
+    "address": "0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d",
+    "chain": "eth"
+  }
+]
