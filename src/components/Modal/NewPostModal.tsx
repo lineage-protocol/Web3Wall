@@ -26,6 +26,7 @@ interface Props {
   isOpen: boolean
   onClose: () => void
   afterLeave?: () => void
+  onClickSelect: (selectedImages) => void
 }
 
 const NewPostModal = (prop: Props) => {
@@ -136,6 +137,11 @@ const NewPostModal = (prop: Props) => {
 
   const closeMentionModal = () => {
     setIsMentionOpened(false)
+  }
+
+  const handleSelectedImages = (selectedImages:[]) => {
+    // selected
+    console.log('It is working')
   }
 
   return (
@@ -264,7 +270,7 @@ const NewPostModal = (prop: Props) => {
           </div>
         </Dialog>
       </Transition>
-      <MentionModal isOpen={isMentionOpened} onClose={closeMentionModal} />
+      <MentionModal isOpen={isMentionOpened} onClose={closeMentionModal} onClickSelect={handleSelectedImages} />
     </>
   )
 }

@@ -1,3 +1,4 @@
+import { Fragment, ChangeEvent, useState, useEffect, FC } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { EvmChain } from '@moralisweb3/common-evm-utils'
 import GenericButton from 'components/Buttons/GenericButton'
@@ -11,27 +12,14 @@ import {
   PolygonIcon,
   SolanaIcon,
 } from 'components/Icons/icons'
-
-import { Fragment, ChangeEvent, useState, useEffect } from 'react'
 import { getNftsCollection } from 'services/nft'
-
-const collections = [
-  {
-    name: 'W3Wall',
-    address: '0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d',
-    chain: 'eth',
-  },
-  {
-    name: 'Bored Ape Yacht Club',
-    address: '0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d',
-    chain: 'eth',
-  },
-]
+import instance from 'adapter/moralis'
 
 interface Props {
   isOpen: boolean
   onClose: () => void
   afterLeave?: () => void
+  onClickSelect: (selectedImages) => void
 }
 
 // Data and its interface
@@ -53,7 +41,7 @@ const chainsLogo: Chains[] = [
     svg: <PolygonIcon />,
   },
   {
-    name: 'BNB Smart Chain',
+    name: 'BNB',
     value: 'bnb',
     svg: <BNBIcon />,
   },
@@ -89,6 +77,11 @@ interface SearchData {
   address: string
 }
 
+interface Collections {
+  name: string
+  metadata?: string
+}
+
 const MentionModal = (prop: Props) => {
   const [searchData, setSearchData] = useState<SearchData>({
     chain: '',
@@ -114,21 +107,19 @@ const MentionModal = (prop: Props) => {
     setSelectedValue(event.target.value)
   }
 
+  const [collections, setCollections] = useState<Collections[]>([])
+
   // Fetch Endpoint
   useEffect(() => {
     const fetchData = async () => {
       try {
+        await instance
+
         const address = '0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB'
-        let chain = ''
-        switch(EvmChain.ETHEREUM) {
-          case EvmChain.ETHEREUM:
-            chain = 'eth'
-            break
-        }
+        const chain = EvmChain.ETHEREUM
 
         const response = await getNftsCollection(address, chain)
-
-        console.log(response.data)
+        setCollections(response.raw.result)
       } catch (error) {
         console.log((error as Error).message)
       }
@@ -136,6 +127,20 @@ const MentionModal = (prop: Props) => {
 
     void fetchData()
   }, [])
+
+  // Handle Image Selection
+  const [selectedImages, setSelectedImages] = useState<any[]>([])
+  const maxSelection = 3
+
+  const toggleCheckbox = (collection: any) => {
+    const { imageId } = collection
+    if (selectedImages.find(clt => clt.imageId === imageId)) {
+      setSelectedImages(selectedImages.filter(clt => clt.imageId !== imageId))
+    } else if (selectedImages.length < maxSelection) {
+      setSelectedImages([...selectedImages, collection])
+    }
+  }
+
 
   return (
     <>
@@ -174,18 +179,23 @@ const MentionModal = (prop: Props) => {
                 <Dialog.Panel className="w-full h-screen text-center transform overflow-hidden bg-white align-middle shadow-xl transition-all">
                   <header className="bg-gray-50">
                     <div className="px-4 py-2">
-                      {/* <div className=""> */}
+                      <div className="">
                       <div className="flex justify-between">
                         <div className="relative flex justify-between min-w-full">
                           <button onClick={() => closeDialog()} className="p-2.5 text-gray-600">
                             Cancel
                           </button>
-                          <button onClick={() => closeDialog()} className="p-2.5 text-gray-600">
+                          <button
+                            onClick={() => {closeDialog(); prop.onClickSelect(selectedImages)}}
+                            className={`p-2.5 text-gray-600 rounded-md cursor-default ${
+                              selectedImages.length > 0 && 'bg-purple-400 font-medium text-white hover:cursor-pointer'
+                            }`}
+                          >
                             Select
                           </button>
                         </div>
                       </div>
-                      {/* </div> */}
+                      </div>
                     </div>
                   </header>
 
@@ -196,15 +206,15 @@ const MentionModal = (prop: Props) => {
                           type="text"
                           name="price"
                           id="price"
-                          className="block w-1/2 rounded-md border-0 py-1.5 pr-2 text-gray-900 placeholder:text-gray-400 text-sm sm:leading-6 outline-indigo-600"
+                          className="block w-8/12 rounded-md border-0 py-1.5 text-gray-900 placeholder:text-gray-400 text-sm sm:leading-6 outline-indigo-600"
                           placeholder="Contract Address"
                         />
-                        <div className="absolute w-1/2 inset-y-0 right-0 flex items-center">
+                        <div className="absolute w-4/12 inset-y-0 right-0 flex items-center">
                           <label htmlFor="currency" className="sr-only">
                             Network
                           </label>
 
-                          <span className="grid place-content-center pl-3 pr-2">
+                          <span className="grid place-content-center pr-2">
                             {chainsLogo.find(chainLogo => chainLogo.value === selectedValue)?.svg}
                           </span>
                           <select
@@ -223,22 +233,51 @@ const MentionModal = (prop: Props) => {
                         </div>
                       </div>
                     </div>
-                    <div className="mt-3 flex flex-cols gap-2">
-                      {collections.map(collection => (
-                        <button className="p-0 rounded-lg px-4 py-2 bg-gray-200 text-gray-700 text-sm">
-                          {collection.name}
-                        </button>
-                      ))}
+                    <div
+                      className="mt-3 overflow-x-scroll flex flex-cols gap-2"
+                      style={{ scrollbarWidth: 'thin', scrollbarColor: '#ccc #f5f5f5' }}
+                    >
+                      <div className="flex gap-1">
+                        {collections.map((collection, index) => (
+                          <button
+                            key={index}
+                            className="p-0 rounded-lg px-4 py-2 m-1 bg-gray-200 text-gray-700 text-sm whitespace-nowrap"
+                          >
+                            {collection.name}
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
-                    <div className="grid gap-2 grid-cols-3 mt-3">
-                      <div className="">
-                        <img
-                          src="https://images.unsplash.com/photo-1593795899768-947c4929449d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2672&q=80"
-                          alt=""
-                          className="h-full w-full object-cover opacity-100 group-hover:opacity-0"
-                        />
-                      </div>
+                    <div
+                      className="grid gap-2 grid-cols-3 mt-3 overflow-auto max-h-[540px]"
+                      style={{ scrollbarWidth: 'thin', scrollbarColor: '#ccc #f5f5f5' }}
+                    >
+                      {collections.map((collection, index) => {
+                        const metadataString = collection.metadata
+                        const metadataConvertObject = JSON.parse(metadataString!)
+                        const imageURL = metadataConvertObject?.image
+                        const imageId = index
+                        const collectionWithIndex = { imageId, ...collection }
+                        const isSelected = selectedImages.find(collection => collection.imageId === imageId)
+
+                        return (
+                          <div key={imageId} className="relative hover:brightness-75">
+                            <img
+                              src={imageURL}
+                              alt='placeholder'
+                              onClick={() => toggleCheckbox(collectionWithIndex)}
+                              className=' w-32 h-32 grid place-content-center border rounded-md cursor-pointer'
+                            />
+                            <p className=' text-sm p-2 font-thin'>{collection.name}</p>
+                            {isSelected && (
+                              <div className="absolute top-0 left-0 p-2 h-5 w-5">
+                                <input type="checkbox" checked={isSelected} readOnly />
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
                     </div>
                   </div>
                 </Dialog.Panel>
