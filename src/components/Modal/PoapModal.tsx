@@ -1,6 +1,8 @@
 import { Dialog, Transition } from '@headlessui/react'
 import PoapButton from 'components/Buttons/PoapButton'
-import { Fragment } from 'react'
+import { BadgeSolidIcon } from 'components/Icons/icons'
+import { useWeb3Auth } from 'hooks/use-web3auth'
+import { Fragment, useEffect, useState } from 'react'
 
 interface Props {
   tokenId: string
@@ -10,9 +12,20 @@ interface Props {
 }
 
 const PoapModal = (prop: Props) => {
+  const { getUserBalance } = useWeb3Auth()
+  const [balance, setBalance] = useState<number>(0)
+
   const closeDialog = () => {
     prop.onClose()
   }
+
+  useEffect(() => {
+    async function getBalance() {
+      const balance = await getUserBalance()
+      setBalance(balance ? parseFloat(balance) : 0)
+    }
+    getBalance().catch(e => console.log(e))
+  }, [])
 
   return (
     <>
@@ -41,31 +54,15 @@ const PoapModal = (prop: Props) => {
             <div className="flex min-h-full items-center justify-center text-center">
               <Transition.Child
                 as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
+                enter="transition ease-out duration-300 transform"
+                enterFrom="opacity-0 translate-y-full"
+                enterTo="opacity-100 translate-y-0"
+                leave="transition ease-in duration-200 transform"
+                leaveFrom="opacity-100 translate-y-0"
+                leaveTo="opacity-0 translate-y-full"
               >
-                <Dialog.Panel className="w-full h-screen text-center transform overflow-hidden bg-white align-middle shadow-xl transition-all">
-                  <header className="bg-gray-50">
-                    <div className="px-4">
-                      <div className="">
-                        <div className="flex justify-between">
-                          <div className="relative flex items-center">
-                            <button onClick={() => closeDialog()} className="p-2.5 text-gray-600">
-                              Cancel
-                            </button>
-                          </div>
-
-                          <PoapButton tokenId={prop.tokenId} disabled={false} />
-                        </div>
-                      </div>
-                    </div>
-                  </header>
-
-                  <div className="w-full text-left mt-5 p-3">
+                <Dialog.Panel className="w-full h-1/2 fixed max-w-md bottom-0 text-center transform overflow-hidden bg-white align-middle shadow-xl transition-all">
+                  {/* <div className="w-full text-left mt-5 p-3">
                     <h3 className="font-semibold text-xl">Become Co-owner of this Subject</h3>
                     <p className="text-sm text-gray-500 mt-2">
                       By acquiring a share, you don't just own a piece; you play an integral role in the forum's
@@ -78,6 +75,31 @@ const PoapModal = (prop: Props) => {
                       generated from this forum will be evenly distributed among its shareholders. Your share isn’t just
                       symbolic—it has real value.
                     </p>
+                  </div> */}
+                  {balance <= 0 && (
+                    <div className="w-full bg-yellow-100 p-3 text-left">
+                      <p className="text-sm text-yellow-700">You need $MATIC to mint</p>
+                    </div>
+                  )}
+                  <div className="w-full text-left mt-5 p-3">
+                    <h3 className="font-semibold text-xl flex items-center gap-1">
+                      Mint Your POAP Badge <BadgeSolidIcon />
+                    </h3>
+                    <p className="mt-2 text-sm p-2 bg-green-100 border border-green-300">
+                      POAP (Proof of Attendance Protocol) is a digital badge that proves your participation.
+                    </p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      By minting this badge, you're securing a digital token that verifies your participation. Simply
+                      follow the next steps to claim your unique badge and showcase your involvement.
+                    </p>
+                  </div>
+                  <div className="flex mt-2 items-center justify-center">
+                    <div className="w-1/2">
+                      <PoapButton tokenId={prop.tokenId} disabled={false} />
+                    </div>
+                    <button onClick={() => closeDialog()} className="p-2 w-1/2">
+                      Cancel
+                    </button>
                   </div>
                 </Dialog.Panel>
               </Transition.Child>

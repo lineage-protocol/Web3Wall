@@ -18,9 +18,12 @@ import ActionBarLayout from 'layouts/ActionBarLayout'
 import { NavigationProvider } from 'hooks/use-navigation'
 import ReactGA from 'react-ga4'
 import useGoogleAnalytic from 'hooks/useGoogleAnalytic'
-ReactGA.initialize(import.meta.env.VITE_GA_MEASUREMENT_ID as string)
 
 const App = () => {
+  if (import.meta.env.VITE_MODE === 'production') {
+    ReactGA.initialize(import.meta.env.VITE_GA_MEASUREMENT_ID as string)
+  }
+
   const location = useLocation()
   useGoogleAnalytic(location)
 

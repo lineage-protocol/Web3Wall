@@ -3,6 +3,7 @@ import { useWeb3Auth } from 'hooks/use-web3auth'
 import { AbiCoder } from 'ethers'
 import { useAlertMessage } from 'hooks/use-alert-message'
 import { useState } from 'react'
+import DOMPurify from 'dompurify'
 
 interface Prop {
   name: string
@@ -48,7 +49,10 @@ const MintButton = (prop: Prop) => {
       ]
 
       const abiCoder = new AbiCoder()
-      const encoded = abiCoder.encode(['string', 'string', 'string'], [prop.name, prop.url, prop.body])
+      const encoded = abiCoder.encode(
+        ['string', 'string', 'string'],
+        [DOMPurify.sanitize(prop.name.replace(/'/g, '’')), prop.url, DOMPurify.sanitize(prop.body.replace(/'/g, '’'))]
+      )
       await callContractMethod({
         contractABI,
         contractAddress: `${import.meta.env.VITE_WEB3WALL_UTILITY}`,

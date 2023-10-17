@@ -19,7 +19,7 @@ interface Props {
   isOpen: boolean
   onClose: () => void
   afterLeave?: () => void
-  onClickSelect: (selectedImages) => void
+  onClickSelect: (selectedImages: any) => void
 }
 
 // Data and its interface
@@ -141,7 +141,6 @@ const MentionModal = (prop: Props) => {
     }
   }
 
-
   return (
     <>
       <Transition
@@ -180,21 +179,24 @@ const MentionModal = (prop: Props) => {
                   <header className="bg-gray-50">
                     <div className="px-4 py-2">
                       <div className="">
-                      <div className="flex justify-between">
-                        <div className="relative flex justify-between min-w-full">
-                          <button onClick={() => closeDialog()} className="p-2.5 text-gray-600">
-                            Cancel
-                          </button>
-                          <button
-                            onClick={() => {closeDialog(); prop.onClickSelect(selectedImages)}}
-                            className={`p-2.5 text-gray-600 rounded-md cursor-default ${
-                              selectedImages.length > 0 && 'bg-purple-400 font-medium text-white hover:cursor-pointer'
-                            }`}
-                          >
-                            Select
-                          </button>
+                        <div className="flex justify-between">
+                          <div className="relative flex justify-between min-w-full">
+                            <button onClick={() => closeDialog()} className="p-2.5 text-gray-600">
+                              Cancel
+                            </button>
+                            <button
+                              onClick={() => {
+                                closeDialog()
+                                prop.onClickSelect(selectedImages)
+                              }}
+                              className={`p-2.5 text-gray-600 rounded-md cursor-default ${
+                                selectedImages.length > 0 && 'bg-purple-400 font-medium text-white hover:cursor-pointer'
+                              }`}
+                            >
+                              Select
+                            </button>
+                          </div>
                         </div>
-                      </div>
                       </div>
                     </div>
                   </header>
@@ -265,11 +267,11 @@ const MentionModal = (prop: Props) => {
                           <div key={imageId} className="relative hover:brightness-75">
                             <img
                               src={imageURL}
-                              alt='placeholder'
+                              alt="placeholder"
                               onClick={() => toggleCheckbox(collectionWithIndex)}
-                              className=' w-32 h-32 grid place-content-center border rounded-md cursor-pointer'
+                              className=" w-32 h-32 grid place-content-center border rounded-md cursor-pointer"
                             />
-                            <p className=' text-sm p-2 font-thin'>{collection.name}</p>
+                            <p className=" text-sm p-2 font-thin">{collection.name}</p>
                             {isSelected && (
                               <div className="absolute top-0 left-0 p-2 h-5 w-5">
                                 <input type="checkbox" checked={isSelected} readOnly />

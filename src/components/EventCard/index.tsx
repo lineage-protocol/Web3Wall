@@ -1,3 +1,4 @@
+import { JustInIcon, NewNFTIcon } from 'components/Icons/icons'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { RWebShare } from 'react-web-share'
@@ -10,10 +11,38 @@ interface VersionCardProp {
   chainId: String
   tokenAddress: String
   tokenId: String
+  timestamp: number
   totalUser: number
   totalPost: number
   onHandleShareClicked: (chainId: String, tokenAddress: String, tokenId: String, version: String) => void
   onProofClicked: () => void
+}
+
+const RecentlyAdded = ({ timestamp }: { timestamp: number }) => {
+  const isWithinAWeek = () => {
+    const currentTime = Date.now()
+    const timestampInMilliseconds = timestamp * 1000
+    const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000
+    return currentTime - timestampInMilliseconds <= oneWeekInMilliseconds
+  }
+
+  const isWithinDay = () => {
+    const currentTime = Date.now()
+    const timestampInMilliseconds = timestamp * 1000
+    const oneWeekInMilliseconds = 3 * 24 * 60 * 60 * 1000
+    return currentTime - timestampInMilliseconds <= oneWeekInMilliseconds
+  }
+
+  if (isWithinDay()) {
+    return (
+      <div className="text-xs text-orange-800 p-2 flex items-center gap-1">
+        <JustInIcon />
+        New Post
+      </div>
+    )
+  } else if (isWithinAWeek()) {
+    return <div className="text-xs text-purple-800 p-2">Recently added</div>
+  }
 }
 
 const EventCard = (prop: VersionCardProp) => {
@@ -35,10 +64,11 @@ const EventCard = (prop: VersionCardProp) => {
       <div className="overflow-hidden shadow border-black transition">
         <div className="h-full transform items-end bg-white transition-transform">
           <div className="bg-white">
+            <RecentlyAdded timestamp={prop.timestamp} />
             {prop.imageUrl && (
               <img
                 src={prop.imageUrl as string}
-                className="h-32 w-full object-cover cursor-pointer"
+                className="w-full object-scale-down h-52 p-2 cursor-pointer"
                 onClick={() => goToWall(nftKey)}
               />
             )}
@@ -47,7 +77,7 @@ const EventCard = (prop: VersionCardProp) => {
                 <h3 className="grow font-medium text-ellipsis">{prop.title}</h3>
               </div>
               <div className="items-center gap-2 text-xs text-gray-500">
-                <div className="text-xs">{prop.content}</div>
+                <div className="text-xs content">{prop.content}</div>
               </div>
             </div>
 
