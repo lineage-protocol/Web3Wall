@@ -27,7 +27,7 @@ interface Props {
   isOpen: boolean
   onClose: () => void
   afterLeave?: () => void
-  onClickSelect: (selectedImages: any) => void
+  // onClickSelect: (selectedImages: any) => void
 }
 
 const NewPostModal = (prop: Props) => {
