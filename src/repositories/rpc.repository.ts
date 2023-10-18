@@ -68,7 +68,7 @@ const usePublishTransaction = () => {
         await queryClient.invalidateQueries([RQ_KEY.GET_POSTS])
         await queryClient.invalidateQueries([RQ_KEY.GET_COMMENTS])
         if (timeout) clearTimeout(timeout)
-      }, 5000)
+      }, 8000)
     },
   })
 }
@@ -224,7 +224,7 @@ const useGetComments = (cid: string) => {
         ],
         ordering: [],
         from: 0,
-        to: 0
+        to: 0,
       })
 
       const promises = result?.map(async (curr: any) => {

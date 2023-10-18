@@ -1,4 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react'
+import DOMPurify from 'dompurify'
 import { useAlertMessage } from 'hooks/use-alert-message'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import { useState, Fragment } from 'react'
@@ -25,7 +26,6 @@ const CommentModal = (prop: Props) => {
   const { showError, showSuccess } = useAlertMessage()
 
   const closeDialog = () => {
-    setText('')
     prop.onClose()
   }
 
@@ -38,7 +38,7 @@ const CommentModal = (prop: Props) => {
       const content = {
         cid: modal.comment.postCid,
         content: {
-          text,
+          text: DOMPurify.sanitize(text.replace(/'/g, '’')),
           medias: [],
         },
       }
@@ -89,22 +89,40 @@ const CommentModal = (prop: Props) => {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black bg-opacity-25" />
+            <div className="fixed inset-0 bg-black bg-opacity-5" />
           </Transition.Child>
 
           <div className="max-w-md mx-auto fixed inset-0 overflow-y-auto">
             <div className="flex min-h-full items-center justify-center text-center">
               <Transition.Child
                 as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
+                enter="transition ease-out duration-300 transform"
+                enterFrom="opacity-0 translate-y-full"
+                enterTo="opacity-100 translate-y-0"
+                leave="transition ease-in duration-200 transform"
+                leaveFrom="opacity-100 translate-y-0"
+                leaveTo="opacity-0 translate-y-full"
               >
-                <Dialog.Panel className="w-full h-screen text-center transform overflow-hidden bg-white align-middle shadow-xl transition-all">
-                  <header className="bg-gray-50 w-full">
+                <Dialog.Panel className="w-full h-2/5 fixed max-w-md bottom-0 text-center transform overflow-hidden bg-white align-middle shadow-xl transition-all">
+                  <div className="flex flex-col w-full">
+                    <label className="sr-only" htmlFor="message">
+                      Message
+                    </label>
+
+                    <div className="m-1">
+                      <textarea
+                        className="mt-5 w-full border-none text-sm bg-gray-100 radius-sm"
+                        placeholder="Add a comment"
+                        id="message"
+                        rows={textRows}
+                        value={text}
+                        onChange={e => {
+                          setText(e.target.value)
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <header className="w-full">
                     <div className="px-4 py-2">
                       <div className="">
                         <div className="flex justify-between">
@@ -129,25 +147,6 @@ const CommentModal = (prop: Props) => {
                       </div>
                     </div>
                   </header>
-
-                  <div className="flex flex-col w-full">
-                    <label className="sr-only" htmlFor="message">
-                      Message
-                    </label>
-
-                    <div className="m-1">
-                      <textarea
-                        className="mt-5 w-full border-none text-sm bg-gray-100 radius-sm"
-                        placeholder="Add a comment"
-                        id="message"
-                        rows={textRows}
-                        value={text}
-                        onChange={e => {
-                          setText(e.target.value)
-                        }}
-                      />
-                    </div>
-                  </div>
                 </Dialog.Panel>
               </Transition.Child>
             </div>
