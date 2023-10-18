@@ -10,6 +10,7 @@ import { useAlertMessage } from 'hooks/use-alert-message'
 import { useBoundStore } from 'store'
 import MentionModal from './MentionModal'
 import DOMPurify from 'dompurify'
+import { Nft } from 'lib'
 
 const LoadingOverlay = () => {
   return (
@@ -38,6 +39,7 @@ const NewPostModal = (prop: Props) => {
   const inputFileRef = useRef<HTMLInputElement>(null)
   const { modal, setModalState } = useBoundStore()
   const [isMentionOpened, setIsMentionOpened] = useState(false)
+  const [displayImages, setDisplayImages] = useState<Nft[]>([])
 
   const { mutateAsync: storeBlob } = useStoreBlob()
   const { mutateAsync: publishTx } = usePublishTransaction()
@@ -87,6 +89,7 @@ const NewPostModal = (prop: Props) => {
   const onCloseDialog = () => {
     setText('')
     setFile(undefined)
+    setDisplayImages([])
 
     prop.onClose()
     setIsLoading(false)
@@ -137,7 +140,8 @@ const NewPostModal = (prop: Props) => {
   // }
 
   const handleSelectedImages = (selectedImages: []) => {
-    console.log(selectedImages)
+    setDisplayImages(selectedImages)
+    setModalState({ newPost: { isOpen: true } })
   }
 
   const openMentionModal = () => {
@@ -250,6 +254,16 @@ const NewPostModal = (prop: Props) => {
                         )}
                       </div>
                     )}
+
+                    {displayImages &&
+                      displayImages.map((display, index) => (
+                        <div key={index} className="flex justify-left w-full">
+                          <img
+                            src={display.imageUrl as string}
+                            className="h-32 grid place-content-center rounded-md object-scale-down max-h-52 p-1 w-full"
+                          />
+                        </div>
+                      ))}
 
                     <div className="flex gap-5 p-3">
                       <GenericButton

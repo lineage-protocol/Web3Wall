@@ -145,10 +145,10 @@ const MentionModal = (prop: Props) => {
     })
   }
 
+  console.log(selectedImages)
   const { setModalState } = useBoundStore()
   const handleSelect = () => {
     prop.onClickSelect(selectedImages)
-    setModalState({ newPost: {isOpen: true}})
   }
   return (
     <>
