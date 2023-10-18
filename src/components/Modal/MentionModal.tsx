@@ -5,6 +5,7 @@ import { ArbitrumIcon, BNBIcon, CeloIcon, EthereumIcon, PolygonIcon, SolanaIcon 
 import { getNFTMetadata } from 'services/nft'
 import ExpandableInput from 'components/ExpandableInput'
 import { Nft } from 'lib'
+import { useBoundStore } from 'store'
 
 interface Props {
   isOpen: boolean
@@ -132,6 +133,7 @@ const MentionModal = (prop: Props) => {
       address: '',
       token_id: '',
     })
+    setModalState({ newPost: {isOpen: true}})
   }
 
   const onClickFastNFT = (index: number) => {
@@ -143,6 +145,11 @@ const MentionModal = (prop: Props) => {
     })
   }
 
+  const { setModalState } = useBoundStore()
+  const handleSelect = () => {
+    prop.onClickSelect(selectedImages)
+    setModalState({ newPost: {isOpen: true}})
+  }
   return (
     <>
       <Transition
@@ -187,10 +194,7 @@ const MentionModal = (prop: Props) => {
                               Cancel
                             </button>
                             <button
-                              onClick={() => {
-                                onDialogClose()
-                                prop.onClickSelect(selectedImages)
-                              }}
+                              onClick={handleSelect}
                               className={`p-2.5 text-gray-600 rounded-md cursor-default ${
                                 selectedImages.length > 0 && 'bg-purple-400 font-medium text-white hover:cursor-pointer'
                               }`}

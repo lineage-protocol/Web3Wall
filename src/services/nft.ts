@@ -12,3 +12,4 @@ export const getNFTMetadata = (address: string, chain: any, tokenId: string) => 
     method: 'GET',
     url: `/nft/${address}/${tokenId}?chain=${chain}`,
   })
+}

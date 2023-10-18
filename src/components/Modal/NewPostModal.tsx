@@ -132,12 +132,20 @@ const NewPostModal = (prop: Props) => {
     prop.onClose()
   }
 
-  const closeMentionModal = () => {
-    setIsMentionOpened(false)
-  }
+  // const closeMentionModal = () => {
+  //   setIsMentionOpened(false)
+  // }
 
   const handleSelectedImages = (selectedImages: []) => {
     console.log(selectedImages)
+  }
+
+  const openMentionModal = () => {
+    setModalState({ mention: { isOpen: true } })
+  }
+
+  const closeMentionModal = () => {
+    setModalState({ mention: { isOpen: false } })
   }
 
   return (
@@ -254,7 +262,7 @@ const NewPostModal = (prop: Props) => {
                       />
                       <GenericButton
                         onClick={() => {
-                          setIsMentionOpened(true)
+                          openMentionModal()
                         }}
                         name="Mentions"
                         icon={<MentionIcon />}
@@ -268,7 +276,7 @@ const NewPostModal = (prop: Props) => {
           </div>
         </Dialog>
       </Transition>
-      <MentionModal isOpen={isMentionOpened} onClose={closeMentionModal} onClickSelect={handleSelectedImages} />
+      <MentionModal isOpen={modal.mention.isOpen} onClose={closeMentionModal} onClickSelect={handleSelectedImages} />
     </>
   )
 }

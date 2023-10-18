@@ -30,16 +30,16 @@ const PageWall = () => {
   const { showError } = useAlertMessage()
   const { getAccounts } = useWeb3Auth()
 
-  const openModal = () => {
+  const openNewPostModal = () => {
     if (account) {
-      setIsModalOpen(true)
+      setModalState({newPost: {isOpen: true}})
     } else {
       showError(`Please login to post content`)
     }
   }
 
-  const closeModal = () => {
-    setIsModalOpen(false)
+  const closeNewPostModal = () => {
+    setModalState({ newPost: { isOpen: false } })
   }
 
   const openPOAPModal = () => {
@@ -144,7 +144,7 @@ const PageWall = () => {
           </div>
         </RWebShare>
         <button
-          onClick={() => openModal()}
+          onClick={() => openNewPostModal()}
           className="bg-purple-500 text-white hover:bg-purple-400  h-14 w-14 shadow-mg rounded-full flex items-center justify-center text-2xl"
         >
           <WallAddIcon />
@@ -156,8 +156,8 @@ const PageWall = () => {
         tokenId={token_id as String}
         tokenAddress={token_address as String}
         chainId={chain_id as String}
-        isOpen={isModalOpen}
-        onClose={closeModal}
+        isOpen={modal.newPost.isOpen}
+        onClose={closeNewPostModal}
       />
 
       <PoapModal tokenId={token_id as string} isOpen={modal.poap.isOpen} onClose={closePOAPModal} />
