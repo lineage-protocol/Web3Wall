@@ -6,6 +6,7 @@ interface ExpandableInputProps {
   placeholder?: string
   initialWidth: number
   extraPadding: number
+  value: string
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
   onBlur?: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
@@ -17,6 +18,7 @@ const ExpandableInput: React.FC<ExpandableInputProps> = ({
   onBlur,
   initialWidth,
   extraPadding,
+  value,
 }) => {
   const [width, setWidth] = useState<number>(initialWidth ?? 130) // Initial width
   const inputRef = useRef<HTMLInputElement | null>(null)
@@ -48,6 +50,7 @@ const ExpandableInput: React.FC<ExpandableInputProps> = ({
         placeholder={placeholder}
         className="text-sm text-black px-1 py-0 border-0 border-b-2 border-b-black text-center font-medium"
         name={name}
+        value={value}
         onBlur={onBlur}
       />
       <span ref={tempElRef} style={{ position: 'absolute', left: '-9999px' }}></span>

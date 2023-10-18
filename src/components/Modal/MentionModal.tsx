@@ -145,7 +145,6 @@ const MentionModal = (prop: Props) => {
     })
   }
 
-  console.log(selectedImages)
   const { setModalState } = useBoundStore()
   const handleSelect = () => {
     prop.onClickSelect(selectedImages)
@@ -216,6 +215,7 @@ const MentionModal = (prop: Props) => {
                             name="token_id"
                             onBlur={fetchData}
                             onChange={onHandleInputChange}
+                            value={searchData.token_id}
                             placeholder="0"
                             initialWidth={20}
                             extraPadding={10}
@@ -242,6 +242,7 @@ const MentionModal = (prop: Props) => {
                         <span className="text-gray-500 text-sm">and</span>
                         <ExpandableInput
                           name="address"
+                          value={searchData.address}
                           onBlur={fetchData}
                           onChange={onHandleInputChange}
                           placeholder="Contract address"

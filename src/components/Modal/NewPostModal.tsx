@@ -255,15 +255,12 @@ const NewPostModal = (prop: Props) => {
                       </div>
                     )}
 
-                    {displayImages &&
-                      displayImages.map((display, index) => (
-                        <div key={index} className="flex justify-left w-full">
-                          <img
-                            src={display.imageUrl as string}
-                            className="h-32 grid place-content-center rounded-md object-scale-down max-h-52 p-1 w-full"
-                          />
-                        </div>
-                      ))}
+                    <div className="flex gap-3 justify-center p-2">
+                      {displayImages &&
+                        displayImages.map((display, index) => (
+                          <img src={display.imageUrl as string} key={index} className="w-32 h-32 grid place-content-center" />
+                        ))}
+                    </div>
 
                     <div className="flex gap-5 p-3">
                       <GenericButton
