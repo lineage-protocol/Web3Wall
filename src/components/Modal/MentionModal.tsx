@@ -5,6 +5,7 @@ import { ArbitrumIcon, BNBIcon, CeloIcon, EthereumIcon, PolygonIcon, SolanaIcon 
 import { getNFTMetadata } from 'services/nft'
 import ExpandableInput from 'components/ExpandableInput'
 import { Nft } from 'lib'
+import { useBoundStore } from 'store'
 
 interface Props {
   isOpen: boolean
@@ -132,6 +133,7 @@ const MentionModal = (prop: Props) => {
       address: '',
       token_id: '',
     })
+    setModalState({ newPost: {isOpen: true}})
   }
 
   const onClickFastNFT = (index: number) => {
@@ -143,6 +145,10 @@ const MentionModal = (prop: Props) => {
     })
   }
 
+  const { setModalState } = useBoundStore()
+  const handleSelect = () => {
+    prop.onClickSelect(selectedImages)
+  }
   return (
     <>
       <Transition
@@ -187,10 +193,7 @@ const MentionModal = (prop: Props) => {
                               Cancel
                             </button>
                             <button
-                              onClick={() => {
-                                onDialogClose()
-                                prop.onClickSelect(selectedImages)
-                              }}
+                              onClick={handleSelect}
                               className={`p-2.5 text-gray-600 rounded-md cursor-default ${
                                 selectedImages.length > 0 && 'bg-purple-400 font-medium text-white hover:cursor-pointer'
                               }`}
@@ -212,6 +215,7 @@ const MentionModal = (prop: Props) => {
                             name="token_id"
                             onBlur={fetchData}
                             onChange={onHandleInputChange}
+                            value={searchData.token_id}
                             placeholder="0"
                             initialWidth={20}
                             extraPadding={10}
@@ -238,6 +242,7 @@ const MentionModal = (prop: Props) => {
                         <span className="text-gray-500 text-sm">and</span>
                         <ExpandableInput
                           name="address"
+                          value={searchData.address}
                           onBlur={fetchData}
                           onChange={onHandleInputChange}
                           placeholder="Contract address"

@@ -20,6 +20,7 @@ export type Modal = {
   comment: ModalState & TokenState & { postCid: string }
   proof: ModalState & { tokenId: string }
   mention: ModalState
+  newPost: ModalState
 }
 
 export interface ModalSlice {
@@ -37,6 +38,7 @@ const initialModal = {
     comment: { isOpen: false, tokenId: '', tokenAddress: '', chainId: '', postCid: '' },
     proof: { isOpen: false, tokenId: '' },
     mention: { isOpen: false },
+    newPost: { isOpen: false },
   },
 }
 

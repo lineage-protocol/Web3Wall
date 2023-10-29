@@ -10,6 +10,7 @@ import { useAlertMessage } from 'hooks/use-alert-message'
 import { useBoundStore } from 'store'
 import MentionModal from './MentionModal'
 import DOMPurify from 'dompurify'
+import { Nft } from 'lib'
 
 const LoadingOverlay = () => {
   return (
@@ -38,6 +39,7 @@ const NewPostModal = (prop: Props) => {
   const inputFileRef = useRef<HTMLInputElement>(null)
   const { modal, setModalState } = useBoundStore()
   const [isMentionOpened, setIsMentionOpened] = useState(false)
+  const [displayImages, setDisplayImages] = useState<Nft[]>([])
 
   const { mutateAsync: storeBlob } = useStoreBlob()
   const { mutateAsync: publishTx } = usePublishTransaction()
@@ -87,6 +89,7 @@ const NewPostModal = (prop: Props) => {
   const onCloseDialog = () => {
     setText('')
     setFile(undefined)
+    setDisplayImages([])
 
     prop.onClose()
     setIsLoading(false)
@@ -132,12 +135,21 @@ const NewPostModal = (prop: Props) => {
     prop.onClose()
   }
 
-  const closeMentionModal = () => {
-    setIsMentionOpened(false)
-  }
+  // const closeMentionModal = () => {
+  //   setIsMentionOpened(false)
+  // }
 
   const handleSelectedImages = (selectedImages: []) => {
-    console.log(selectedImages)
+    setDisplayImages(selectedImages)
+    setModalState({ newPost: { isOpen: true } })
+  }
+
+  const openMentionModal = () => {
+    setModalState({ mention: { isOpen: true } })
+  }
+
+  const closeMentionModal = () => {
+    setModalState({ mention: { isOpen: false } })
   }
 
   return (
@@ -243,6 +255,13 @@ const NewPostModal = (prop: Props) => {
                       </div>
                     )}
 
+                    <div className="flex gap-3 justify-center p-2">
+                      {displayImages &&
+                        displayImages.map((display, index) => (
+                          <img src={display.imageUrl as string} key={index} className="w-32 h-32 grid place-content-center" />
+                        ))}
+                    </div>
+
                     <div className="flex gap-5 p-3">
                       <GenericButton
                         onClick={() => {
@@ -254,7 +273,7 @@ const NewPostModal = (prop: Props) => {
                       />
                       <GenericButton
                         onClick={() => {
-                          setIsMentionOpened(true)
+                          openMentionModal()
                         }}
                         name="Mentions"
                         icon={<MentionIcon />}
@@ -268,7 +287,7 @@ const NewPostModal = (prop: Props) => {
           </div>
         </Dialog>
       </Transition>
-      <MentionModal isOpen={isMentionOpened} onClose={closeMentionModal} onClickSelect={handleSelectedImages} />
+      <MentionModal isOpen={modal.mention.isOpen} onClose={closeMentionModal} onClickSelect={handleSelectedImages} />
     </>
   )
 }
