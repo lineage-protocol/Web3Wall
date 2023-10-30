@@ -2,7 +2,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import rpc, { JSONRPCFilter, NftMetadata, Transaction } from '../services/rpc'
 import { useIpfs } from 'hooks/use-ipfs'
 import { RQ_KEY } from 'repositories'
-import { formatDataKey } from 'utils'
+import { Nft } from 'lib'
+import { getMoralisNftMetadata } from './moralis.repository'
 
 const useGetCompleteTransactions = () => {
   return useQuery({
@@ -285,6 +286,89 @@ const useGetMetadata = () => {
   })
 }
 
+export type Mention = {
+  mentionable: boolean
+  timestamp: number
+}
+
+const useGetMentions = (cid: string, count: number) => {
+  return useQuery<(Nft & Mention)[]>({
+    queryKey: [RQ_KEY.GET_MENTIONS, cid],
+    queryFn: async () => {
+      const result = await rpc.searchMetadatas({
+        query: [
+          {
+            column: 'version',
+            op: '=',
+            query: cid,
+          },
+          {
+            column: 'meta_contract_id',
+            op: '=',
+            query: `${import.meta.env.VITE_MENTION_META_CONTRACT_ID}`,
+          },
+          {
+            column: 'alias',
+            op: '=',
+            query: 'mentions',
+          },
+        ],
+        ordering: [],
+        from: 0,
+        to: 0,
+      })
+
+      const promises = result?.map(async (curr: any) => {
+        const res = await rpc.getContentFromIpfs(curr.cid as string)
+        const txs = await rpc.getTransactions({
+          query: [
+            {
+              column: 'data_key',
+              op: '=',
+              query: curr.data_key,
+            },
+          ],
+        })
+        const content = JSON.parse(res.data.result.content as string)
+        const token_address = txs.length > 0 ? txs[0].token_address : ''
+
+        const nft = await getMoralisNftMetadata(token_address, curr.token_id)
+
+        return { ...content.content, ...nft }
+      })
+
+      const results = await Promise.all(promises)
+      const flattened = results.flat()
+      return flattened.sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1))
+    },
+    enabled: count > 0,
+  })
+}
+
+const useGetMentionCount = (cid: string) => {
+  return useQuery({
+    queryKey: [RQ_KEY.GET_MENTION_COUNT, cid],
+    queryFn: async () => {
+      const result = await rpc.searchMetadataCount({
+        query: [
+          {
+            column: 'version',
+            op: '=',
+            query: cid,
+          },
+          {
+            column: 'meta_contract_id',
+            op: '=',
+            query: `${import.meta.env.VITE_MENTION_META_CONTRACT_ID}`,
+          },
+        ],
+      })
+
+      return result
+    },
+  })
+}
+
 export {
   useGetCompleteTransactions,
   useGetTransactions,
@@ -295,4 +379,6 @@ export {
   useGetCommentCount,
   useGetPost,
   useGetMetadata,
+  useGetMentions,
+  useGetMentionCount,
 }

@@ -1,6 +1,7 @@
 export enum RQ_KEY {
   GET_COMPLETED_TXS = 'get_complete_transactions',
   GET_TXS = 'get_transactions',
+  GET_TX = 'get_transaction',
   PUBLISH_TX = 'publish_transaction',
   POSTS = 'posts',
   GET_SHEETS = 'get_sheets',
@@ -12,4 +13,7 @@ export enum RQ_KEY {
   GET_COMMENT_COUNT = 'get_comment_count',
   GET_POST = 'post',
   GET_NFT_METADATA = 'get_nft_metadata',
+  GET_MENTIONS = 'get_mentions',
+  GET_MENTION_COUNT = 'get_mention_count',
+  GET_MORALIS_METADATA = 'get_moralis_metadata',
 }

@@ -1,8 +1,8 @@
-import { CloseIcon, CommentIcon, CommentSolidIcon } from 'components/Icons/icons'
+import { AtSymbolIcon, AtSymbolSolidIcon, CommentIcon, CommentSolidIcon } from 'components/Icons/icons'
 import useInViewport from 'hooks/useInViewport'
 import { useEffect, useState } from 'react'
 import { RWebShare } from 'react-web-share'
-import { useGetCommentCount } from 'repositories/rpc.repository'
+import { useGetCommentCount, useGetMentionCount, useGetMentions } from 'repositories/rpc.repository'
 import { timeAgo } from 'utils'
 
 interface SocialCardProp {
@@ -47,6 +47,8 @@ const SocialCard = (prop: SocialCardProp) => {
   const [ref, inViewport] = useInViewport()
 
   const commentQuery = useGetCommentCount(prop.cid)
+  const { data: mentionCount } = useGetMentionCount(prop.cid)
+  const { data: mentions } = useGetMentions(prop.cid as string, mentionCount)
 
   useEffect(() => {
     if (prop?.showNoOfComments && prop.noOfComments !== undefined) {
@@ -86,19 +88,39 @@ const SocialCard = (prop: SocialCardProp) => {
             <SortCardDisplay {...prop} />
           </div>
 
+          {mentions && mentions?.length > 0 && (
+            <div className="flex gap-2 ml-2">
+              {mentions.map((mention, index) => {
+                if (!mention.mentionable) return
+
+                return (
+                  <img src={mention.imageUrl as string} key={index} className="w-32 h-32 grid place-content-center" />
+                )
+              })}
+            </div>
+          )}
+
           <div className={`flex mx-3 items-center gap-1 py-3 text-gray-500 justify-between`}>
-            <span
-              onClick={() => {
-                if (prop?.goToComments) {
-                  prop.goToComments?.(prop.cid)
-                }
-              }}
-              className={`text-sm flex gap-1 items-center ${prop?.goToComments ? 'cursor-pointer' : ''}`}
-            >
-              {commentCount == 0 && <CommentIcon />}
-              {commentCount > 0 && <CommentSolidIcon />}
-              <span className="text-xs">{commentCount}</span>
-            </span>
+            <div className="flex gap-3">
+              <span
+                onClick={() => {
+                  if (prop?.goToComments) {
+                    prop.goToComments?.(prop.cid)
+                  }
+                }}
+                className={`text-sm flex gap-1 items-center ${prop?.goToComments ? 'cursor-pointer' : ''}`}
+              >
+                {commentCount == 0 && <CommentIcon />}
+                {commentCount > 0 && <CommentSolidIcon />}
+                <span className="text-xs">{commentCount}</span>
+              </span>
+
+              <span className={`text-sm flex gap-1 items-center ${prop?.goToComments ? 'cursor-pointer' : ''}`}>
+                {mentionCount == 0 && <AtSymbolIcon />}
+                {mentionCount > 0 && <AtSymbolSolidIcon />}
+                <span className="text-xs">{mentionCount}</span>
+              </span>
+            </div>
             <RWebShare
               data={{
                 title: 'W3wall',
