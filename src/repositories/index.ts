@@ -11,4 +11,5 @@ export enum RQ_KEY {
   GET_COMMENTS = 'get_comments',
   GET_COMMENT_COUNT = 'get_comment_count',
   GET_POST = 'post',
+  GET_NFT_METADATA = 'get_nft_metadata',
 }

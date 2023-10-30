@@ -265,6 +265,26 @@ const useGetCommentCount = (cid: string) => {
   })
 }
 
+const useGetMetadata = () => {
+  return useMutation({
+    mutationFn: async ({
+      data_key,
+      meta_contract_id,
+      public_key,
+      alias = '',
+      version = '',
+    }: {
+      data_key: string
+      meta_contract_id: string
+      public_key: string
+      alias?: string
+      version?: string
+    }) => {
+      return await rpc.getMetadata(data_key, meta_contract_id, public_key, alias, version)
+    },
+  })
+}
+
 export {
   useGetCompleteTransactions,
   useGetTransactions,
@@ -274,4 +294,5 @@ export {
   useGetComments,
   useGetCommentCount,
   useGetPost,
+  useGetMetadata,
 }

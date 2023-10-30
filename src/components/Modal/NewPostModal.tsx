@@ -3,7 +3,7 @@ import GenericButton from 'components/Buttons/GenericButton'
 import { CameraIcon, LoadingSpinner, MentionIcon } from 'components/Icons/icons'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { usePublishTransaction, useStoreBlob } from 'repositories/rpc.repository'
+import { useGetMetadata, usePublishTransaction, useStoreBlob } from 'repositories/rpc.repository'
 import imageCompression from 'browser-image-compression'
 import { v4 } from 'uuid'
 import { useAlertMessage } from 'hooks/use-alert-message'
@@ -11,6 +11,8 @@ import { useBoundStore } from 'store'
 import MentionModal from './MentionModal'
 import DOMPurify from 'dompurify'
 import { Nft } from 'lib'
+import { formatDataKey } from 'utils'
+import { Transaction } from 'services/rpc'
 
 const LoadingOverlay = () => {
   return (
@@ -43,9 +45,15 @@ const NewPostModal = (prop: Props) => {
 
   const { mutateAsync: storeBlob } = useStoreBlob()
   const { mutateAsync: publishTx } = usePublishTransaction()
+  const { mutateAsync: getMetadata } = useGetMetadata()
 
   const { signMessage, getAccounts } = useWeb3Auth()
   const { showError, showSuccess } = useAlertMessage()
+
+  const createMention = async (content: any, tx_data: Transaction) => {
+    let signed = await signMessage(JSON.stringify(content))
+    return await publishTx({ ...tx_data, signature: signed?.signature as string })
+  }
 
   const onPost = async (): Promise<void> => {
     const account = await getAccounts()
@@ -63,6 +71,7 @@ const NewPostModal = (prop: Props) => {
 
     try {
       const signed = await signMessage(JSON.stringify(content))
+      const version = v4()
 
       await publishTx({
         alias: '',
@@ -75,8 +84,50 @@ const NewPostModal = (prop: Props) => {
         public_key: account as string,
         token_address: prop.tokenAddress as string,
         token_id: prop.tokenId as string,
-        version: v4(),
+        version,
       })
+
+      const mentions = displayImages
+
+      setTimeout(async () => {
+        if (mentions.length > 0) {
+          const data_key = formatDataKey(prop.chainId, prop.tokenAddress, prop.tokenId)
+
+          let data = {
+            data_key,
+            meta_contract_id: `${import.meta.env.VITE_WEB3WALL_META_CONTRACT_ID}`,
+            public_key: account,
+            version,
+          }
+
+          let metadata = await getMetadata(data)
+
+          const promises: any[] = []
+
+          for (let i = 0; i < mentions.length; i++) {
+            const mention = mentions[i]
+            const content = { cid: metadata.cid }
+
+            promises.push(
+              createMention(content, {
+                alias: '',
+                chain_id: prop.chainId as string,
+                signature: '',
+                data: JSON.stringify(content),
+                mcdata: JSON.stringify({ loose: 0 }),
+                meta_contract_id: `${import.meta.env.VITE_MENTION_META_CONTRACT_ID}`,
+                method: 'metadata',
+                public_key: account as string,
+                token_address: mention.token_address as string,
+                token_id: mention.token_id as string,
+                version: metadata.cid as string,
+              })
+            )
+          }
+
+          await Promise.all(promises)
+        }
+      }, 5000)
 
       showSuccess(`Publishing your post to network...`)
       onCloseDialog()
@@ -258,7 +309,11 @@ const NewPostModal = (prop: Props) => {
                     <div className="flex gap-3 justify-center p-2">
                       {displayImages &&
                         displayImages.map((display, index) => (
-                          <img src={display.imageUrl as string} key={index} className="w-32 h-32 grid place-content-center" />
+                          <img
+                            src={display.imageUrl as string}
+                            key={index}
+                            className="w-32 h-32 grid place-content-center"
+                          />
                         ))}
                     </div>
 

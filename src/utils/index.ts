@@ -59,6 +59,7 @@ export const catchAsync = async <T, A>(asyncFunction: (args: A) => Promise<T>, a
 export function networkToChainId(chain: string) {
   let chainId = ''
   switch (chain.toLowerCase()) {
+    case 'eth':
     case 'homestead':
       chainId = '1'
       break
