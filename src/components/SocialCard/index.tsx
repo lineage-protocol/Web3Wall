@@ -29,7 +29,7 @@ const SortCardDisplay = (prop: SocialCardProp) => {
     const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#/%=~_|$?!:,.]*[A-Z0-9+&@#/%=~_|$])/gi
     const textWithLinks = text.replace(
       urlRegex,
-      '<a href="$1" target="_blank" rel="noopener noreferrer" class="underline text-indigo-500">$1</a>'
+      '<a href="$1" target="_blank" rel="noopener noreferrer" class="underline text-indigo-500 text-sm">$1</a>'
     )
     return textWithLinks
   }
@@ -71,7 +71,7 @@ const SortCardDisplay = (prop: SocialCardProp) => {
 const SocialCard = (prop: SocialCardProp) => {
   const [commentCount, setCommentCount] = useState(0)
   const [ref, inViewport] = useInViewport()
-  const [isClick, setIsClick] = useState(false)
+  
 
   const commentQuery = useGetCommentCount(prop.cid)
 
@@ -116,7 +116,7 @@ const SocialCard = (prop: SocialCardProp) => {
           <div className={`flex mx-3 items-center gap-1 py-3 text-gray-500 justify-between`}>
             <span
               onClick={() => {
-                if (prop?.goToComments && isClick === false) {
+                if (prop?.goToComments) {
                   prop.goToComments?.(prop.cid)
                 }
               }}
