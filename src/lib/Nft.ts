@@ -5,4 +5,5 @@ export interface Nft {
   metadata: String
   metaObject?: object
   imageUrl?: String
+  chain_id?: String
 }

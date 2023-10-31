@@ -6,6 +6,7 @@ import { getNFTMetadata } from 'services/nft'
 import ExpandableInput from 'components/ExpandableInput'
 import { Nft } from 'lib'
 import { useBoundStore } from 'store'
+import { networkToChainId } from 'utils'
 
 interface Props {
   isOpen: boolean
@@ -118,7 +119,7 @@ const MentionModal = (prop: Props) => {
         nft.imageUrl = imageURL.replace('ipfs://', import.meta.env.VITE_IPFS_GATEWAY_URL)
       }
 
-      setCollections(prevCollections => [...prevCollections, nft])
+      setCollections(prevCollections => [...prevCollections, { ...nft, chain_id: networkToChainId(searchData.chain) }])
     } catch (error) {
       console.log((error as Error).message)
     }
@@ -133,7 +134,7 @@ const MentionModal = (prop: Props) => {
       address: '',
       token_id: '',
     })
-    setModalState({ newPost: {isOpen: true}})
+    setModalState({ newPost: { isOpen: true } })
   }
 
   const onClickFastNFT = (index: number) => {
