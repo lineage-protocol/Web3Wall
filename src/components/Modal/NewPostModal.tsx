@@ -1,12 +1,13 @@
 import { Dialog, Transition } from '@headlessui/react'
 import GenericButton from 'components/Buttons/GenericButton'
-import { CameraIcon, LoadingSpinner } from 'components/Icons/icons'
+import { CameraIcon, CloseIcon, LoadingSpinner } from 'components/Icons/icons'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { usePublishTransaction, useStoreBlob } from 'repositories/rpc.repository'
 import imageCompression from 'browser-image-compression'
 import { v4 } from 'uuid'
 import { useAlertMessage } from 'hooks/use-alert-message'
+import DOMPurify from 'dompurify'
 
 const LoadingOverlay = () => {
   return (
@@ -49,7 +50,7 @@ const NewPostModal = (prop: Props) => {
     if (file) url = await storeBlob(new Blob([file]))
 
     const content = {
-      text,
+      text: DOMPurify.sanitize(text.replace(/'/g, '’')),
       image: url,
     }
 
@@ -86,38 +87,34 @@ const NewPostModal = (prop: Props) => {
     setIsLoading(false)
   }
 
-  const onSelectMedia = () => {
-    return new Promise<void>((resolve, reject) => {
-      const filePicker = document.getElementById('media') as HTMLInputElement
+  const onSelectMedia = (e: React.FormEvent<HTMLInputElement>) => {
+    const filePicker = e.target as HTMLInputElement & {
+      files: FileList
+    }
 
-      if (!filePicker || !filePicker.files || filePicker.files.length <= 0) {
-        reject('No file selected')
-        return
+    if (!filePicker || !filePicker.files || filePicker.files.length <= 0) {
+      showError('No file selected')
+      return
+    }
+
+    const pickedFile = filePicker.files[0]
+
+    if (pickedFile.type.includes('image')) {
+      const options = {
+        maxSizeMB: 0.8,
+        maxWidthOrHeight: 1280,
       }
 
-      const pickedFile = filePicker.files[0]
-
-      if (getFileType() == 'image') {
-        console.log(`originalFile size ${pickedFile.size / 1024 / 1024} MB`)
-
-        const options = {
-          maxSizeMB: 300,
-          maxWidthOrHeight: 400,
-        }
-
-        imageCompression(pickedFile, options)
-          .then(compressedFile => {
-            setFile(compressedFile)
-          })
-          .catch(e => {
-            console.log(e)
-          })
-      } else {
-        setFile(pickedFile)
-      }
-
-      resolve()
-    })
+      imageCompression(pickedFile, options)
+        .then(compressedFile => {
+          setFile(compressedFile)
+        })
+        .catch(e => {
+          console.log(e)
+        })
+    } else {
+      setFile(pickedFile)
+    }
   }
 
   const getFileType = (): 'image' | 'video' | undefined => {
@@ -180,7 +177,9 @@ const NewPostModal = (prop: Props) => {
                             <button
                               disabled={text.length <= 0}
                               onClick={() => onPost()}
-                              className="block shrink-0 p-2.5 font-semibold text-blue-600"
+                              className={`block shrink-0 p-2.5 font-semibold ${
+                                text.length <= 0 ? 'text-gray-400' : 'text-blue-600'
+                              }`}
                             >
                               Post
                             </button>
@@ -214,14 +213,14 @@ const NewPostModal = (prop: Props) => {
                       ref={inputFileRef}
                       type="file"
                       accept="image/x-png, image/jpeg, image/gif, video/mp4, video/x-m4v, video/*"
-                      onChange={() => onSelectMedia()}
+                      onChange={onSelectMedia}
                       className="bg-gray-400 p-3 hidden"
                     />
 
                     {file && (
                       <div className="flex justify-left w-full">
                         {getFileType() === 'image' && (
-                          <img src={URL.createObjectURL(file)} className="object-contain w-full" />
+                          <img src={URL.createObjectURL(file)} className="object-scale-down max-h-52 p-1 w-full" />
                         )}
                         {getFileType() === 'video' && (
                           <video controls className="object-fit bg-indigo-600">

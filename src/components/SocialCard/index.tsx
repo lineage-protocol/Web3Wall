@@ -1,4 +1,4 @@
-import { CommentIcon } from 'components/Icons/icons'
+import { CloseIcon, CommentIcon, CommentSolidIcon } from 'components/Icons/icons'
 import useInViewport from 'hooks/useInViewport'
 import { useEffect, useState } from 'react'
 import { RWebShare } from 'react-web-share'
@@ -81,17 +81,22 @@ const SocialCard = (prop: SocialCardProp) => {
                 prop.goToComments?.(prop.cid)
               }
             }}
+            className={prop?.goToComments ? 'cursor-pointer' : ''}
           >
             <SortCardDisplay {...prop} />
           </div>
 
           <div className={`flex mx-3 items-center gap-1 py-3 text-gray-500 justify-between`}>
-            <span className="text-sm flex gap-1 items-center cursor-pointer" onClick={() => {
-              if (prop?.goToComments) {
-                prop.goToComments?.(prop.cid)
-              }
-            }}>
-              <CommentIcon />
+            <span
+              onClick={() => {
+                if (prop?.goToComments) {
+                  prop.goToComments?.(prop.cid)
+                }
+              }}
+              className={`text-sm flex gap-1 items-center ${prop?.goToComments ? 'cursor-pointer' : ''}`}
+            >
+              {commentCount == 0 && <CommentIcon />}
+              {commentCount > 0 && <CommentSolidIcon />}
               <span className="text-xs">{commentCount}</span>
             </span>
             <RWebShare

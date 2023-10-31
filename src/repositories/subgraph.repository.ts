@@ -14,8 +14,8 @@ type MintedEvent = {
 
 const useGetEvents = (variables: ApolloClientFilter) => {
   const query = `
-  query Minteds($first: Int, $skip: Int, $where: Minted_filter) {
-    minteds(first: $first, skip: $skip, where: $where) {
+  query Minteds($first: Int, $skip: Int, $where: Minted_filter, $orderDirection: OrderDirection) {
+    minteds(first: $first, skip: $skip, where: $where, orderBy: blockTimestamp, orderDirection: $orderDirection) {
       tokenId
       id
       data
@@ -29,14 +29,14 @@ const useGetEvents = (variables: ApolloClientFilter) => {
     queryFn: async () => {
       const { data } = await apolloQuery<{ minteds: MintedEvent[] }>({ query, variables })
 
-      return data?.minteds?.map(el => {
+      return data.minteds?.map(el => {
         const [name, image, body] = decodeMinted(el.data)
         return {
           ...el,
           data: { name, image, body },
           data_key: formatDataKey(
             `${import.meta.env.VITE_DEFAULT_CHAIN_ID}`,
-            `${import.meta.env.VITE_WEB3WALL_NFT}`,
+            `${import.meta.env.VITE_WEB3WALL_NFT}`.toLowerCase(),
             `${el.tokenId}`
           ),
         }
