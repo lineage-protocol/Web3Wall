@@ -1,6 +1,6 @@
 import { Dialog, Transition } from '@headlessui/react'
 import GenericButton from 'components/Buttons/GenericButton'
-import { CameraIcon, LoadingSpinner, MentionIcon } from 'components/Icons/icons'
+import { CameraIcon, CloseIcon, CloseSmallIcon, LoadingSpinner, MentionIcon } from 'components/Icons/icons'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { useGetMetadata, usePublishTransaction, useStoreBlob } from 'repositories/rpc.repository'
@@ -13,6 +13,7 @@ import DOMPurify from 'dompurify'
 import { Nft } from 'lib'
 import { formatDataKey } from 'utils'
 import { Transaction } from 'services/rpc'
+import ImageContainer from 'components/ImageContainer'
 
 const LoadingOverlay = () => {
   return (
@@ -40,8 +41,7 @@ const NewPostModal = (prop: Props) => {
   const [textRows, setTextRows] = useState(8)
   const inputFileRef = useRef<HTMLInputElement>(null)
   const { modal, setModalState } = useBoundStore()
-  const [isMentionOpened, setIsMentionOpened] = useState(false)
-  const [displayImages, setDisplayImages] = useState<Nft[]>([])
+  const [tagNFTs, setTagNFTs] = useState<Nft[]>([])
 
   const { mutateAsync: storeBlob } = useStoreBlob()
   const { mutateAsync: publishTx } = usePublishTransaction()
@@ -51,7 +51,7 @@ const NewPostModal = (prop: Props) => {
   const { showError, showSuccess } = useAlertMessage()
 
   const createMention = async (content: any, tx_data: Transaction) => {
-    let signed = await signMessage(JSON.stringify(content))
+    const signed = await signMessage(JSON.stringify(content))
     return await publishTx({ ...tx_data, signature: signed?.signature as string })
   }
 
@@ -87,20 +87,20 @@ const NewPostModal = (prop: Props) => {
         version,
       })
 
-      const mentions = displayImages
+      const mentions = tagNFTs
 
       setTimeout(async () => {
         if (mentions.length > 0) {
           const data_key = formatDataKey(prop.chainId, prop.tokenAddress, prop.tokenId)
 
-          let data = {
+          const data = {
             data_key,
             meta_contract_id: `${import.meta.env.VITE_WEB3WALL_META_CONTRACT_ID}`,
             public_key: account,
             version,
           }
 
-          let metadata = await getMetadata(data)
+          const metadata = await getMetadata(data)
 
           const promises: any[] = []
 
@@ -140,7 +140,7 @@ const NewPostModal = (prop: Props) => {
   const onCloseDialog = () => {
     setText('')
     setFile(undefined)
-    setDisplayImages([])
+    setTagNFTs([])
 
     prop.onClose()
     setIsLoading(false)
@@ -186,13 +186,21 @@ const NewPostModal = (prop: Props) => {
     prop.onClose()
   }
 
-  // const closeMentionModal = () => {
-  //   setIsMentionOpened(false)
-  // }
-
   const handleSelectedImages = (selectedImages: []) => {
-    setDisplayImages(selectedImages)
+    const areNFTsSimilar = (nft1: any, nft2: any) => {
+      return (
+        nft1.chain_id === nft2.chain_id && nft1.token_address === nft2.token_address && nft1.token_id === nft2.token_id
+      )
+    }
+    const uniqueNFT = selectedImages.filter(image => !tagNFTs.some(existingNFT => areNFTsSimilar(existingNFT, image)))
+    setTagNFTs([...tagNFTs, ...uniqueNFT])
     setModalState({ newPost: { isOpen: true } })
+    closeMentionModal()
+  }
+
+  const removeTaggedNFT = (nftToRemove: Nft) => {
+    const updatedNFTs = tagNFTs.filter(nft => nft !== nftToRemove)
+    setTagNFTs(updatedNFTs)
   }
 
   const openMentionModal = () => {
@@ -306,33 +314,44 @@ const NewPostModal = (prop: Props) => {
                       </div>
                     )}
 
-                    <div className="flex gap-3 justify-center p-2">
-                      {displayImages &&
-                        displayImages.map((display, index) => (
-                          <img
-                            src={display.imageUrl as string}
-                            key={index}
-                            className="w-32 h-32 grid place-content-center"
-                          />
+                    <div className="flex flex-wrap gap-3 justify-left p-2">
+                      {tagNFTs &&
+                        tagNFTs.map((nft, index) => (
+                          <div key={index} className="relative">
+                            <ImageContainer
+                              src={nft.imageUrl as string}
+                              key={index}
+                              classNames="w-32 h-32 grid place-content-center"
+                            />
+                            <div className="absolute top-0 right-6 p-2 h-5 w-5">
+                              <button
+                                className="hover:bg-gray-800/20 bg-gray-800 text-white rounded-full p-1"
+                                onClick={() => removeTaggedNFT(nft)}
+                              >
+                                <CloseSmallIcon />
+                              </button>
+                            </div>
+                            <div className="absolute top-0 left-0 p-2 h-5 w-5">{nft.chain_id}</div>
+                          </div>
                         ))}
                     </div>
 
-                    <div className="flex gap-5 p-3">
+                    <div className="flex gap-5 p-3 justify-center">
                       <GenericButton
                         onClick={() => {
                           inputFileRef?.current?.click()
                         }}
                         name="Media"
                         icon={<CameraIcon />}
-                        className=""
+                        className="w-1/2"
                       />
                       <GenericButton
                         onClick={() => {
                           openMentionModal()
                         }}
-                        name="Mentions"
+                        name="NFT"
                         icon={<MentionIcon />}
-                        className=""
+                        className="w-1/2"
                       />
                     </div>
                   </div>

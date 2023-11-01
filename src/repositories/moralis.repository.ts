@@ -1,8 +1,8 @@
 import { Nft } from 'lib'
 import { getNFTMetadata } from 'services/nft'
 
-const getMoralisNftMetadata = async (tokenAddress: string, tokenId: string) => {
-  const response = await getNFTMetadata(tokenAddress, '', tokenId)
+const getMoralisNftMetadata = async (chainId: string, tokenAddress: string, tokenId: string) => {
+  const response = await getNFTMetadata(tokenAddress, chainId, tokenId)
 
   const nft: Nft = response.data
   nft.metaObject = JSON.parse(nft.metadata as string)

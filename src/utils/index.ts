@@ -116,6 +116,7 @@ export function chainIdToNetwork(chain: string) {
       return ''
   }
 }
+
 export function formatDataKey(chain_id: String, address: String, token_id: String) {
   const input = `${chain_id}${address?.toLowerCase()}${token_id}`
   const sha256Hash = SHA256(input).toString()

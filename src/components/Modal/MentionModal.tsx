@@ -7,6 +7,7 @@ import ExpandableInput from 'components/ExpandableInput'
 import { Nft } from 'lib'
 import { useBoundStore } from 'store'
 import { networkToChainId } from 'utils'
+import ImageContainer from 'components/ImageContainer'
 
 interface Props {
   isOpen: boolean
@@ -115,10 +116,9 @@ const MentionModal = (prop: Props) => {
       const nft: Nft = response.data
       nft.metaObject = JSON.parse(nft.metadata as string)
       const imageURL = (nft.metaObject as any).image
-      if (imageURL && imageURL.startsWith('ipfs://')) {
-        nft.imageUrl = imageURL.replace('ipfs://', import.meta.env.VITE_IPFS_GATEWAY_URL)
-      }
+      nft.imageUrl = imageURL
 
+      console.log({ ...nft, chain_id: networkToChainId(searchData.chain) })
       setCollections(prevCollections => [...prevCollections, { ...nft, chain_id: networkToChainId(searchData.chain) }])
     } catch (error) {
       console.log((error as Error).message)
@@ -137,18 +137,11 @@ const MentionModal = (prop: Props) => {
     setModalState({ newPost: { isOpen: true } })
   }
 
-  const onClickFastNFT = (index: number) => {
-    const nft = presets[index]
-    setSearchData({
-      chain: nft.chain,
-      address: nft.address,
-      token_id: '0',
-    })
-  }
-
   const { setModalState } = useBoundStore()
   const handleSelect = () => {
     prop.onClickSelect(selectedImages)
+    setCollections([])
+    setSelectedImages([])
   }
   return (
     <>
@@ -217,8 +210,8 @@ const MentionModal = (prop: Props) => {
                             onBlur={fetchData}
                             onChange={onHandleInputChange}
                             value={searchData.token_id}
-                            placeholder="0"
-                            initialWidth={20}
+                            placeholder="id"
+                            initialWidth={50}
                             extraPadding={10}
                           />
                         </div>
@@ -252,7 +245,7 @@ const MentionModal = (prop: Props) => {
                         />
                       </div>
                     </div>
-                    <div
+                    {/* <div
                       className="mt-3 overflow-x-scroll flex flex-cols gap-2"
                       style={{ scrollbarWidth: 'thin', scrollbarColor: '#ccc #f5f5f5' }}
                     >
@@ -267,7 +260,7 @@ const MentionModal = (prop: Props) => {
                           </button>
                         ))}
                       </div>
-                    </div>
+                    </div> */}
 
                     <div
                       className="grid gap-2 grid-cols-3 mt-3 overflow-auto max-h-[540px]"
@@ -281,10 +274,10 @@ const MentionModal = (prop: Props) => {
 
                         return (
                           <div key={index} className="relative hover:brightness-75">
-                            <img
+                            <ImageContainer
                               src={nft.imageUrl as string}
                               onClick={() => toggleCheckbox(index)}
-                              className={`w-32 h-32 grid place-content-center rounded-md cursor-pointer border-2 ${
+                              classNames={`w-32 h-32 grid place-content-center rounded-md cursor-pointer border-2 ${
                                 isSelected ? 'border-blue-400' : 'border-white'
                               }`}
                             />

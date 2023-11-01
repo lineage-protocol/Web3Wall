@@ -331,10 +331,9 @@ const useGetMentions = (cid: string, count: number) => {
         })
         const content = JSON.parse(res.data.result.content as string)
         const token_address = txs.length > 0 ? txs[0].token_address : ''
+        const nft = await getMoralisNftMetadata(content.chain_id, token_address, curr.token_id)
 
-        const nft = await getMoralisNftMetadata(token_address, curr.token_id)
-
-        return { ...content.content, ...nft }
+        return { ...content.content, ...nft, lineage: { ...curr, token_address } }
       })
 
       const results = await Promise.all(promises)

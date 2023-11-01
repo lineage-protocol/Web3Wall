@@ -1,4 +1,5 @@
 import { AtSymbolIcon, AtSymbolSolidIcon, CommentIcon, CommentSolidIcon } from 'components/Icons/icons'
+import ImageContainer from 'components/ImageContainer'
 import useInViewport from 'hooks/useInViewport'
 import { useEffect, useState } from 'react'
 import { RWebShare } from 'react-web-share'
@@ -48,7 +49,7 @@ const SocialCard = (prop: SocialCardProp) => {
 
   const commentQuery = useGetCommentCount(prop.cid)
   const { data: mentionCount } = useGetMentionCount(prop.cid)
-  const { data: mentions } = useGetMentions(prop.cid as string, mentionCount)
+  const { data: mentions } = useGetMentions(prop.cid, mentionCount)
 
   useEffect(() => {
     if (prop?.showNoOfComments && prop.noOfComments !== undefined) {
@@ -65,6 +66,15 @@ const SocialCard = (prop: SocialCardProp) => {
       }
     }
   }, [commentQuery, inViewport, prop.noOfComments])
+
+  const goToScan = (mention: any) => {
+    console.log(mention)
+    switch (mention.chain_id) {
+      case '1':
+        window.open(`https://etherscan.com/nft/${mention.token_address}/${mention.lineage.token_id}`, '_blank')
+        break
+    }
+  }
 
   return (
     <>
@@ -89,12 +99,16 @@ const SocialCard = (prop: SocialCardProp) => {
           </div>
 
           {mentions && mentions?.length > 0 && (
-            <div className="flex gap-2 ml-2">
+            <div className="flex flex-wrap gap-2 ml-3 mt-2">
               {mentions.map((mention, index) => {
                 if (!mention.mentionable) return
-
                 return (
-                  <img src={mention.imageUrl as string} key={index} className="w-32 h-32 grid place-content-center" />
+                  <ImageContainer
+                    src={(mention.metaObject as any).image as string}
+                    key={index}
+                    onClick={() => goToScan(mention)}
+                    classNames="w-32 h-32 grid place-content-center cursor-pointer"
+                  />
                 )
               })}
             </div>
@@ -116,9 +130,11 @@ const SocialCard = (prop: SocialCardProp) => {
               </span>
 
               <span className={`text-sm flex gap-1 items-center ${prop?.goToComments ? 'cursor-pointer' : ''}`}>
-                {mentionCount == 0 && <AtSymbolIcon />}
-                {mentionCount > 0 && <AtSymbolSolidIcon />}
-                <span className="text-xs">{mentionCount}</span>
+                {mentionCount > 0 && (
+                  <>
+                    <AtSymbolSolidIcon />
+                  </>
+                )}
               </span>
             </div>
             <RWebShare
