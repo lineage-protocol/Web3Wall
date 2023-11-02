@@ -14,6 +14,7 @@ import { Nft } from 'lib'
 import { formatDataKey } from 'utils'
 import { Transaction } from 'services/rpc'
 import ImageContainer from 'components/ImageContainer'
+import ChainToIcon from 'components/ChainToIcon'
 
 const LoadingOverlay = () => {
   return (
@@ -38,25 +39,54 @@ const NewPostModal = (prop: Props) => {
   const [isLoading, setIsLoading] = useState(false)
   const [text, setText] = useState('')
   const [file, setFile] = useState<File | Blob>()
-  const [textRows, setTextRows] = useState(8)
   const inputFileRef = useRef<HTMLInputElement>(null)
   const { modal, setModalState } = useBoundStore()
   const [tagNFTs, setTagNFTs] = useState<Nft[]>([])
+  const [version, setVersion] = useState<String>('')
+  const [dataKey, setDataKey] = useState<String>('')
+  const [shouldFetchMetadata, setShouldFetchMetadata] = useState(false)
+  const [account, setAccount] = useState<String>('')
 
   const { mutateAsync: storeBlob } = useStoreBlob()
   const { mutateAsync: publishTx } = usePublishTransaction()
-  const { mutateAsync: getMetadata } = useGetMetadata()
 
   const { signMessage, getAccounts } = useWeb3Auth()
   const { showError, showSuccess } = useAlertMessage()
+  const { data: metadata } = useGetMetadata(
+    dataKey as string,
+    `${import.meta.env.VITE_WEB3WALL_META_CONTRACT_ID}`,
+    account as string,
+    '',
+    version as string,
+    shouldFetchMetadata
+  )
 
-  const createMention = async (content: any, tx_data: Transaction) => {
-    const signed = await signMessage(JSON.stringify(content))
-    return await publishTx({ ...tx_data, signature: signed?.signature as string })
+  useEffect(() => {
+    if (!version) {
+      setVersion(v4())
+    }
+
+    const getAccount = async () => {
+      try {
+        const acc = await getAccounts()
+        if (acc) {
+          setAccount(acc as string)
+        }
+      } catch (e) {
+        setAccount('')
+      }
+    }
+
+    getAccount().catch(e => console.log(e))
+  }, [dataKey, getAccounts, prop.chainId, prop.tokenAddress, prop.tokenId, version])
+
+  const onEnter = () => {
+    if (!dataKey) {
+      const data_key = formatDataKey(prop.chainId.toLowerCase(), prop.tokenAddress.toLowerCase(), prop.tokenId)
+      setDataKey(data_key)
+    }
   }
-
   const onPost = async (): Promise<void> => {
-    const account = await getAccounts()
     if (!account) {
       return
     }
@@ -71,7 +101,6 @@ const NewPostModal = (prop: Props) => {
 
     try {
       const signed = await signMessage(JSON.stringify(content))
-      const version = v4()
 
       await publishTx({
         alias: '',
@@ -84,53 +113,19 @@ const NewPostModal = (prop: Props) => {
         public_key: account as string,
         token_address: prop.tokenAddress as string,
         token_id: prop.tokenId as string,
-        version,
+        version: version as string,
       })
 
       const mentions = tagNFTs
 
-      setTimeout(async () => {
+      setTimeout(() => {
         if (mentions.length > 0) {
-          const data_key = formatDataKey(prop.chainId, prop.tokenAddress, prop.tokenId)
-
-          const data = {
-            data_key,
-            meta_contract_id: `${import.meta.env.VITE_WEB3WALL_META_CONTRACT_ID}`,
-            public_key: account,
-            version,
-          }
-
-          const metadata = await getMetadata(data)
-
-          const promises: any[] = []
-
-          for (let i = 0; i < mentions.length; i++) {
-            const mention = mentions[i]
-            const content = { cid: metadata.cid }
-
-            promises.push(
-              createMention(content, {
-                alias: '',
-                chain_id: prop.chainId as string,
-                signature: '',
-                data: JSON.stringify(content),
-                mcdata: JSON.stringify({ loose: 0 }),
-                meta_contract_id: `${import.meta.env.VITE_MENTION_META_CONTRACT_ID}`,
-                method: 'metadata',
-                public_key: account as string,
-                token_address: mention.token_address as string,
-                token_id: mention.token_id as string,
-                version: metadata.cid as string,
-              })
-            )
-          }
-
-          await Promise.all(promises)
+          setShouldFetchMetadata(true)
+        } else {
+          showSuccess(`Publishing your post to network...`)
+          onCloseDialog()
         }
-      }, 5000)
-
-      showSuccess(`Publishing your post to network...`)
-      onCloseDialog()
+      }, 10000)
     } catch (e) {
       showError(`Error submitting your post. Try again.`)
       onCloseDialog()
@@ -141,10 +136,53 @@ const NewPostModal = (prop: Props) => {
     setText('')
     setFile(undefined)
     setTagNFTs([])
+    setVersion('')
+    setShouldFetchMetadata(false)
 
     prop.onClose()
     setIsLoading(false)
   }
+
+  useEffect(() => {
+    const createMention = async (content: any, tx_data: Transaction) => {
+      const signed = await signMessage(JSON.stringify(content))
+      return await publishTx({ ...tx_data, signature: signed?.signature as string })
+    }
+
+    const publishTag = async () => {
+      const promises: any[] = []
+
+      for (let i = 0; i < tagNFTs.length; i++) {
+        const tag = tagNFTs[i]
+        const content = { cid: metadata?.cid }
+
+        promises.push(
+          createMention(content, {
+            alias: '',
+            chain_id: tag.chain_id as string,
+            signature: '',
+            data: JSON.stringify(content),
+            mcdata: JSON.stringify({ loose: 0 }),
+            meta_contract_id: `${import.meta.env.VITE_MENTION_META_CONTRACT_ID}`,
+            method: 'metadata',
+            public_key: account as string,
+            token_address: tag.token_address as string,
+            token_id: tag.token_id as string,
+            version: metadata?.cid as string,
+          })
+        )
+      }
+
+      await Promise.all(promises)
+
+      showSuccess(`Publishing your post to network...`)
+      onCloseDialog()
+    }
+
+    if (metadata && metadata.cid) {
+      publishTag().catch(console.log)
+    }
+  }, [account, metadata, publishTx, showSuccess, signMessage, tagNFTs, onCloseDialog])
 
   const onSelectMedia = (e: React.FormEvent<HTMLInputElement>) => {
     const filePicker = e.target as HTMLInputElement & {
@@ -217,8 +255,10 @@ const NewPostModal = (prop: Props) => {
         appear
         show={prop.isOpen}
         as={Fragment}
+        afterEnter={onEnter}
         afterLeave={() => {
           prop?.afterLeave ? prop.afterLeave() : () => {}
+          setVersion('')
         }}
       >
         <Dialog as="div" className="relative z-10" onClose={closeDialog}>
@@ -283,7 +323,7 @@ const NewPostModal = (prop: Props) => {
                         className="mt-5 w-full border-none text-sm bg-gray-100 radius-sm"
                         placeholder="What's happening?"
                         id="message"
-                        rows={textRows}
+                        rows={8}
                         value={text}
                         onChange={e => {
                           setText(e.target.value)
@@ -331,7 +371,9 @@ const NewPostModal = (prop: Props) => {
                                 <CloseSmallIcon />
                               </button>
                             </div>
-                            <div className="absolute top-0 left-0 p-2 h-5 w-5">{nft.chain_id}</div>
+                            <div className="absolute top-0 left-0 p-2 h-5 w-5">
+                              <ChainToIcon chain={nft.chain_id as String} />
+                            </div>
                           </div>
                         ))}
                     </div>

@@ -118,7 +118,6 @@ const MentionModal = (prop: Props) => {
       const imageURL = (nft.metaObject as any).image
       nft.imageUrl = imageURL
 
-      console.log({ ...nft, chain_id: networkToChainId(searchData.chain) })
       setCollections(prevCollections => [...prevCollections, { ...nft, chain_id: networkToChainId(searchData.chain) }])
     } catch (error) {
       console.log((error as Error).message)
@@ -245,22 +244,6 @@ const MentionModal = (prop: Props) => {
                         />
                       </div>
                     </div>
-                    {/* <div
-                      className="mt-3 overflow-x-scroll flex flex-cols gap-2"
-                      style={{ scrollbarWidth: 'thin', scrollbarColor: '#ccc #f5f5f5' }}
-                    >
-                      <div className="flex gap-1">
-                        {presets.map((preset, index) => (
-                          <button
-                            key={index}
-                            onClick={() => onClickFastNFT(index)}
-                            className="p-0 rounded-lg px-4 py-2 m-1 bg-gray-200 text-gray-700 text-xs whitespace-nowrap"
-                          >
-                            {preset.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div> */}
 
                     <div
                       className="grid gap-2 grid-cols-3 mt-3 overflow-auto max-h-[540px]"

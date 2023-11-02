@@ -63,7 +63,7 @@ export function networkToChainId(chain: string) {
     case 'homestead':
       chainId = '1'
       break
-    case 'matic':
+    case 'polygon':
       chainId = '137'
       break
     case 'bsc':
@@ -95,7 +95,7 @@ export function chainIdToNetwork(chain: string) {
   switch (chain) {
     case 'eth':
     case '1':
-      return 'homestead'
+      return 'eth'
     case '137':
       return 'matic'
     case '56':

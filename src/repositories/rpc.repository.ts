@@ -4,6 +4,8 @@ import { useIpfs } from 'hooks/use-ipfs'
 import { RQ_KEY } from 'repositories'
 import { Nft } from 'lib'
 import { getMoralisNftMetadata } from './moralis.repository'
+import { getNFTMetadata } from 'services/nft'
+import { chainIdToNetwork } from 'utils'
 
 const useGetCompleteTransactions = () => {
   return useQuery({
@@ -34,14 +36,18 @@ export async function parseString(input: string): Promise<DataTypeMetadata | Dat
   try {
     const parsed = JSON.parse(input)
     if (typeof parsed === 'object') return { type: 'metadata', data: parsed }
-  } catch (e) {}
+  } catch (e) {
+    /* empty */
+  }
 
   try {
     const response = await fetch(input)
     const contentType = response.headers.get('content-type')
     if (contentType?.startsWith('image/')) return { type: 'image', data: input }
     if (contentType?.startsWith('audio/')) return { type: 'audio', data: input }
-  } catch (e) {}
+  } catch (e) {
+    /* empty */
+  }
 
   return { type: 'none', data: input }
 }
@@ -69,7 +75,7 @@ const usePublishTransaction = () => {
         await queryClient.invalidateQueries([RQ_KEY.GET_POSTS])
         await queryClient.invalidateQueries([RQ_KEY.GET_COMMENTS])
         if (timeout) clearTimeout(timeout)
-      }, 8000)
+      }, 10000)
     },
   })
 }
@@ -266,23 +272,45 @@ const useGetCommentCount = (cid: string) => {
   })
 }
 
-const useGetMetadata = () => {
-  return useMutation({
-    mutationFn: async ({
-      data_key,
-      meta_contract_id,
-      public_key,
-      alias = '',
-      version = '',
-    }: {
-      data_key: string
-      meta_contract_id: string
-      public_key: string
-      alias?: string
-      version?: string
-    }) => {
-      return await rpc.getMetadata(data_key, meta_contract_id, public_key, alias, version)
+const useGetMetadataContent = (
+  data_key: string,
+  meta_contract_id: string,
+  public_key: string,
+  alias: string,
+  version: string
+) => {
+  return useQuery({
+    queryKey: [RQ_KEY.GET_METADATA, data_key, meta_contract_id, public_key, alias, version],
+    queryFn: async () => {
+      const result = await rpc.getMetadata(data_key, meta_contract_id, public_key, alias, version)
+      if (result.cid) {
+        const res = await rpc.getContentFromIpfs(result.cid)
+        const content = JSON.parse(res.data.result.content as string)
+        return content.content
+      }
+
+      return {}
     },
+    staleTime: Infinity,
+  })
+}
+
+const useGetMetadata = (
+  data_key: string,
+  meta_contract_id: string,
+  public_key: string,
+  alias: string,
+  version: string,
+  enabled: boolean
+) => {
+  return useQuery({
+    queryKey: [RQ_KEY.GET_METADATA, data_key, meta_contract_id, public_key, alias, version],
+    queryFn: async () => {
+      const result = await rpc.getMetadata(data_key, meta_contract_id, public_key, alias, version)
+      return result
+    },
+    staleTime: Infinity,
+    enabled: enabled,
   })
 }
 
@@ -292,7 +320,7 @@ export type Mention = {
 }
 
 const useGetMentions = (cid: string, count: number) => {
-  return useQuery<(Nft & Mention)[]>({
+  return useQuery<any[]>({
     queryKey: [RQ_KEY.GET_MENTIONS, cid],
     queryFn: async () => {
       const result = await rpc.searchMetadatas({
@@ -319,24 +347,30 @@ const useGetMentions = (cid: string, count: number) => {
       })
 
       const promises = result?.map(async (curr: any) => {
-        const res = await rpc.getContentFromIpfs(curr.cid as string)
-        const result = await rpc.getMetadata(curr.data_key, '0x02', '0x01', 'token', curr.data_key)
-        console.log(curr.data_key, result)
-        const txs = await rpc.getTransactions({
-          query: [
-            {
-              column: 'data_key',
-              op: '=',
-              query: curr.data_key,
-            },
-          ],
-        })
-        const content = JSON.parse(res.data.result.content as string)
+        const resMentionContent = await rpc.getContentFromIpfs(curr.cid as string)
+        const mention = JSON.parse(resMentionContent.data.result.content as string)
 
-        const token_address = txs.length > 0 ? txs[0].token_address : ''
-        const nft = await getMoralisNftMetadata(content.chain_id, token_address, curr.token_id)
+        const resToken = await rpc.getMetadata(
+          curr.data_key as string,
+          import.meta.env.VITE_MENTION_META_CONTRACT_ID as string,
+          import.meta.env.VITE_METADATA_META_CONTRACT_ID as string,
+          'token',
+          ''
+        )
 
-        return { ...content.content, ...nft, lineage: { ...curr, token_address } }
+        if (!resToken.cid) {
+          return {}
+        }
+        const resTokenContent = await rpc.getContentFromIpfs(resToken.cid)
+        const token = JSON.parse(resTokenContent.data.result.content as string)
+
+        const resNft = await getNFTMetadata(
+          token.content.address as string,
+          chainIdToNetwork(token.content.chain as string),
+          token.content.id as string
+        )
+
+        return { mention: mention.content, nft: JSON.parse(resNft.data.metadata as string), token: token.content }
       })
 
       const results = await Promise.all(promises)
@@ -381,6 +415,7 @@ export {
   useGetCommentCount,
   useGetPost,
   useGetMetadata,
+  useGetMetadataContent,
   useGetMentions,
   useGetMentionCount,
 }

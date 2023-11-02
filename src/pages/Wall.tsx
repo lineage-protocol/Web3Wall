@@ -9,13 +9,23 @@ import { useAlertMessage } from 'hooks/use-alert-message'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useGetPosts } from 'repositories/rpc.repository'
+import { useGetMetadataContent, useGetPosts } from 'repositories/rpc.repository'
 import { useBoundStore } from 'store'
 import { WallAddIcon, WallShareIcon } from 'components/Icons/icons'
 
 const PageWall = () => {
-  const { token_address, token_id, chain_id, key } = useParams()
+  const { key } = useParams()
+  const { data: token } = useGetMetadataContent(
+    key as string,
+    import.meta.env.VITE_METADATA_META_CONTRACT_ID as string,
+    import.meta.env.VITE_METADATA_META_CONTRACT_ID as string,
+    'token',
+    key as string
+  )
   const [socials, setSocials] = useState<any>([])
+  const [address, setAddress] = useState<String>('')
+  const [id, setTokenId] = useState<String>('')
+  const [chain, setChainId] = useState<String>('')
 
   const navigate = useNavigate()
 
@@ -32,7 +42,7 @@ const PageWall = () => {
 
   const openNewPostModal = () => {
     if (account) {
-      setModalState({newPost: {isOpen: true}})
+      setModalState({ newPost: { isOpen: true } })
     } else {
       showError(`Please login to post content`)
     }
@@ -47,7 +57,7 @@ const PageWall = () => {
   }
 
   const goToComments = (cid: string) => {
-    navigate(`/comment/${token_address}/${token_id}/${chain_id}/${cid}`)
+    navigate(`/comment/${address}/${id}/${chain}/${cid}`)
   }
 
   const closePOAPModal = () => {
@@ -87,7 +97,13 @@ const PageWall = () => {
     }
 
     getAccount().catch(e => console.log(e))
-  })
+
+    if (token) {
+      setAddress(token.address as String)
+      setChainId(token.chain as String)
+      setTokenId(token.id as String)
+    }
+  }, [getAccounts, token])
 
   return (
     <div className="h-full">
@@ -134,7 +150,7 @@ const PageWall = () => {
         <RWebShare
           data={{
             title: 'W3wall',
-            url: `${window.location.origin}/wall/${token_address}/${token_id}/${chain_id}/${key}`,
+            url: `${window.location.origin}/wall/${key}`,
             text: 'Check this out',
           }}
           onClick={() => {}}
@@ -153,19 +169,19 @@ const PageWall = () => {
 
       <NewPostModal
         id={key as String}
-        tokenId={token_id as String}
-        tokenAddress={token_address as String}
-        chainId={chain_id as String}
+        tokenId={id}
+        tokenAddress={address}
+        chainId={chain}
         isOpen={modal.newPost.isOpen}
         onClose={closeNewPostModal}
       />
 
-      <PoapModal tokenId={token_id as string} isOpen={modal.poap.isOpen} onClose={closePOAPModal} />
+      <PoapModal tokenId={id as string} isOpen={modal.poap.isOpen} onClose={closePOAPModal} />
 
       <CommentModal
-        tokenAddress={token_address as String}
-        chainId={chain_id as String}
-        tokenId={token_id as string}
+        tokenAddress={address}
+        chainId={chain}
+        tokenId={id}
         isOpen={modal.comment.isOpen}
         onClose={closeCommentModal}
       />

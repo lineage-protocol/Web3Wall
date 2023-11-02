@@ -1,3 +1,4 @@
+import ChainToIcon from 'components/ChainToIcon'
 import { AtSymbolIcon, AtSymbolSolidIcon, CommentIcon, CommentSolidIcon } from 'components/Icons/icons'
 import ImageContainer from 'components/ImageContainer'
 import useInViewport from 'hooks/useInViewport'
@@ -49,7 +50,7 @@ const SocialCard = (prop: SocialCardProp) => {
 
   const commentQuery = useGetCommentCount(prop.cid)
   const { data: mentionCount } = useGetMentionCount(prop.cid)
-  const { data: mentions } = useGetMentions(prop.cid, mentionCount)
+  const { data: mentions } = useGetMentions(prop.cid, mentionCount as number)
 
   useEffect(() => {
     if (prop?.showNoOfComments && prop.noOfComments !== undefined) {
@@ -68,10 +69,9 @@ const SocialCard = (prop: SocialCardProp) => {
   }, [commentQuery, inViewport, prop.noOfComments])
 
   const goToScan = (mention: any) => {
-    console.log(mention)
-    switch (mention.chain_id) {
+    switch (mention.token.chain) {
       case '1':
-        window.open(`https://etherscan.com/nft/${mention.token_address}/${mention.lineage.token_id}`, '_blank')
+        window.open(`https://etherscan.com/nft/${mention.token.address}/${mention.token.id}`, '_blank')
         break
     }
   }
@@ -101,14 +101,19 @@ const SocialCard = (prop: SocialCardProp) => {
           {mentions && mentions?.length > 0 && (
             <div className="flex flex-wrap gap-2 ml-3 mt-2">
               {mentions.map((mention, index) => {
-                if (!mention.mentionable) return
+                if (!mention.mention.mentionable) return
                 return (
-                  <ImageContainer
-                    src={(mention.metaObject as any).image as string}
-                    key={index}
-                    onClick={() => goToScan(mention)}
-                    classNames="w-32 h-32 grid place-content-center cursor-pointer"
-                  />
+                  <div key={index} className="relative">
+                    <ImageContainer
+                      src={mention.nft.image as string}
+                      key={index}
+                      onClick={() => goToScan(mention)}
+                      classNames="w-32 h-32 grid place-content-center cursor-pointer"
+                    />
+                    <div className="absolute top-0 left-0 p-2 h-5 w-5">
+                      <ChainToIcon chain={mention.token.chain} />
+                    </div>
+                  </div>
                 )
               })}
             </div>
