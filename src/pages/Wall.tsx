@@ -9,13 +9,26 @@ import { useAlertMessage } from 'hooks/use-alert-message'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useGetPosts } from 'repositories/rpc.repository'
+import { useGetMetadataContent, useGetPosts, useGetWallData } from 'repositories/rpc.repository'
 import { useBoundStore } from 'store'
-import { WallAddIcon, WallShareIcon } from 'components/Icons/icons'
+import { ChevronIcon, WallAddIcon, WallShareIcon } from 'components/Icons/icons'
 
 const PageWall = () => {
-  const { token_address, token_id, chain_id, key } = useParams()
+  const { key } = useParams()
+  const { data: token } = useGetMetadataContent(
+    key as string,
+    import.meta.env.VITE_METADATA_META_CONTRACT_ID as string,
+    import.meta.env.VITE_METADATA_META_CONTRACT_ID as string,
+    'token',
+    key as string
+  )
+
+  const { data: wallData } = useGetWallData(key as string)
+
   const [socials, setSocials] = useState<any>([])
+  const [address, setAddress] = useState<String>('')
+  const [id, setTokenId] = useState<String>('')
+  const [chain, setChainId] = useState<String>('')
 
   const navigate = useNavigate()
 
@@ -23,23 +36,22 @@ const PageWall = () => {
 
   const { modal, setModalState } = useBoundStore()
 
-  const [isModalOpen, setIsModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [account, setAccount] = useState('')
 
   const { showError } = useAlertMessage()
   const { getAccounts } = useWeb3Auth()
 
-  const openModal = () => {
+  const openNewPostModal = () => {
     if (account) {
-      setIsModalOpen(true)
+      setModalState({ newPost: { isOpen: true } })
     } else {
       showError(`Please login to post content`)
     }
   }
 
-  const closeModal = () => {
-    setIsModalOpen(false)
+  const closeNewPostModal = () => {
+    setModalState({ newPost: { isOpen: false } })
   }
 
   const openPOAPModal = () => {
@@ -47,7 +59,7 @@ const PageWall = () => {
   }
 
   const goToComments = (cid: string) => {
-    navigate(`/comment/${token_address}/${token_id}/${chain_id}/${cid}`)
+    navigate(`/comment/${address}/${id}/${chain}/${cid}`)
   }
 
   const closePOAPModal = () => {
@@ -87,7 +99,13 @@ const PageWall = () => {
     }
 
     getAccount().catch(e => console.log(e))
-  })
+
+    if (token) {
+      setAddress(token.address as String)
+      setChainId(token.chain as String)
+      setTokenId(token.id as String)
+    }
+  }, [getAccounts, token])
 
   return (
     <div className="h-full">
@@ -99,6 +117,33 @@ const PageWall = () => {
         </div>
       )}
 
+      {!isLoading && wallData && wallData.name && (
+        <div>
+          <details className="overflow-hidden [&_summary::-webkit-details-marker]:hidden pt-3">
+            {/* Relative position to the details tag so that the absolute div is positioned according to this container */}
+            <summary className="flex cursor-pointer items-center justify-between gap-2 p-3 text-black bg-yellow-200 transition">
+              <span className="text-sm font-semibold">{wallData?.name}</span>
+              <span className="transition group-open:-rotate-180">{wallData.body && <ChevronIcon />}</span>
+            </summary>
+
+            {/* Absolutely positioned div which will not affect other elements when it opens/closes */}
+            {wallData.body && (
+              <div className="transition-opacity duration-300" style={{ top: '100%' }}>
+                <div className="flex border-t border-yellow-300 bg-yellow-200 text-black">
+                  {wallData.image && (
+                    <div className="flex-initial w-1/4">
+                      <img src={wallData.image} className="p-2 rounded-md" />
+                    </div>
+                  )}
+                  <div className={`flex-1 p-3 text-xs content break-words ${wallData.image ? 'w-3/4' : 'w-full'}`}>
+                    {wallData.body}
+                  </div>
+                </div>
+              </div>
+            )}
+          </details>
+        </div>
+      )}
       {!isLoading && socials.length > 0 && (
         <div className="grid gap-0 overflow-auto pb-[120px] h-full pt-3">
           {socials &&
@@ -121,7 +166,6 @@ const PageWall = () => {
       )}
 
       <aside className="fixed bottom-5 right-5 flex flex-col space-y-2 items-end">
-        {/* Mint Ownership */}
         {
           <button
             onClick={() => openPOAPModal()}
@@ -134,7 +178,7 @@ const PageWall = () => {
         <RWebShare
           data={{
             title: 'W3wall',
-            url: `${window.location.origin}/wall/${token_address}/${token_id}/${chain_id}/${key}`,
+            url: `${window.location.origin}/wall/${key}`,
             text: 'Check this out',
           }}
           onClick={() => {}}
@@ -144,7 +188,7 @@ const PageWall = () => {
           </div>
         </RWebShare>
         <button
-          onClick={() => openModal()}
+          onClick={() => openNewPostModal()}
           className="bg-purple-500 text-white hover:bg-purple-400  h-14 w-14 shadow-mg rounded-full flex items-center justify-center text-2xl"
         >
           <WallAddIcon />
@@ -153,19 +197,19 @@ const PageWall = () => {
 
       <NewPostModal
         id={key as String}
-        tokenId={token_id as String}
-        tokenAddress={token_address as String}
-        chainId={chain_id as String}
-        isOpen={isModalOpen}
-        onClose={closeModal}
+        tokenId={id}
+        tokenAddress={address}
+        chainId={chain}
+        isOpen={modal.newPost.isOpen}
+        onClose={closeNewPostModal}
       />
 
-      <PoapModal tokenId={token_id as string} isOpen={modal.poap.isOpen} onClose={closePOAPModal} />
+      <PoapModal tokenId={id as string} isOpen={modal.poap.isOpen} onClose={closePOAPModal} />
 
       <CommentModal
-        tokenAddress={token_address as String}
-        chainId={chain_id as String}
-        tokenId={token_id as string}
+        tokenAddress={address}
+        chainId={chain}
+        tokenId={id}
         isOpen={modal.comment.isOpen}
         onClose={closeCommentModal}
       />

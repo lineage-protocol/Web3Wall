@@ -16,9 +16,9 @@ const GenericButton = ({ name, onClick, icon, className, disabled }: ButtonProp)
       onClick={e => onClick(e)}
     >
       <span className="absolute inset-0 translate-x-0.5 translate-y-0.5 bg-black transition-transform group-hover:translate-y-0 group-hover:translate-x-0"></span>
-      <span className="flex items-center relative border border-current bg-white px-8 py-3">
+      <span className="flex items-center justify-center relative border border-current bg-white px-8 py-3">
         {icon}
-        {name}
+        <span className="ml-1">{name}</span>
       </span>
     </button>
   )

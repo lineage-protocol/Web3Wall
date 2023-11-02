@@ -1,13 +1,20 @@
 import { Dialog, Transition } from '@headlessui/react'
 import GenericButton from 'components/Buttons/GenericButton'
-import { CameraIcon, CloseIcon, LoadingSpinner } from 'components/Icons/icons'
+import { CameraIcon, CloseIcon, CloseSmallIcon, LoadingSpinner, MentionIcon } from 'components/Icons/icons'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { usePublishTransaction, useStoreBlob } from 'repositories/rpc.repository'
+import { useGetMetadata, usePublishTransaction, useStoreBlob } from 'repositories/rpc.repository'
 import imageCompression from 'browser-image-compression'
 import { v4 } from 'uuid'
 import { useAlertMessage } from 'hooks/use-alert-message'
+import { useBoundStore } from 'store'
+import MentionModal from './MentionModal'
 import DOMPurify from 'dompurify'
+import { Nft } from 'lib'
+import { formatDataKey } from 'utils'
+import { Transaction } from 'services/rpc'
+import ImageContainer from 'components/ImageContainer'
+import ChainToIcon from 'components/ChainToIcon'
 
 const LoadingOverlay = () => {
   return (
@@ -25,23 +32,61 @@ interface Props {
   isOpen: boolean
   onClose: () => void
   afterLeave?: () => void
+  // onClickSelect: (selectedImages: any) => void
 }
 
 const NewPostModal = (prop: Props) => {
   const [isLoading, setIsLoading] = useState(false)
   const [text, setText] = useState('')
   const [file, setFile] = useState<File | Blob>()
-  const [textRows, setTextRows] = useState(8)
   const inputFileRef = useRef<HTMLInputElement>(null)
+  const { modal, setModalState } = useBoundStore()
+  const [tagNFTs, setTagNFTs] = useState<Nft[]>([])
+  const [version, setVersion] = useState<String>('')
+  const [dataKey, setDataKey] = useState<String>('')
+  const [shouldFetchMetadata, setShouldFetchMetadata] = useState(false)
+  const [account, setAccount] = useState<String>('')
 
   const { mutateAsync: storeBlob } = useStoreBlob()
   const { mutateAsync: publishTx } = usePublishTransaction()
 
   const { signMessage, getAccounts } = useWeb3Auth()
   const { showError, showSuccess } = useAlertMessage()
+  const { data: metadata } = useGetMetadata(
+    dataKey as string,
+    `${import.meta.env.VITE_WEB3WALL_META_CONTRACT_ID}`,
+    account as string,
+    '',
+    version as string,
+    shouldFetchMetadata
+  )
 
+  useEffect(() => {
+    if (!version) {
+      setVersion(v4())
+    }
+
+    const getAccount = async () => {
+      try {
+        const acc = await getAccounts()
+        if (acc) {
+          setAccount(acc as string)
+        }
+      } catch (e) {
+        setAccount('')
+      }
+    }
+
+    getAccount().catch(e => console.log(e))
+  }, [dataKey, getAccounts, prop.chainId, prop.tokenAddress, prop.tokenId, version])
+
+  const onEnter = () => {
+    if (!dataKey) {
+      const data_key = formatDataKey(prop.chainId.toLowerCase(), prop.tokenAddress.toLowerCase(), prop.tokenId)
+      setDataKey(data_key)
+    }
+  }
   const onPost = async (): Promise<void> => {
-    const account = await getAccounts()
     if (!account) {
       return
     }
@@ -68,11 +113,19 @@ const NewPostModal = (prop: Props) => {
         public_key: account as string,
         token_address: prop.tokenAddress as string,
         token_id: prop.tokenId as string,
-        version: v4(),
+        version: version as string,
       })
 
-      showSuccess(`Publishing your post to network...`)
-      onCloseDialog()
+      const mentions = tagNFTs
+
+      setTimeout(() => {
+        if (mentions.length > 0) {
+          setShouldFetchMetadata(true)
+        } else {
+          showSuccess(`Publishing your post to network...`)
+          onCloseDialog()
+        }
+      }, 10000)
     } catch (e) {
       showError(`Error submitting your post. Try again.`)
       onCloseDialog()
@@ -82,10 +135,54 @@ const NewPostModal = (prop: Props) => {
   const onCloseDialog = () => {
     setText('')
     setFile(undefined)
+    setTagNFTs([])
+    setVersion('')
+    setShouldFetchMetadata(false)
 
     prop.onClose()
     setIsLoading(false)
   }
+
+  useEffect(() => {
+    const createMention = async (content: any, tx_data: Transaction) => {
+      const signed = await signMessage(JSON.stringify(content))
+      return await publishTx({ ...tx_data, signature: signed?.signature as string })
+    }
+
+    const publishTag = async () => {
+      const promises: any[] = []
+
+      for (let i = 0; i < tagNFTs.length; i++) {
+        const tag = tagNFTs[i]
+        const content = { cid: metadata?.cid }
+
+        promises.push(
+          createMention(content, {
+            alias: '',
+            chain_id: tag.chain_id as string,
+            signature: '',
+            data: JSON.stringify(content),
+            mcdata: JSON.stringify({ loose: 0 }),
+            meta_contract_id: `${import.meta.env.VITE_MENTION_META_CONTRACT_ID}`,
+            method: 'metadata',
+            public_key: account as string,
+            token_address: tag.token_address as string,
+            token_id: tag.token_id as string,
+            version: metadata?.cid as string,
+          })
+        )
+      }
+
+      await Promise.all(promises)
+
+      showSuccess(`Publishing your post to network...`)
+      onCloseDialog()
+    }
+
+    if (metadata && metadata.cid) {
+      publishTag().catch(console.log)
+    }
+  }, [account, metadata, publishTx, showSuccess, signMessage, tagNFTs, onCloseDialog])
 
   const onSelectMedia = (e: React.FormEvent<HTMLInputElement>) => {
     const filePicker = e.target as HTMLInputElement & {
@@ -127,14 +224,41 @@ const NewPostModal = (prop: Props) => {
     prop.onClose()
   }
 
+  const handleSelectedImages = (selectedImages: []) => {
+    const areNFTsSimilar = (nft1: any, nft2: any) => {
+      return (
+        nft1.chain_id === nft2.chain_id && nft1.token_address === nft2.token_address && nft1.token_id === nft2.token_id
+      )
+    }
+    const uniqueNFT = selectedImages.filter(image => !tagNFTs.some(existingNFT => areNFTsSimilar(existingNFT, image)))
+    setTagNFTs([...tagNFTs, ...uniqueNFT])
+    setModalState({ newPost: { isOpen: true } })
+    closeMentionModal()
+  }
+
+  const removeTaggedNFT = (nftToRemove: Nft) => {
+    const updatedNFTs = tagNFTs.filter(nft => nft !== nftToRemove)
+    setTagNFTs(updatedNFTs)
+  }
+
+  const openMentionModal = () => {
+    setModalState({ mention: { isOpen: true } })
+  }
+
+  const closeMentionModal = () => {
+    setModalState({ mention: { isOpen: false } })
+  }
+
   return (
     <>
       <Transition
         appear
         show={prop.isOpen}
         as={Fragment}
+        afterEnter={onEnter}
         afterLeave={() => {
           prop?.afterLeave ? prop.afterLeave() : () => {}
+          setVersion('')
         }}
       >
         <Dialog as="div" className="relative z-10" onClose={closeDialog}>
@@ -199,7 +323,7 @@ const NewPostModal = (prop: Props) => {
                         className="mt-5 w-full border-none text-sm bg-gray-100 radius-sm"
                         placeholder="What's happening?"
                         id="message"
-                        rows={textRows}
+                        rows={8}
                         value={text}
                         onChange={e => {
                           setText(e.target.value)
@@ -230,14 +354,46 @@ const NewPostModal = (prop: Props) => {
                       </div>
                     )}
 
-                    <div className="flex gap-5 p-3">
+                    <div className="flex flex-wrap gap-3 justify-left p-2">
+                      {tagNFTs &&
+                        tagNFTs.map((nft, index) => (
+                          <div key={index} className="relative">
+                            <ImageContainer
+                              src={nft.imageUrl as string}
+                              key={index}
+                              classNames="w-32 h-32 grid place-content-center"
+                            />
+                            <div className="absolute top-0 right-6 p-2 h-5 w-5">
+                              <button
+                                className="hover:bg-gray-800/20 bg-gray-800 text-white rounded-full p-1"
+                                onClick={() => removeTaggedNFT(nft)}
+                              >
+                                <CloseSmallIcon />
+                              </button>
+                            </div>
+                            <div className="absolute top-0 left-0 p-2 h-5 w-5">
+                              <ChainToIcon chain={nft.chain_id as String} />
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+
+                    <div className="flex gap-5 p-3 justify-center">
                       <GenericButton
                         onClick={() => {
                           inputFileRef?.current?.click()
                         }}
                         name="Media"
                         icon={<CameraIcon />}
-                        className=""
+                        className="w-1/2"
+                      />
+                      <GenericButton
+                        onClick={() => {
+                          openMentionModal()
+                        }}
+                        name="NFT"
+                        icon={<MentionIcon />}
+                        className="w-1/2"
                       />
                     </div>
                   </div>
@@ -247,6 +403,7 @@ const NewPostModal = (prop: Props) => {
           </div>
         </Dialog>
       </Transition>
+      <MentionModal isOpen={modal.mention.isOpen} onClose={closeMentionModal} onClickSelect={handleSelectedImages} />
     </>
   )
 }
