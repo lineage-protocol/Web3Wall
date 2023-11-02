@@ -17,7 +17,7 @@ const SortCardDisplay = (prop: CommentCardProp) => {
 const CommentCard = (prop: CommentCardProp) => {
   return (
     <>
-      <article>
+      <article className="max-w-md break-words">
         <div className="bg-white border-b-[1px] mb-1 border-gray-200 mx-1">
           <div className="flex px-3 pt-2 mb-1 text-xs">
             <div className="font-bold">

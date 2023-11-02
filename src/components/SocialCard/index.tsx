@@ -114,7 +114,7 @@ const SocialCard = (prop: SocialCardProp) => {
 
   return (
     <>
-      <article className="transition max-w-md" ref={ref as React.RefObject<HTMLDivElement>}>
+      <article className="transition max-w-md break-words" ref={ref as React.RefObject<HTMLDivElement>}>
         <div className="bg-white border-b-[1px] mb-1 border-gray-200 mx-1">
           <div className="flex px-3 pt-3 mb-1 text-xs">
             <div className="font-bold">
