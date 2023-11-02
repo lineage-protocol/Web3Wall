@@ -21,7 +21,6 @@ interface SocialCardProp {
   goToComments?: (cid: string) => void
 }
 
-
 const SortCardDisplay = (prop: SocialCardProp) => {
   const textWithClickableLink = (text: string) => {
     if (!text) {
@@ -37,7 +36,7 @@ const SortCardDisplay = (prop: SocialCardProp) => {
   }
   const linkValidation = textWithClickableLink(prop.text as string)
 
-  const handleLinkClick =(e: any) => {
+  const handleLinkClick = (e: any) => {
     if (e.target instanceof HTMLAnchorElement) {
       e.stopPropagation()
     }
@@ -73,7 +72,6 @@ const SortCardDisplay = (prop: SocialCardProp) => {
 const SocialCard = (prop: SocialCardProp) => {
   const [commentCount, setCommentCount] = useState(0)
   const [ref, inViewport] = useInViewport()
-  
 
   const commentQuery = useGetCommentCount(prop.cid)
   const { data: mentionCount } = useGetMentionCount(prop.cid)
@@ -116,7 +114,7 @@ const SocialCard = (prop: SocialCardProp) => {
 
   return (
     <>
-      <article className="transition" ref={ref as React.RefObject<HTMLDivElement>}>
+      <article className="transition max-w-md" ref={ref as React.RefObject<HTMLDivElement>}>
         <div className="bg-white border-b-[1px] mb-1 border-gray-200 mx-1">
           <div className="flex px-3 pt-3 mb-1 text-xs">
             <div className="font-bold">

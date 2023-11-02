@@ -2,8 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import rpc, { JSONRPCFilter, NftMetadata, Transaction } from '../services/rpc'
 import { useIpfs } from 'hooks/use-ipfs'
 import { RQ_KEY } from 'repositories'
-import { Nft } from 'lib'
-import { getMoralisNftMetadata } from './moralis.repository'
 import { getNFTMetadata } from 'services/nft'
 import { chainIdToNetwork } from 'utils'
 
