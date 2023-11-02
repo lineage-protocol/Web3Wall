@@ -1,13 +1,22 @@
 import { Fragment, ChangeEvent, useState, useEffect, FC } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import presets from 'data/preset_nft.json'
-import { ArbitrumIcon, BNBIcon, CeloIcon, EthereumIcon, PolygonIcon, SolanaIcon } from 'components/Icons/icons'
+import {
+  ArbitrumIcon,
+  BNBIcon,
+  CeloIcon,
+  EthereumIcon,
+  PolygonIcon,
+  SearchIcon,
+  SolanaIcon,
+} from 'components/Icons/icons'
 import { getNFTMetadata } from 'services/nft'
 import ExpandableInput from 'components/ExpandableInput'
 import { Nft } from 'lib'
 import { useBoundStore } from 'store'
 import { networkToChainId } from 'utils'
 import ImageContainer from 'components/ImageContainer'
+import GenericButton from 'components/Buttons/GenericButton'
 
 interface Props {
   isOpen: boolean
@@ -199,31 +208,24 @@ const MentionModal = (prop: Props) => {
                     </div>
                   </header>
 
-                  <div className="w-screen flex flex-col max-w-md p-2">
-                    <div>
-                      <div className="relative mt-2 gap-2 flex items-center">
-                        <div className="flex items-center">
-                          <span className="text-gray-500 text-sm mr-2">NFT with Token ID</span>
-                          <ExpandableInput
-                            name="token_id"
-                            onBlur={fetchData}
-                            onChange={onHandleInputChange}
-                            value={searchData.token_id}
-                            placeholder="id"
-                            initialWidth={50}
-                            extraPadding={10}
-                          />
-                        </div>
-                        <span className="text-gray-500 text-sm">at</span>
+                  <div className="w-full flex flex-col max-w-md p-2">
+                    <div className="w-full overflow-hidden border border-black bg-white shadow-lg p-4 text-left flex-col gap-2">
+                      <div className="flex gap-2">
+                        <input
+                          name="token_id"
+                          onChange={onHandleInputChange}
+                          value={searchData.token_id}
+                          placeholder="Token Id #"
+                          className="w-1/2"
+                        />
                         <select
                           id="chain"
                           name="chain"
                           value={searchData.chain}
                           onChange={handleSelectValueChange}
-                          onBlur={fetchData}
-                          className="h-full border-b-2 rounded-none text-md border-0 bg-transparent py-0  text-black font-medium border-b-black outline-indigo-600"
+                          className="h-full w-1/2"
                         >
-                          <option value="">None</option>
+                          <option value="">Select chain</option>
                           {chainsLogo.map(chainLogo => (
                             <option key={chainLogo.value} value={chainLogo.value}>
                               {chainLogo.name}
@@ -231,17 +233,15 @@ const MentionModal = (prop: Props) => {
                           ))}
                         </select>
                       </div>
-                      <div className="relative mt-2 gap-2 flex items-center">
-                        <span className="text-gray-500 text-sm">and</span>
-                        <ExpandableInput
-                          name="address"
-                          value={searchData.address}
-                          onBlur={fetchData}
-                          onChange={onHandleInputChange}
-                          placeholder="Contract address"
-                          initialWidth={150}
-                          extraPadding={-50}
-                        />
+                      <input
+                        name="address"
+                        value={searchData.address}
+                        onChange={onHandleInputChange}
+                        placeholder="Contract address"
+                        className="w-full mt-2 text-sm"
+                      />
+                      <div className="mt-2 text-right">
+                        <GenericButton onClick={fetchData} name="Search" icon={<SearchIcon />} className="" />
                       </div>
                     </div>
 
