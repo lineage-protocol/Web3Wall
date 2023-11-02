@@ -59,10 +59,11 @@ export const catchAsync = async <T, A>(asyncFunction: (args: A) => Promise<T>, a
 export function networkToChainId(chain: string) {
   let chainId = ''
   switch (chain.toLowerCase()) {
+    case 'eth':
     case 'homestead':
       chainId = '1'
       break
-    case 'matic':
+    case 'polygon':
       chainId = '137'
       break
     case 'bsc':
@@ -94,7 +95,7 @@ export function chainIdToNetwork(chain: string) {
   switch (chain) {
     case 'eth':
     case '1':
-      return 'homestead'
+      return 'eth'
     case '137':
       return 'matic'
     case '56':
@@ -115,6 +116,7 @@ export function chainIdToNetwork(chain: string) {
       return ''
   }
 }
+
 export function formatDataKey(chain_id: String, address: String, token_id: String) {
   const input = `${chain_id}${address?.toLowerCase()}${token_id}`
   const sha256Hash = SHA256(input).toString()

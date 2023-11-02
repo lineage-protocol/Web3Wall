@@ -78,6 +78,26 @@ const getMetadataUseKeyByBlock = (nftKey: String, meta_contract_id: String, vers
   })
 }
 
+const getMetadata = async (
+  nftKey: String,
+  metaContractId: String,
+  publicKey: String,
+  alias: String,
+  version: String
+) => {
+  const response = await rpc({
+    method: 'POST',
+    data: JSON.stringify({
+      jsonrpc: '2.0',
+      method: 'get_metadata',
+      params: [nftKey, metaContractId, publicKey, alias, version],
+      id: '1',
+    }),
+  })
+
+  return response.data?.result?.metadata as Metadata
+}
+
 const searchMetadatas = async ({ query = [], ordering = [], from = 0, to = 0 }: Partial<JSONRPCFilter<Metadata>>) => {
   const response = await rpc({
     method: 'POST',
@@ -85,15 +105,7 @@ const searchMetadatas = async ({ query = [], ordering = [], from = 0, to = 0 }: 
       jsonrpc: '2.0',
       method: 'search_metadatas',
       params: {
-        query: [
-          {
-            column: 'loose',
-            op: '=',
-            query: '0',
-          },
-
-          ...query,
-        ],
+        query: [...query],
         ordering,
         from,
         to,
@@ -237,4 +249,5 @@ export default {
   getTransactions,
   searchMetadatas,
   searchMetadataCount,
+  getMetadata,
 }

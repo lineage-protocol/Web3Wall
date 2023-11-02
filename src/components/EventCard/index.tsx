@@ -56,7 +56,7 @@ const EventCard = (prop: VersionCardProp) => {
   }, [prop.chainId, prop.tokenAddress, prop.tokenId])
 
   const goToWall = (id: String) => {
-    navigate(`/wall/${prop.tokenAddress}/${prop.tokenId}/${prop.chainId}/${id}`)
+    navigate(`/wall/${id}`)
   }
 
   return (
@@ -88,7 +88,7 @@ const EventCard = (prop: VersionCardProp) => {
               <RWebShare
                 data={{
                   title: 'W3wall',
-                  url: `${window.location.origin}/wall/${prop.tokenAddress}/${prop.tokenId}/${prop.chainId}/${nftKey}/`,
+                  url: `${window.location.origin}/wall/${nftKey}/`,
                   text: 'Check this out',
                 }}
                 onClick={() => {}}

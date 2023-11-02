@@ -36,7 +36,7 @@ const App = () => {
               <Routes>
                 <Route element={<MainLayout />}>
                   <Route path="/" element={<PageDashboard />} />
-                  <Route path="/wall/:token_address/:token_id/:chain_id/:key/" element={<PageWall />} />
+                  <Route path="/wall/:key/" element={<PageWall />} />
                 </Route>
                 <Route element={<PublicLayout children={undefined} />}>
                   <Route path="/login" element={<PageLogin />} />
