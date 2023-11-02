@@ -21,24 +21,50 @@ interface SocialCardProp {
   goToComments?: (cid: string) => void
 }
 
+
 const SortCardDisplay = (prop: SocialCardProp) => {
+  const textWithClickableLink = (text: string) => {
+    if (!text) {
+      return ''
+    }
+
+    const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#/%=~_|$?!:,.]*[A-Z0-9+&@#/%=~_|$])/gi
+    const textWithLinks = text.replace(
+      urlRegex,
+      '<a href="$1" target="_blank" rel="noopener noreferrer" class="underline text-indigo-500 text-sm">$1</a>'
+    )
+    return textWithLinks
+  }
+  const linkValidation = textWithClickableLink(prop.text as string)
+
+  const handleLinkClick =(e: any) => {
+    if (e.target instanceof HTMLAnchorElement) {
+      e.stopPropagation()
+    }
+  }
   if (prop.text && prop.image) {
     return (
       <>
-        <div className="px-3 content">{prop.text}</div>
+        <div onClick={handleLinkClick}>
+          <p dangerouslySetInnerHTML={{ __html: linkValidation }} className="px-3 pb-2 text-sm content" />
+        </div>
         <div className="mx-auto mt-2">
-          <img src={prop.image} className="w-full object-contain" alt="" />
+          <img src={prop.image} className="w-full h-auto object-contain" alt="" />
         </div>
       </>
     )
   } else if (prop.image) {
     return (
       <div className="w-full flex justify-around">
-        <img src={prop.image} className="object-contain" alt="" />
+        <img src={prop.image} className="w-full h-auto object-contain" alt="" />
       </div>
     )
   } else if (prop.text) {
-    return <div className="px-3 content">{prop.text}</div>
+    return (
+      <div onClick={handleLinkClick}>
+        <p dangerouslySetInnerHTML={{ __html: linkValidation }} className="px-3 pb-2 text-sm content" />
+      </div>
+    )
   } else {
     return <></>
   }
@@ -47,6 +73,7 @@ const SortCardDisplay = (prop: SocialCardProp) => {
 const SocialCard = (prop: SocialCardProp) => {
   const [commentCount, setCommentCount] = useState(0)
   const [ref, inViewport] = useInViewport()
+  
 
   const commentQuery = useGetCommentCount(prop.cid)
   const { data: mentionCount } = useGetMentionCount(prop.cid)
