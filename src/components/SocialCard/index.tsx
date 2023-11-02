@@ -73,6 +73,17 @@ const SocialCard = (prop: SocialCardProp) => {
       case '1':
         window.open(`https://etherscan.com/nft/${mention.token.address}/${mention.token.id}`, '_blank')
         break
+      case '137':
+        window.open(`https://polygonscan.com/nft/${mention.token.address}/${mention.token.id}`, '_blank')
+        break
+      case '56':
+        window.open(`https://bscscan.com/nft/${mention.token.address}/${mention.token.id}`, '_blank')
+        break
+      case '42161':
+        window.open(`https://arbscan.io/nft/${mention.token.address}/${mention.token.id}`, '_blank')
+        break
+      default:
+        break
     }
   }
 
@@ -101,7 +112,7 @@ const SocialCard = (prop: SocialCardProp) => {
           {mentions && mentions?.length > 0 && (
             <div className="flex flex-wrap gap-2 ml-3 mt-2">
               {mentions.map((mention, index) => {
-                if (!mention.mention.mentionable) return
+                if (mention.mention && !mention.mention?.mentionable) return
                 return (
                   <div key={index} className="relative">
                     <ImageContainer

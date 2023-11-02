@@ -9,9 +9,9 @@ import { useAlertMessage } from 'hooks/use-alert-message'
 import { useWeb3Auth } from 'hooks/use-web3auth'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useGetMetadataContent, useGetPosts } from 'repositories/rpc.repository'
+import { useGetMetadataContent, useGetPosts, useGetWallData } from 'repositories/rpc.repository'
 import { useBoundStore } from 'store'
-import { WallAddIcon, WallShareIcon } from 'components/Icons/icons'
+import { ChevronIcon, WallAddIcon, WallShareIcon } from 'components/Icons/icons'
 
 const PageWall = () => {
   const { key } = useParams()
@@ -22,6 +22,9 @@ const PageWall = () => {
     'token',
     key as string
   )
+
+  const { data: wallData } = useGetWallData(key as string)
+
   const [socials, setSocials] = useState<any>([])
   const [address, setAddress] = useState<String>('')
   const [id, setTokenId] = useState<String>('')
@@ -33,7 +36,6 @@ const PageWall = () => {
 
   const { modal, setModalState } = useBoundStore()
 
-  const [isModalOpen, setIsModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [account, setAccount] = useState('')
 
@@ -115,6 +117,33 @@ const PageWall = () => {
         </div>
       )}
 
+      {!isLoading && wallData && wallData.name && (
+        <div>
+          <details className="overflow-hidden [&_summary::-webkit-details-marker]:hidden pt-3">
+            {/* Relative position to the details tag so that the absolute div is positioned according to this container */}
+            <summary className="flex cursor-pointer items-center justify-between gap-2 p-3 text-black bg-yellow-200 transition">
+              <span className="text-sm font-semibold">{wallData?.name}</span>
+              <span className="transition group-open:-rotate-180">{wallData.body && <ChevronIcon />}</span>
+            </summary>
+
+            {/* Absolutely positioned div which will not affect other elements when it opens/closes */}
+            {wallData.body && (
+              <div className="transition-opacity duration-300" style={{ top: '100%' }}>
+                <div className="flex border-t border-yellow-300 bg-yellow-200 text-black">
+                  {wallData.image && (
+                    <div className="flex-initial w-1/4">
+                      <img src={wallData.image} className="p-2 rounded-md" />
+                    </div>
+                  )}
+                  <div className={`flex-1 p-3 text-xs content break-words ${wallData.image ? 'w-3/4' : 'w-full'}`}>
+                    {wallData.body}
+                  </div>
+                </div>
+              </div>
+            )}
+          </details>
+        </div>
+      )}
       {!isLoading && socials.length > 0 && (
         <div className="grid gap-0 overflow-auto pb-[120px] h-full pt-3">
           {socials &&
@@ -137,7 +166,6 @@ const PageWall = () => {
       )}
 
       <aside className="fixed bottom-5 right-5 flex flex-col space-y-2 items-end">
-        {/* Mint Ownership */}
         {
           <button
             onClick={() => openPOAPModal()}

@@ -105,15 +105,7 @@ const searchMetadatas = async ({ query = [], ordering = [], from = 0, to = 0 }: 
       jsonrpc: '2.0',
       method: 'search_metadatas',
       params: {
-        query: [
-          {
-            column: 'loose',
-            op: '=',
-            query: '0',
-          },
-
-          ...query,
-        ],
+        query: [...query],
         ordering,
         from,
         to,

@@ -17,4 +17,5 @@ export enum RQ_KEY {
   GET_MENTION_COUNT = 'get_mention_count',
   GET_MORALIS_METADATA = 'get_moralis_metadata',
   GET_METADATA = 'get_metadata',
+  GET_WALL_DATA = 'get_wall_data',
 }

@@ -295,6 +295,58 @@ const useGetMetadataContent = (
   })
 }
 
+interface WallData {
+  name: string
+  image: string
+  body: string
+}
+
+const useGetWallData = (data_key: string) => {
+  return useQuery({
+    queryKey: [RQ_KEY.GET_WALL_DATA, data_key],
+    queryFn: async () => {
+      const result = await rpc.searchMetadatas({
+        query: [
+          {
+            column: 'data_key',
+            op: '=',
+            query: data_key,
+          },
+          {
+            column: 'meta_contract_id',
+            op: '=',
+            query: `${import.meta.env.VITE_METADATA_META_CONTRACT_ID}`,
+          },
+        ],
+        ordering: [],
+        from: 0,
+        to: 0,
+      })
+
+      const wallData: WallData = {
+        name: '',
+        image: '',
+        body: '',
+      }
+
+      const promises = result?.map(async (curr: any) => {
+        if (['name', 'image', 'body'].includes(curr.alias)) {
+          const res = await rpc.getContentFromIpfs(curr.cid as string)
+          const content = JSON.parse(res.data.result.content as string)
+          if (curr.alias in wallData) {
+            wallData[curr.alias as keyof WallData] = content.content
+          }
+        }
+      })
+
+      await Promise.all(promises)
+
+      return wallData
+    },
+    staleTime: Infinity,
+  })
+}
+
 const useGetMetadata = (
   data_key: string,
   meta_contract_id: string,
@@ -418,4 +470,5 @@ export {
   useGetMetadataContent,
   useGetMentions,
   useGetMentionCount,
+  useGetWallData,
 }
