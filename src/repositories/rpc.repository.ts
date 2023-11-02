@@ -2,7 +2,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import rpc, { JSONRPCFilter, NftMetadata, Transaction } from '../services/rpc'
 import { useIpfs } from 'hooks/use-ipfs'
 import { RQ_KEY } from 'repositories'
-import { formatDataKey } from 'utils'
+import { getNFTMetadata } from 'services/nft'
+import { chainIdToNetwork } from 'utils'
 
 const useGetCompleteTransactions = () => {
   return useQuery({
@@ -33,14 +34,18 @@ export async function parseString(input: string): Promise<DataTypeMetadata | Dat
   try {
     const parsed = JSON.parse(input)
     if (typeof parsed === 'object') return { type: 'metadata', data: parsed }
-  } catch (e) {}
+  } catch (e) {
+    /* empty */
+  }
 
   try {
     const response = await fetch(input)
     const contentType = response.headers.get('content-type')
     if (contentType?.startsWith('image/')) return { type: 'image', data: input }
     if (contentType?.startsWith('audio/')) return { type: 'audio', data: input }
-  } catch (e) {}
+  } catch (e) {
+    /* empty */
+  }
 
   return { type: 'none', data: input }
 }
@@ -68,7 +73,7 @@ const usePublishTransaction = () => {
         await queryClient.invalidateQueries([RQ_KEY.GET_POSTS])
         await queryClient.invalidateQueries([RQ_KEY.GET_COMMENTS])
         if (timeout) clearTimeout(timeout)
-      }, 8000)
+      }, 10000)
     },
   })
 }
@@ -265,6 +270,191 @@ const useGetCommentCount = (cid: string) => {
   })
 }
 
+const useGetMetadataContent = (
+  data_key: string,
+  meta_contract_id: string,
+  public_key: string,
+  alias: string,
+  version: string
+) => {
+  return useQuery({
+    queryKey: [RQ_KEY.GET_METADATA, data_key, meta_contract_id, public_key, alias, version],
+    queryFn: async () => {
+      const result = await rpc.getMetadata(data_key, meta_contract_id, public_key, alias, version)
+      if (result.cid) {
+        const res = await rpc.getContentFromIpfs(result.cid)
+        const content = JSON.parse(res.data.result.content as string)
+        return content.content
+      }
+
+      return {}
+    },
+    staleTime: Infinity,
+  })
+}
+
+interface WallData {
+  name: string
+  image: string
+  body: string
+}
+
+const useGetWallData = (data_key: string) => {
+  return useQuery({
+    queryKey: [RQ_KEY.GET_WALL_DATA, data_key],
+    queryFn: async () => {
+      const result = await rpc.searchMetadatas({
+        query: [
+          {
+            column: 'data_key',
+            op: '=',
+            query: data_key,
+          },
+          {
+            column: 'meta_contract_id',
+            op: '=',
+            query: `${import.meta.env.VITE_METADATA_META_CONTRACT_ID}`,
+          },
+        ],
+        ordering: [],
+        from: 0,
+        to: 0,
+      })
+
+      const wallData: WallData = {
+        name: '',
+        image: '',
+        body: '',
+      }
+
+      const promises = result?.map(async (curr: any) => {
+        if (['name', 'image', 'body'].includes(curr.alias)) {
+          const res = await rpc.getContentFromIpfs(curr.cid as string)
+          const content = JSON.parse(res.data.result.content as string)
+          if (curr.alias in wallData) {
+            wallData[curr.alias as keyof WallData] = content.content
+          }
+        }
+      })
+
+      await Promise.all(promises)
+
+      return wallData
+    },
+    staleTime: Infinity,
+  })
+}
+
+const useGetMetadata = (
+  data_key: string,
+  meta_contract_id: string,
+  public_key: string,
+  alias: string,
+  version: string,
+  enabled: boolean
+) => {
+  return useQuery({
+    queryKey: [RQ_KEY.GET_METADATA, data_key, meta_contract_id, public_key, alias, version],
+    queryFn: async () => {
+      const result = await rpc.getMetadata(data_key, meta_contract_id, public_key, alias, version)
+      return result
+    },
+    staleTime: Infinity,
+    enabled: enabled,
+  })
+}
+
+export type Mention = {
+  mentionable: boolean
+  timestamp: number
+}
+
+const useGetMentions = (cid: string, count: number) => {
+  return useQuery<any[]>({
+    queryKey: [RQ_KEY.GET_MENTIONS, cid],
+    queryFn: async () => {
+      const result = await rpc.searchMetadatas({
+        query: [
+          {
+            column: 'version',
+            op: '=',
+            query: cid,
+          },
+          {
+            column: 'meta_contract_id',
+            op: '=',
+            query: `${import.meta.env.VITE_MENTION_META_CONTRACT_ID}`,
+          },
+          {
+            column: 'alias',
+            op: '=',
+            query: 'mentions',
+          },
+        ],
+        ordering: [],
+        from: 0,
+        to: 0,
+      })
+
+      const promises = result?.map(async (curr: any) => {
+        const resMentionContent = await rpc.getContentFromIpfs(curr.cid as string)
+        const mention = JSON.parse(resMentionContent.data.result.content as string)
+
+        const resToken = await rpc.getMetadata(
+          curr.data_key as string,
+          import.meta.env.VITE_MENTION_META_CONTRACT_ID as string,
+          import.meta.env.VITE_METADATA_META_CONTRACT_ID as string,
+          'token',
+          ''
+        )
+
+        if (!resToken.cid) {
+          return {}
+        }
+        const resTokenContent = await rpc.getContentFromIpfs(resToken.cid)
+        const token = JSON.parse(resTokenContent.data.result.content as string)
+
+        const resNft = await getNFTMetadata(
+          token.content.address as string,
+          chainIdToNetwork(token.content.chain as string),
+          token.content.id as string
+        )
+
+        return { mention: mention.content, nft: JSON.parse(resNft.data.metadata as string), token: token.content }
+      })
+
+      const results = await Promise.all(promises)
+      const flattened = results.flat()
+      return flattened.sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1))
+    },
+    enabled: count > 0,
+  })
+}
+
+const useGetMentionCount = (cid: string) => {
+  return useQuery({
+    queryKey: [RQ_KEY.GET_MENTION_COUNT, cid],
+    queryFn: async () => {
+      const result = await rpc.searchMetadataCount({
+        query: [
+          {
+            column: 'version',
+            op: '=',
+            query: cid,
+          },
+          {
+            column: 'meta_contract_id',
+            op: '=',
+            query: `${import.meta.env.VITE_MENTION_META_CONTRACT_ID}`,
+          },
+        ],
+      })
+
+      return result
+    },
+  })
+}
+
 export {
   useGetCompleteTransactions,
   useGetTransactions,
@@ -274,4 +464,9 @@ export {
   useGetComments,
   useGetCommentCount,
   useGetPost,
+  useGetMetadata,
+  useGetMetadataContent,
+  useGetMentions,
+  useGetMentionCount,
+  useGetWallData,
 }

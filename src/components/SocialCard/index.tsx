@@ -1,8 +1,10 @@
-import { CloseIcon, CommentIcon, CommentSolidIcon } from 'components/Icons/icons'
+import ChainToIcon from 'components/ChainToIcon'
+import { AtSymbolIcon, AtSymbolSolidIcon, CommentIcon, CommentSolidIcon } from 'components/Icons/icons'
+import ImageContainer from 'components/ImageContainer'
 import useInViewport from 'hooks/useInViewport'
 import { useEffect, useState } from 'react'
 import { RWebShare } from 'react-web-share'
-import { useGetCommentCount } from 'repositories/rpc.repository'
+import { useGetCommentCount, useGetMentionCount, useGetMentions } from 'repositories/rpc.repository'
 import { timeAgo } from 'utils'
 
 interface SocialCardProp {
@@ -19,7 +21,6 @@ interface SocialCardProp {
   goToComments?: (cid: string) => void
 }
 
-
 const SortCardDisplay = (prop: SocialCardProp) => {
   const textWithClickableLink = (text: string) => {
     if (!text) {
@@ -35,7 +36,7 @@ const SortCardDisplay = (prop: SocialCardProp) => {
   }
   const linkValidation = textWithClickableLink(prop.text as string)
 
-  const handleLinkClick =(e: any) => {
+  const handleLinkClick = (e: any) => {
     if (e.target instanceof HTMLAnchorElement) {
       e.stopPropagation()
     }
@@ -71,9 +72,10 @@ const SortCardDisplay = (prop: SocialCardProp) => {
 const SocialCard = (prop: SocialCardProp) => {
   const [commentCount, setCommentCount] = useState(0)
   const [ref, inViewport] = useInViewport()
-  
 
   const commentQuery = useGetCommentCount(prop.cid)
+  const { data: mentionCount } = useGetMentionCount(prop.cid)
+  const { data: mentions } = useGetMentions(prop.cid, mentionCount as number)
 
   useEffect(() => {
     if (prop?.showNoOfComments && prop.noOfComments !== undefined) {
@@ -91,9 +93,28 @@ const SocialCard = (prop: SocialCardProp) => {
     }
   }, [commentQuery, inViewport, prop.noOfComments])
 
+  const goToScan = (mention: any) => {
+    switch (mention.token.chain) {
+      case '1':
+        window.open(`https://etherscan.com/nft/${mention.token.address}/${mention.token.id}`, '_blank')
+        break
+      case '137':
+        window.open(`https://polygonscan.com/nft/${mention.token.address}/${mention.token.id}`, '_blank')
+        break
+      case '56':
+        window.open(`https://bscscan.com/nft/${mention.token.address}/${mention.token.id}`, '_blank')
+        break
+      case '42161':
+        window.open(`https://arbscan.io/nft/${mention.token.address}/${mention.token.id}`, '_blank')
+        break
+      default:
+        break
+    }
+  }
+
   return (
     <>
-      <article className="transition" ref={ref as React.RefObject<HTMLDivElement>}>
+      <article className="transition max-w-md break-words" ref={ref as React.RefObject<HTMLDivElement>}>
         <div className="bg-white border-b-[1px] mb-1 border-gray-200 mx-1">
           <div className="flex px-3 pt-3 mb-1 text-xs">
             <div className="font-bold">
@@ -113,19 +134,50 @@ const SocialCard = (prop: SocialCardProp) => {
             <SortCardDisplay {...prop} />
           </div>
 
+          {mentions && mentions?.length > 0 && (
+            <div className="flex flex-wrap gap-2 ml-3 mt-2">
+              {mentions.map((mention, index) => {
+                if (mention.mention && !mention.mention?.mentionable) return
+                return (
+                  <div key={index} className="relative">
+                    <ImageContainer
+                      src={mention.nft.image as string}
+                      key={index}
+                      onClick={() => goToScan(mention)}
+                      classNames="w-32 h-32 grid place-content-center cursor-pointer"
+                    />
+                    <div className="absolute top-0 left-0 p-2 h-5 w-5">
+                      <ChainToIcon chain={mention.token.chain} />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
           <div className={`flex mx-3 items-center gap-1 py-3 text-gray-500 justify-between`}>
-            <span
-              onClick={() => {
-                if (prop?.goToComments) {
-                  prop.goToComments?.(prop.cid)
-                }
-              }}
-              className={`text-sm flex gap-1 items-center ${prop?.goToComments ? 'cursor-pointer' : ''}`}
-            >
-              {commentCount == 0 && <CommentIcon />}
-              {commentCount > 0 && <CommentSolidIcon />}
-              <span className="text-xs">{commentCount}</span>
-            </span>
+            <div className="flex gap-3">
+              <span
+                onClick={() => {
+                  if (prop?.goToComments) {
+                    prop.goToComments?.(prop.cid)
+                  }
+                }}
+                className={`text-sm flex gap-1 items-center ${prop?.goToComments ? 'cursor-pointer' : ''}`}
+              >
+                {commentCount == 0 && <CommentIcon />}
+                {commentCount > 0 && <CommentSolidIcon />}
+                <span className="text-xs">{commentCount}</span>
+              </span>
+
+              <span className={`text-sm flex gap-1 items-center ${prop?.goToComments ? 'cursor-pointer' : ''}`}>
+                {mentionCount > 0 && (
+                  <>
+                    <AtSymbolSolidIcon />
+                  </>
+                )}
+              </span>
+            </div>
             <RWebShare
               data={{
                 title: 'W3wall',
