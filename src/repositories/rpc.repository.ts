@@ -320,6 +320,8 @@ const useGetMentions = (cid: string, count: number) => {
 
       const promises = result?.map(async (curr: any) => {
         const res = await rpc.getContentFromIpfs(curr.cid as string)
+        const result = await rpc.getMetadata(curr.data_key, '0x02', '0x01', 'token', curr.data_key)
+        console.log(curr.data_key, result)
         const txs = await rpc.getTransactions({
           query: [
             {
@@ -330,6 +332,7 @@ const useGetMentions = (cid: string, count: number) => {
           ],
         })
         const content = JSON.parse(res.data.result.content as string)
+
         const token_address = txs.length > 0 ? txs[0].token_address : ''
         const nft = await getMoralisNftMetadata(content.chain_id, token_address, curr.token_id)
 

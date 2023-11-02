@@ -127,7 +127,7 @@ const NewPostModal = (prop: Props) => {
 
           await Promise.all(promises)
         }
-      }, 3000)
+      }, 5000)
 
       showSuccess(`Publishing your post to network...`)
       onCloseDialog()
